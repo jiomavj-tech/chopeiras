@@ -2321,6 +2321,51 @@ function somarOrcamento(itens){
 }
 
 /* ═══════════════ CADASTRO DE PEÇAS (admin) ═══════════════ */
+/* ── Trazer peças do Giba Compressores ────────────────────────────
+   O catálogo vem de um arquivo ao lado do aplicativo, gerado a partir
+   do app de compressores. Traz só o que ainda não existe, e sempre com
+   preço zerado: o valor é seu, não do catálogo. */
+async function importarPecasCompressores(){
+  const bt = $("btImportar");
+  if(bt) bt.disabled = true;
+  try{
+    const r = await fetch("./pecas-compressores.json", {cache:"no-store"});
+    if(!r.ok) throw new Error("não achei o catálogo");
+    const dados = await r.json();
+    const vindas = (dados && dados.pecas) || [];
+    if(!vindas.length) throw new Error("catálogo vazio");
+
+    const jaTem = p => PECAS.some(x =>
+      (p.codigo && x.codigo && x.codigo.toLowerCase() === p.codigo.toLowerCase()) ||
+      (x.descricao || "").toLowerCase() === (p.descricao || "").toLowerCase());
+
+    const novas = vindas.filter(p => !jaTem(p));
+    if(!novas.length){
+      if(bt) bt.disabled = false;
+      return toast("Todas as " + vindas.length + " peças já estão na sua lista.", "ok");
+    }
+    if(!confirm("Trazer " + novas.length + " peça" + (novas.length===1?"":"s") +
+        " do Giba Compressores?\n\nOs preços vêm zerados para você preencher." +
+        (novas.length < vindas.length
+          ? "\n\n(" + (vindas.length - novas.length) + " já estavam na lista e ficam como estão.)"
+          : ""))){
+      if(bt) bt.disabled = false;
+      return;
+    }
+
+    for(const p of novas){
+      await db.collection("pecas").add(Object.assign({}, p,
+        {criadoEm: firebase.firestore.FieldValue.serverTimestamp()}));
+    }
+    await recarregar();
+    telaPecas();
+    toast(novas.length + " peças trazidas. Agora ponha os preços.", "ok");
+  }catch(e){
+    toast("Não deu para trazer: " + (e.message || e), "err");
+    if(bt) bt.disabled = false;
+  }
+}
+
 function telaPecas(){
   if(editando && editando.tipo === "peca") return formPeca();
 
@@ -2331,6 +2376,7 @@ function telaPecas(){
   $("tela").innerHTML =
     '<div class="btns" style="margin:0 0 12px">' +
       '<button class="btn pri" onclick="novaPeca()">+ Nova peça</button>' +
+      '<button class="btn" id="btImportar" onclick="importarPecasCompressores()">Trazer do Compressores</button>' +
       '<button class="btn" onclick="atualizar()">Atualizar</button>' +
     '</div>' +
     '<div class="busca"><input placeholder="Buscar por código ou descrição" value="' +

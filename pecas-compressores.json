@@ -1,0 +1,350 @@
+{
+ "origem": "Giba Compressores — aba Peças e diagrama elétrico da chopeira",
+ "gerado": "2026-08-23",
+ "pecas": [
+  {
+   "codigo": "KP1",
+   "descricao": "Pressostato de baixa KP1 (Danfoss)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Controle",
+   "observacoes": "Liga e desliga o compressor pela pressão de sucção — é ele que define a temperatura de corte do chope. Diferencial mínimo 0,7 bar (10 psi)."
+  },
+  {
+   "codigo": "",
+   "descricao": "Pressostato de alta tipo cartucho",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Proteção",
+   "observacoes": "Desarma e desliga o sistema em caso de alta pressão. É proteção, não controle de temperatura."
+  },
+  {
+   "codigo": "",
+   "descricao": "Pressostato RCP (Robert Shaw)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Controle",
+   "observacoes": "Alternativa ao KP1: liga e desliga medindo a pressão do reservatório, regulável conforme o gás."
+  },
+  {
+   "codigo": "",
+   "descricao": "Válvula solenoide (Danfoss) — linha de líquido",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Refrigeração",
+   "observacoes": "Liga e desliga junto com o compressor; impede a migração de fluido para o compressor parado."
+  },
+  {
+   "codigo": "",
+   "descricao": "Relé de partida magnético",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Elétrica",
+   "observacoes": "Liga a bobina auxiliar e o capacitor de partida na largada. Em chopeira usa-se magnético ou voltimétrico — não o PTC nem o amperométrico de geladeira."
+  },
+  {
+   "codigo": "",
+   "descricao": "Relé de partida voltimétrico",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Elétrica",
+   "observacoes": "Alternativa ao magnético. Bobina entre os terminais 5 e 2; contato entre 2 e 1 fecha em repouso."
+  },
+  {
+   "codigo": "",
+   "descricao": "Capacitor de partida (eletrolítico)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Elétrica",
+   "observacoes": "Entra só na partida e sai do circuito. Exemplo real: 324 a 389 µF, 110/120 VAC."
+  },
+  {
+   "codigo": "",
+   "descricao": "Capacitor permanente (de marcha)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Elétrica",
+   "observacoes": "Fica ligado o tempo todo, mantém o giro e corrige o fator de potência."
+  },
+  {
+   "codigo": "",
+   "descricao": "Protetor térmico",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Proteção",
+   "observacoes": "Protege o compressor contra sobrecarga. Sem continuidade a frio = condenado."
+  },
+  {
+   "codigo": "",
+   "descricao": "Bomba de recirculação",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Chopeira",
+   "observacoes": "Motor simples; liga com o pré-resfriador ou por chave própria, conforme o modelo."
+  },
+  {
+   "codigo": "MM 11B",
+   "descricao": "Micromotor MM 11B — 1/40 HP, bivolt 127/220 V",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "44 W · 0,46 / 0,23 A · 550 m³/h · 1550 rpm · hélice 8\" plástica · IP-42 · SEM proteção térmica"
+  },
+  {
+   "codigo": "EY 08 D",
+   "descricao": "Micromotor EY 08 D — 1/40 HP, 127 V 60 Hz",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "33 W · 0,53 A · 520 m³/h · 1550 rpm · hélice 8\" plástica · IP-42 · com proteção térmica"
+  },
+  {
+   "codigo": "EY 08 E",
+   "descricao": "Micromotor EY 08 E — 1/40 HP, 220 V 50/60 Hz",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "33 W · 0,27 A · 450 / 520 m³/h · 1300 / 1550 rpm · hélice 8\" plástica · IP-42 · com proteção térmica"
+  },
+  {
+   "codigo": "EX 08 D",
+   "descricao": "Micromotor EX 08 D — 1/40 HP, 127 V 60 Hz",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "33 W · 0,53 A · 520 m³/h · 1550 rpm · hélice 8\" plástica · IP-44 · com proteção térmica · linha EX — indicada para R290/R600a"
+  },
+  {
+   "codigo": "EX 08 E",
+   "descricao": "Micromotor EX 08 E — 1/40 HP, 220 V 50/60 Hz",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "33 W · 0,27 A · 450 / 520 m³/h · 1300 / 1550 rpm · hélice 8\" plástica · IP-44 · com proteção térmica · linha EX — indicada para R290/R600a"
+  },
+  {
+   "codigo": "EC 08 D",
+   "descricao": "Micromotor EC 08 D — 1/40 HP, 127 V",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "8 W · 0,12 A · 510 / 560 m³/h · 1500 rpm · hélice 8\" plástica · IP-56 · com proteção térmica"
+  },
+  {
+   "codigo": "EC 08 E",
+   "descricao": "Micromotor EC 08 E — 1/40 HP, 220 V",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "8 W · 0,07 A · 510 / 560 m³/h · 1500 rpm · hélice 8\" plástica · IP-56 · com proteção térmica"
+  },
+  {
+   "codigo": "EC 08 B",
+   "descricao": "Micromotor EC 08 B — 1/40 HP, bivolt",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "8 W · 0,10 / 0,20 A · 620 m³/h · 1550 rpm · hélice 8\" plástica · IP-65 · com proteção térmica"
+  },
+  {
+   "codigo": "MM 20B",
+   "descricao": "Micromotor MM 20B — 1/25 HP, bivolt 127/220 V",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "55 W · 0,66 / 0,33 A · 950 m³/h · 1550 rpm · hélice 10\" plástica · IP-42 · SEM proteção térmica"
+  },
+  {
+   "codigo": "EY 20 D",
+   "descricao": "Micromotor EY 20 D — 1/25 HP, 127 V 60 Hz",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "45 W · 0,85 A · 910 m³/h · 1550 rpm · hélice 10\" plástica · IP-42 · com proteção térmica"
+  },
+  {
+   "codigo": "EY 20 E",
+   "descricao": "Micromotor EY 20 E — 1/25 HP, 220 V 50/60 Hz",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "45 W · 0,45 A · 910 / 1050 m³/h · 1300 / 1550 rpm · hélice 10\" plástica · IP-42 · com proteção térmica"
+  },
+  {
+   "codigo": "EX 20 D",
+   "descricao": "Micromotor EX 20 D — 1/25 HP, 127 V 60 Hz",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "45 W · 0,85 A · 910 m³/h · 1550 rpm · hélice 10\" plástica · IP-44 · com proteção térmica · linha EX — indicada para R290/R600a"
+  },
+  {
+   "codigo": "EX 20 E",
+   "descricao": "Micromotor EX 20 E — 1/25 HP, 220 V 50/60 Hz",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "45 W · 0,45 A · 910 / 1050 m³/h · 1300 / 1550 rpm · hélice 10\" plástica · IP-44 · com proteção térmica · linha EX — indicada para R290/R600a"
+  },
+  {
+   "codigo": "EC 20 E",
+   "descricao": "Micromotor EC 20 E — 1/25 HP, 220 V",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "16 W · 0,143 A · 890 / 987 m³/h · 1500 rpm · hélice 10\" plástica · IP-65 · com proteção térmica"
+  },
+  {
+   "codigo": "EC 20 B",
+   "descricao": "Micromotor EC 20 B — 1/25 HP, bivolt",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "15 W · 0,12 / 0,22 A · 930 m³/h · 1550 rpm · hélice 10\" plástica · IP-65 · com proteção térmica"
+  },
+  {
+   "codigo": "EC 20 BD",
+   "descricao": "Micromotor EC 20 BD — 1/25 HP, bivolt",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "8 / 20 W · 0,11 / 0,29 A · 1060 / 1080 m³/h · 1100 / 1550 rpm · hélice 10\" alumínio · IP-56 · com proteção térmica"
+  },
+  {
+   "codigo": "EY 25 E",
+   "descricao": "Micromotor EY 25 E — 1/20 HP, 220 V 50/60 Hz",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "58 W · 0,52 A · 1000 / 1150 m³/h · 1300 / 1550 rpm · hélice 10\" plástica · IP-42 · com proteção térmica"
+  },
+  {
+   "codigo": "EX 25 E",
+   "descricao": "Micromotor EX 25 E — 1/20 HP, 220 V 50/60 Hz",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "58 W · 0,52 A · 1000 / 1150 m³/h · 1300 / 1550 rpm · hélice 10\" plástica · IP-44 · com proteção térmica · linha EX — indicada para R290/R600a"
+  },
+  {
+   "codigo": "EY 30 E",
+   "descricao": "Micromotor EY 30 E — 1/18 HP, 220 V 50/60 Hz",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "68 W · 0,55 A · 1408 / 1590 m³/h · 1300 / 1550 rpm · hélice 12\" alumínio · IP-42 · com proteção térmica"
+  },
+  {
+   "codigo": "EX 30 E",
+   "descricao": "Micromotor EX 30 E — 1/18 HP, 220 V 50/60 Hz",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "68 W · 0,55 A · 1408 / 1590 m³/h · 1300 / 1550 rpm · hélice 12\" alumínio · IP-44 · com proteção térmica · linha EX — indicada para R290/R600a"
+  },
+  {
+   "codigo": "EY 45 E",
+   "descricao": "Micromotor EY 45 E — 1/10 HP, 220 V 50/60 Hz",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "90 W · 0,70 A · 1640 m³/h · 1600 rpm · hélice 12\" alumínio · IP-42 · com proteção térmica"
+  },
+  {
+   "codigo": "EY 45 FF",
+   "descricao": "Micromotor EY 45 FF — 1/10 HP, 220 V 50/60 Hz",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "90 W · 0,70 A · 1640 m³/h · 1350 / 1600 rpm · hélice 12\" alumínio · IP-42 · com proteção térmica"
+  },
+  {
+   "codigo": "CL300EX-CCE",
+   "descricao": "Motoventilador axial CL300EX-CCE — 1/10 HP, Ø300",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "1785 / 1517 m³/h (60/50 Hz) · 1550 / 1350 rpm · 97 / 75 W · capacitor 3 µF / 450 V · IP-44"
+  },
+  {
+   "codigo": "CF300EX-CCE",
+   "descricao": "Motoventilador axial CF300EX-CCE — 1/10 HP, Ø300",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "2640 / 2308 m³/h (60/50 Hz) · 1550 / 1380 rpm · 105 / 76 W · capacitor 3 µF / 450 V · IP-54"
+  },
+  {
+   "codigo": "CL300EY-CEE",
+   "descricao": "Motoventilador axial CL300EY-CEE — 1/10 HP, Ø300",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "1785 / 1517 m³/h (60/50 Hz) · 1580 / 1380 rpm · 97 / 75 W · capacitor 3 µF / 450 V · IP-54"
+  },
+  {
+   "codigo": "CL350EX-CCE",
+   "descricao": "Motoventilador axial CL350EX-CCE — 1/8 HP, Ø350",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "3517 / 3080 m³/h (60/50 Hz) · 1650 / 1400 rpm · 185 / 150 W · capacitor 4 µF / 450 V · IP-44"
+  },
+  {
+   "codigo": "CF350EX-CCE",
+   "descricao": "Motoventilador axial CF350EX-CCE — 1/8 HP, Ø350",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "3776 / 3376 m³/h (60/50 Hz) · 1540 / 1382 rpm · 143 / 105 W · capacitor 3 µF / 450 V · IP-54"
+  },
+  {
+   "codigo": "CL350BX-CCE",
+   "descricao": "Motoventilador axial CL350BX-CCE — 1/8 HP, Ø350",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "3517 / 3080 m³/h (60/50 Hz) · 1650 / 1400 rpm · 185 / 140 W · capacitor — (trifásico) · IP-44"
+  },
+  {
+   "codigo": "CL350EY-CEE",
+   "descricao": "Motoventilador axial CL350EY-CEE — 1/8 HP, Ø350",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "3517 / 3080 m³/h (60/50 Hz) · 1650 / 1400 rpm · 185 / 150 W · capacitor 4 µF / 450 V · IP-54"
+  },
+  {
+   "codigo": "CL400EX-CCE",
+   "descricao": "Motoventilador axial CL400EX-CCE — 1/5 HP, Ø400",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "4326 / 3777 m³/h (60/50 Hz) · 1650 / 1400 rpm · 270 / 195 W · capacitor 6 µF / 450 V · IP-44"
+  },
+  {
+   "codigo": "CF400EX-CCE",
+   "descricao": "Motoventilador axial CF400EX-CCE — 1/5 HP, Ø400",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "5116 / 4824 m³/h (60/50 Hz) · 1500 / 1367 rpm · 221 / 156 W · capacitor 5 µF / 450 V · IP-54"
+  },
+  {
+   "codigo": "CL400EY-CEE",
+   "descricao": "Motoventilador axial CL400EY-CEE — 1/5 HP, Ø400",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "4326 / 3777 m³/h (60/50 Hz) · 1650 / 1400 rpm · 270 / 195 W · capacitor 6 µF / 450 V · IP-54"
+  },
+  {
+   "codigo": "CL400BY-CEE",
+   "descricao": "Motoventilador axial CL400BY-CEE — 1/5 HP, Ø400",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Ventilador do condensador",
+   "observacoes": "4326 / 3777 m³/h (60/50 Hz) · 1680 / 1430 rpm · 270 / 175 W · capacitor — (trifásico) · IP-54"
+  }
+ ]
+}
