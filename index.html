@@ -122,7 +122,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-<script src="https://apis.google.com/js/platform.js" async defer></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 
 <div id="authGate" style="position:fixed;inset:0;z-index:99999;background:var(--bg);display:flex;
      align-items:center;justify-content:center;padding:20px;overflow:auto">
@@ -544,30 +544,9 @@ async function iniciar(){
   desenharNav();
   await recarregar();
 
-  /* inicializar Google Calendar se for admin */
-  if(EU.admin){
-    iniciarGoogleCalendar();
-  }
-
   irPara(EU.admin ? "semana" : "chamados");
 }
 
-function iniciarGoogleCalendar(){
-  if(!window.gapi) return;
-  gapi.load("client:auth2", function(){
-    gapi.client.init({
-      apiKey: "AIzaSyDummy123", /* você precisa colocar sua chave aqui */
-      clientId: "seu-client-id-aqui.apps.googleusercontent.com", /* seu client ID aqui */
-      discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"],
-      scope: "https://www.googleapis.com/auth/calendar"
-    }).then(() => {
-      const auth = gapi.auth2.getAuthInstance();
-      if(!auth.isSignedIn.get()){
-        auth.signIn();
-      }
-    }).catch(e => console.log("Google Calendar não disponível:", e));
-  });
-}
 
 function desenharNav(){
   const abas = EU.admin ? ABAS_ADMIN : ABAS_CLIENTE;
@@ -1255,7 +1234,8 @@ async function telaAcessos(){
       ? '<h3>Esperando aprovação ('+pend.length+')</h3>' + pend.map(u=>cartaoUsuario(u,true)).join("")
       : '<div class="alert grn">Ninguém na fila.</div>') +
     '<h3>Com acesso liberado ('+lib.length+')</h3>' +
-    (lib.length ? lib.map(u=>cartaoUsuario(u,false)).join("") : '<div class="vazio">Ninguém ainda.</div>');
+    (lib.length ? lib.map(u=>cartaoUsuario(u,false)).join("") : '<div class="vazio">Ninguém ainda.</div>') +
+    cartaoAgenda();
 }
 
 function ehAdminEmail(e){ return !!(e && e.toLowerCase() === ADMIN_EMAIL.toLowerCase()); }
@@ -1684,41 +1664,240 @@ function notificarAdminNovosChamados(cliente, problema){
   console.log("Link WhatsApp pronto para aviso de chamado:", link);
 }
 
-/* Criar evento no Google Calendar */
-async function criarEventoCalendar(titulo, data, descricao){
-  if(!window.gapi || !gapi.auth2) {
-    console.log("Google API ainda não carregou");
-    return;
-  }
-  const auth = gapi.auth2.getAuthInstance();
-  if(!auth.isSignedIn.get()) {
-    console.log("Usuário não autorizado no Google Calendar");
-    return;
-  }
+/* ═══════════════════ AGENDA DO GOOGLE ═══════════════════
+   O compromisso é criado uma vez e depois ATUALIZADO: o id do evento
+   fica guardado dentro da ordem, então remarcar muda a data no mesmo
+   compromisso em vez de encher a agenda de duplicatas. Apagar a data
+   apaga o compromisso.
 
-  const d = new Date(data);
-  const inicio = d.toISOString();
-  const fim = new Date(d.getTime() + 2*60*60*1000).toISOString();
+   Sem Client ID configurado nada disso roda — e o app continua
+   funcionando igual, oferecendo o link de "pôr na agenda" à mão. */
 
-  const evento = {
-    summary: titulo,
-    description: descricao || "",
-    start: {dateTime: inicio},
-    end: {dateTime: fim},
-    reminders: {
-      useDefault: true
+const AGENDA_FUSO   = "America/Sao_Paulo";
+const AGENDA_HORAS  = 2;
+const AGENDA_ESCOPO = "https://www.googleapis.com/auth/calendar.events";
+const AGENDA_API    = "https://www.googleapis.com/calendar/v3/calendars/primary/events";
+
+function agendaClientId(){
+  try{ return (localStorage.getItem("googleClientId") || "").trim(); }
+  catch(e){ return ""; }
+}
+
+function agendaConfigurada(){ return !!agendaClientId(); }
+
+function agendaDisponivel(){
+  return agendaConfigurada() &&
+    !!(window.google && google.accounts && google.accounts.oauth2);
+}
+
+let AGENDA_TOKEN = null;     /* {valor, expira} — só na memória */
+let AGENDA_CLIENTE = null;
+
+/* interativo=true abre a janela de permissão do Google; false tenta
+   renovar calado, que é o que serve no meio de um salvamento. */
+function tokenAgenda(interativo){
+  return new Promise(resolve => {
+    if(AGENDA_TOKEN && AGENDA_TOKEN.expira > Date.now() + 30000){
+      return resolve(AGENDA_TOKEN.valor);
     }
+    if(!agendaDisponivel()) return resolve(null);
+    try{
+      if(!AGENDA_CLIENTE){
+        AGENDA_CLIENTE = google.accounts.oauth2.initTokenClient({
+          client_id: agendaClientId(),
+          scope: AGENDA_ESCOPO,
+          callback: function(){}
+        });
+      }
+      let respondido = false;
+      const responder = v => { if(!respondido){ respondido = true; resolve(v); } };
+      AGENDA_CLIENTE.callback = function(r){
+        if(r && r.access_token){
+          AGENDA_TOKEN = {valor: r.access_token,
+            expira: Date.now() + (Number(r.expires_in || 3600) - 60) * 1000};
+          responder(r.access_token);
+        } else responder(null);
+      };
+      AGENDA_CLIENTE.error_callback = function(){ responder(null); };
+      AGENDA_CLIENTE.requestAccessToken({prompt: interativo ? "consent" : ""});
+      /* se a renovação calada não voltar, seguimos sem agenda */
+      if(!interativo) setTimeout(() => responder(null), 8000);
+    }catch(e){ resolve(null); }
+  });
+}
+
+/* "2026-08-25" + "09:00" → {inicio, fim} no formato que a API quer,
+   sem passar por UTC: quem diz o fuso é o campo timeZone. */
+function janelaAgenda(data, hora){
+  const dia = String(data || "").slice(0,10);
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(dia)) return null;
+  const hm = /^\d{2}:\d{2}$/.test(hora || "") ? hora : "09:00";
+  const [h, m] = hm.split(":").map(Number);
+  const fim = new Date(2000, 0, 1, h + AGENDA_HORAS, m);
+  const dois = n => String(n).padStart(2, "0");
+  return {
+    inicio: dia + "T" + hm + ":00",
+    fim:    dia + "T" + dois(Math.min(fim.getHours(), 23)) + ":" + dois(fim.getMinutes()) + ":00"
   };
+}
+
+async function chamarAgenda(caminho, metodo, corpo){
+  const token = await tokenAgenda(false);
+  if(!token) return null;
+  const r = await fetch(AGENDA_API + caminho, {
+    method: metodo,
+    headers: {Authorization: "Bearer " + token, "Content-Type": "application/json"},
+    body: corpo ? JSON.stringify(corpo) : undefined
+  });
+  if(r.status === 401 || r.status === 403){ AGENDA_TOKEN = null; return null; }
+  if(!r.ok) return null;
+  return metodo === "DELETE" ? true : r.json();
+}
+
+/* Cria ou atualiza. Devolve o id do evento, ou null se não deu. */
+async function porNaAgenda(idExistente, dados){
+  const janela = janelaAgenda(dados.data, dados.hora);
+  if(!janela) return null;
+  const evento = {
+    summary: dados.titulo,
+    description: dados.descricao || "",
+    location: dados.local || "",
+    start: {dateTime: janela.inicio, timeZone: AGENDA_FUSO},
+    end:   {dateTime: janela.fim,    timeZone: AGENDA_FUSO}
+  };
+  if(idExistente){
+    const r = await chamarAgenda("/" + encodeURIComponent(idExistente), "PATCH", evento);
+    if(r && r.id) return r.id;
+    /* o evento pode ter sido apagado na mão: cria de novo */
+  }
+  const novo = await chamarAgenda("", "POST", evento);
+  return novo && novo.id ? novo.id : null;
+}
+
+async function tirarDaAgenda(id){
+  if(!id) return;
+  await chamarAgenda("/" + encodeURIComponent(id), "DELETE");
+}
+
+/* Link de "pôr na agenda" à mão — é o que sobra quando não há Client ID
+   configurado, e funciona sem preparo nenhum. */
+function linkAgenda(dados){
+  const janela = janelaAgenda(dados.data, dados.hora);
+  if(!janela) return "";
+  const cru = s => String(s).replace(/[-:]/g, "");
+  return "https://calendar.google.com/calendar/render?action=TEMPLATE" +
+    "&text="     + encodeURIComponent(dados.titulo || "") +
+    "&dates="    + cru(janela.inicio) + "/" + cru(janela.fim) +
+    "&details="  + encodeURIComponent(dados.descricao || "") +
+    "&location=" + encodeURIComponent(dados.local || "") +
+    "&ctz="      + encodeURIComponent(AGENDA_FUSO);
+}
+
+/* Os dois compromissos de uma ordem, do jeito que devem estar agora. */
+function compromissosDaOrdem(o){
+  const cli = nomeCliente(o.clienteId);
+  const os  = "OS " + (o.numero || "");
+  const lista = [];
+
+  const recolha = (o.agenda && o.agenda.recolhaPrevista) || "";
+  if(recolha){
+    lista.push({chave:"recolha", data:recolha, hora:"09:00",
+      titulo:"Retirar chopeira — " + cli,
+      descricao:"Retirada da chopeira de " + cli + ". " + os,
+      local:""});
+  }
+
+  const entregaData = (o.entrega && o.entrega.quando) ||
+                      (o.agenda && o.agenda.entregaPrevista) || "";
+  if(entregaData){
+    const temHora = String(entregaData).includes("T");
+    lista.push({chave:"entrega",
+      data: String(entregaData).slice(0,10),
+      hora: temHora ? String(entregaData).slice(11,16) : "14:00",
+      titulo:"Entregar chopeira — " + cli,
+      descricao:"Entrega da chopeira de " + cli + ". " + os,
+      local:(o.entrega && o.entrega.local) || ""});
+  }
+  return lista;
+}
+
+/* Põe a agenda de acordo com a ordem: cria o que falta, atualiza o que
+   mudou, apaga o que deixou de ter data. Nunca atrapalha o salvamento —
+   se a agenda não estiver ligada, sai calada. */
+async function sincronizarAgenda(o){
+  if(!agendaDisponivel()) return;
+
+  const antes = Object.assign({}, o.eventos || {});
+  const depois = Object.assign({}, antes);
+  const querem = compromissosDaOrdem(o);
+  const chaves = querem.map(c => c.chave);
 
   try{
-    await gapi.client.calendar.events.insert({
-      calendarId: "primary",
-      resource: evento
-    });
-    console.log("Evento criado no Google Calendar:", titulo);
-  }catch(e){
-    console.log("Não deu para criar evento:", e);
+    for(const c of querem){
+      const id = await porNaAgenda(antes[c.chave], c);
+      if(id) depois[c.chave] = id;
+    }
+    for(const chave of Object.keys(antes)){
+      if(!chaves.includes(chave)){
+        await tirarDaAgenda(antes[chave]);
+        delete depois[chave];
+      }
+    }
+
+    if(JSON.stringify(antes) !== JSON.stringify(depois)){
+      o.eventos = depois;
+      await db.collection("ordens").doc(o.id).update({eventos: depois});
+    }
+  }catch(e){ /* agenda é conforto, não pode derrubar o chamado */ }
+}
+
+/* Conectar a agenda: pedido explícito, uma vez. */
+async function conectarAgenda(){
+  if(!agendaConfigurada()){
+    return toast("Cole primeiro o Client ID do Google.", "err");
   }
+  if(!agendaDisponivel()){
+    return toast("A biblioteca do Google não carregou. Recarregue a página.", "err");
+  }
+  const t = await tokenAgenda(true);
+  toast(t ? "Agenda conectada." : "Não deu para conectar a agenda.", t ? "ok" : "err");
+  if(VISTA === "acessos") telaAcessos();
+}
+
+function salvarClientIdAgenda(){
+  const v = $("cfgClientId").value.trim();
+  try{
+    if(v) localStorage.setItem("googleClientId", v);
+    else localStorage.removeItem("googleClientId");
+  }catch(e){ return toast("O navegador não deixou guardar.", "err"); }
+  AGENDA_CLIENTE = null; AGENDA_TOKEN = null;
+  toast(v ? "Client ID guardado. Agora clique em Conectar." : "Client ID apagado.", "ok");
+  telaAcessos();
+}
+
+function cartaoAgenda(){
+  const ligado = !!AGENDA_TOKEN && AGENDA_TOKEN.expira > Date.now();
+  const cid = agendaClientId();
+  return '<h3>Agenda do Google</h3>' +
+    '<div class="card">' +
+      '<div class="muted">Com a agenda ligada, marcar recolha ou entrega cria o ' +
+        'compromisso sozinho — e remarcar muda a data no mesmo compromisso, ' +
+        'sem duplicar.</div>' +
+      '<label>Client ID do Google</label>' +
+      '<input id="cfgClientId" placeholder="000000-xxxx.apps.googleusercontent.com" value="' +
+        esc(cid) + '">' +
+      '<div class="btns">' +
+        '<button class="btn" onclick="salvarClientIdAgenda()">Guardar</button>' +
+        (cid ? '<button class="btn pri" onclick="conectarAgenda()">' +
+          (ligado ? "Reconectar" : "Conectar agenda") + '</button>' : '') +
+      '</div>' +
+      '<div class="esc">' +
+        (!cid ? 'Ainda sem Client ID: por enquanto cada chamado mostra um botão ' +
+                'para pôr na agenda à mão.'
+              : (ligado ? 'Conectada nesta sessão.'
+                        : 'Guardado. Clique em Conectar — o Google vai pedir permissão uma vez.')) +
+      '</div>' +
+    '</div>';
 }
 
 /* Notificar quando muda o status */
@@ -1870,8 +2049,22 @@ function painelAdmin(o){
       '<button class="btn pri" id="btMover" onclick="moverOrdem()">Registrar mudança</button>' +
       botaoWhats(o) +
     '</div>' +
+    botoesAgendaManual(o) +
     '<div class="esc">Registrar acende o aviso no aplicativo do cliente. O WhatsApp é o empurrão ' +
       'para ele ver hoje.</div>';
+}
+
+/* Quando a agenda automática não está ligada, cada compromisso da ordem
+   vira um link que abre o Google Agenda já preenchido. */
+function botoesAgendaManual(o){
+  if(agendaConfigurada()) return "";
+  const cs = compromissosDaOrdem(o);
+  if(!cs.length) return "";
+  return '<div class="btns" style="margin-top:10px">' +
+    cs.map(c => '<a class="btn sm" target="_blank" rel="noopener" href="' +
+      esc(linkAgenda(c)) + '">Pôr na agenda: ' +
+      (c.chave === "recolha" ? "retirada" : "entrega") + '</a>').join("") +
+    '</div>';
 }
 
 function botaoWhats(o){
@@ -1945,22 +2138,9 @@ async function moverOrdem(){
                       quem: EU.nome || "Giba", nota:nota}]);
     o.naoLidoCliente = true;
 
-    /* criar eventos no calendário se houver data */
+    /* a agenda acompanha a ordem: cria, remarca ou desmarca sozinha */
     const cliente = CLIENTES.find(x => x.id === o.clienteId);
-    if(agenda.recolhaPrevista && ["recolha_agendada","recebido"].includes(novo)){
-      criarEventoCalendar(
-        "📦 Retirada de Chopeira - " + (cliente?.nome || "Cliente"),
-        agenda.recolhaPrevista + "T09:00:00",
-        "Retirada de chopeira para " + (cliente?.nome || "cliente")
-      );
-    }
-    if(agenda.entregaPrevista && ["entrega_agendada","saiu_pra_entrega","entregue"].includes(novo)){
-      criarEventoCalendar(
-        "🚚 Entrega de Chopeira - " + (cliente?.nome || "Cliente"),
-        agenda.entregaPrevista + "T14:00:00",
-        "Entrega de chopeira para " + (cliente?.nome || "cliente")
-      );
-    }
+    sincronizarAgenda(o);
 
     /* notificar cliente */
     notificarClienteStatus(o, cliente);
