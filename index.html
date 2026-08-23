@@ -319,10 +319,15 @@ async function portao(user){
          nasce ligada à empresa e liberada; se não, entra na fila. */
       let convite = null;
       try{
+        console.log("🔍 Procurando convite para:", email);
         const c = await db.collection("convites").doc(email).get();
+        console.log("📄 Convite encontrado:", c.exists, c.data());
         if(c.exists) convite = c.data();
-      }catch(e){ /* sem convite, segue para a fila */ }
+      }catch(e){
+        console.error("❌ Erro ao buscar convite:", e);
+      }
 
+      console.log("✍️ Salvando usuário com convite:", !!convite, convite);
       await ref.set({
         nome:  user.displayName || "",
         email: email,
@@ -896,11 +901,19 @@ async function salvarCliente(){
        Um documento por e-mail, que só o dono daquele e-mail consegue ler. */
     const add = dados.emailsAutorizados.filter(e => !anteriores.includes(e));
     const rem = anteriores.filter(e => !dados.emailsAutorizados.includes(e));
+    console.log("📧 E-mails para adicionar convites:", add);
+    console.log("🗑️  E-mails para remover convites:", rem);
     await Promise.all([].concat(
-      add.map(e => db.collection("convites").doc(e).set({
-        clienteId: id, criadoEm: firebase.firestore.FieldValue.serverTimestamp()
-      })),
-      rem.map(e => db.collection("convites").doc(e).delete())
+      add.map(e => {
+        console.log("➕ Criando convite para:", e);
+        return db.collection("convites").doc(e).set({
+          clienteId: id, criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }),
+      rem.map(e => {
+        console.log("➖ Deletando convite para:", e);
+        return db.collection("convites").doc(e).delete();
+      })
     ));
 
     await recarregar();
