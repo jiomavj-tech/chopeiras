@@ -40,12 +40,23 @@ service cloud.firestore {
       return eu().clienteId;
     }
 
-    /* ── Índice de e-mails ─────────────────────────────────────────
-       Um único documento que mapeia e-mails autorizados para clienteIds.
-       Qualquer usuário autenticado consegue ler para descobrir sua empresa.
-       Só o administrador consegue escrever. */
-    match /admin/emailIndex {
-      allow read:  if autenticado();
+    /* Existe convite aberto para o meu e-mail? */
+    function temConvite(){
+      return exists(/databases/$(database)/documents/convites/$(meuEmail()));
+    }
+
+    /* A empresa que o convite manda — nunca a que a pessoa pedir. */
+    function empresaDoConvite(){
+      return get(/databases/$(database)/documents/convites/$(meuEmail())).data.clienteId;
+    }
+
+    /* ── Convites ─────────────────────────────────────────────────
+       Um documento por e-mail, criado pelo administrador ao cadastrar
+       a empresa. Só o dono daquele e-mail consegue ler o seu — é o que
+       permite a pessoa entrar já ligada à empresa certa, sem ter de
+       ler a lista de clientes (que ela não pode ver).             */
+    match /convites/{email} {
+      allow read:  if autenticado() && email == meuEmail();
       allow write: if ehAdmin();
     }
 
@@ -59,15 +70,14 @@ service cloud.firestore {
          Em nenhum caso ela escolhe a empresa ou o papel por conta. */
       allow create: if autenticado()
         && request.auth.uid == uid
-        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.email == meuEmail()
         && request.resource.data.papel == 'cliente'
         && (
           request.resource.data.ativo == false
           || (
-            exists(/databases/$(database)/documents/convites/$(meuEmail()))
+            temConvite()
             && request.resource.data.ativo == true
-            && request.resource.data.clienteId ==
-               get(/databases/$(database)/documents/convites/$(meuEmail())).data.clienteId
+            && request.resource.data.clienteId == empresaDoConvite()
           )
         );
 
@@ -79,6 +89,20 @@ service cloud.firestore {
         && !request.resource.data.diff(resource.data).affectedKeys()
              .hasAny(['ativo', 'papel', 'clienteId', 'email'])
       );
+
+      /* Uma exceção, e só esta: quem já tinha entrado antes de o
+         administrador liberar o e-mail pode se ligar à empresa que o
+         convite disser — nem a outra, nem a papel nenhum. Sem isto, quem
+         entrou cedo demais ficaria pendente para sempre. */
+      allow update: if autenticado()
+        && request.auth.uid == uid
+        && temConvite()
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['ativo', 'clienteId', 'ultimoAcesso'])
+        && request.resource.data.ativo == true
+        && request.resource.data.clienteId == empresaDoConvite()
+        && request.resource.data.papel == resource.data.papel
+        && request.resource.data.email == resource.data.email;
 
       allow delete: if ehAdmin();
     }

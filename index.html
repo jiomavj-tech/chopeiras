@@ -314,30 +314,43 @@ async function portao(user){
   try{
     let snap = await ref.get();
 
-    if(!snap.exists){
-      /* Primeiro acesso. Procura na lista de e-mails autorizados. */
-      let clienteId = null;
+    /* O convite é o que liga a pessoa à empresa. É conferido em TODO
+       acesso, e não só no primeiro: quem entrou antes de o administrador
+       liberar o e-mail ficaria pendente para sempre, mesmo depois de
+       liberado — que foi exatamente o que aconteceu. */
+    async function convite(){
       try{
-        const idx = await db.collection("admin").doc("emailIndex").get();
-        if(idx.exists){
-          const emails = idx.data() || {};
-          clienteId = emails[email];
-        }
-      }catch(e){ /* sem índice, segue para a fila */ }
+        const c = await db.collection("convites").doc(email).get();
+        return c.exists ? c.data() : null;
+      }catch(e){ return null; }
+    }
 
+    if(!snap.exists){
+      const cv = await convite();
       await ref.set({
         nome:  user.displayName || "",
         email: email,
         foto:  user.photoURL || "",
         papel: "cliente",
-        ativo: !!clienteId,
-        clienteId: clienteId,
+        ativo: !!cv,
+        clienteId: cv ? cv.clienteId : null,
         criadoEm: firebase.firestore.FieldValue.serverTimestamp(),
         ultimoAcesso: firebase.firestore.FieldValue.serverTimestamp()
       });
       snap = await ref.get();
     } else {
       ref.update({ultimoAcesso: firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
+
+      /* Já existia e ainda está na fila: se o administrador liberou o
+         e-mail nesse meio tempo, a pessoa entra agora, sem recadastro. */
+      const d0 = snap.data() || {};
+      if(!admin && d0.ativo !== true){
+        const cv = await convite();
+        if(cv){
+          await ref.update({ativo: true, clienteId: cv.clienteId});
+          snap = await ref.get();
+        }
+      }
     }
 
     const d = snap.data() || {};
@@ -735,7 +748,7 @@ function formCliente(){
         '<div class="esc" id="cnpjAviso"></div>' +
         '<label>Razão social</label><input id="f_razao" value="'+esc(d.razaoSocial)+'">' +
         '<label>Nome fantasia</label><input id="f_fantasia" value="'+esc(d.nomeFantasia)+'">'
-      ) + +
+      ) +
 
       '<h3>Onde fica</h3>' +
       '<label>Endereço</label><input id="f_endereco" value="'+esc(d.endereco)+'">' +
@@ -883,16 +896,15 @@ async function salvarCliente(){
       return toast("O CNPJ não confere. Corrija ou deixe em branco.", "err");
     }
 
-    var repetido = CLIENTES.find(c => c.cnpj && c.cnpj === dados.cnpj && c.id !== editando.id);
-  if(repetido){
-    return toast("Esta empresa já está em " + (repetido.nomeFantasia || repetido.razaoSocial) + ".", "err");
+    const repetidoCnpj = CLIENTES.find(c => c.cnpj && c.cnpj === dados.cnpj && c.id !== editando.id);
+    if(repetidoCnpj){
+      return toast("Esta empresa já está em " +
+        (repetidoCnpj.nomeFantasia || repetidoCnpj.razaoSocial) + ".", "err");
+    }
   }
 
   $("btSalvar").disabled = true;
   try{
-    const anteriores = editando.id
-      ? ((CLIENTES.find(c=>c.id === editando.id) || {}).emailsAutorizados || []).map(e => e.toLowerCase())
-      : [];
     let id = editando.id;
 
     if(id){
@@ -903,14 +915,22 @@ async function salvarCliente(){
       id = ref.id;
     }
 
-    /* Atualizar índice de e-mails autorizados em um único documento.
-       Todos os e-mails desta empresa apontam para o mesmo clienteId. */
-    const emailIndex = {};
-    dados.emailsAutorizados.forEach(e => {
-      emailIndex[e] = id;
-    });
+    /* Os convites são o que permite a pessoa entrar já ligada à empresa.
+       Um documento por e-mail, que só o dono daquele e-mail consegue ler.
+       Regravar todos (e não só os novos) é de propósito: é barato, e
+       conserta sozinho qualquer convite que tenha se perdido. */
+    const anteriores = editando.id
+      ? ((CLIENTES.find(c=>c.id === editando.id) || {}).emailsAutorizados || [])
+          .map(e => String(e).toLowerCase())
+      : [];
+    const saíram = anteriores.filter(e => !dados.emailsAutorizados.includes(e));
 
-    await db.collection("admin").doc("emailIndex").set(emailIndex, {merge: true});
+    await Promise.all([].concat(
+      dados.emailsAutorizados.map(e => db.collection("convites").doc(e).set({
+        clienteId: id, criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+      })),
+      saíram.map(e => db.collection("convites").doc(e).delete())
+    ));
 
     await recarregar();
     irPara("clientes");
@@ -930,14 +950,9 @@ async function apagarCliente(){
   }
   if(!confirm("Apagar esta empresa? Não dá para desfazer.")) return;
   try{
-    const emails = (editando.dados.emailsAutorizados || []);
-    const updates = {};
-    emails.forEach(e => {
-      updates[e] = firebase.firestore.FieldValue.delete();
-    });
-    if(emails.length > 0){
-      await db.collection("admin").doc("emailIndex").update(updates);
-    }
+    const emails = (editando.dados.emailsAutorizados || []).map(e => String(e).toLowerCase());
+    await Promise.all(emails.map(e =>
+      db.collection("convites").doc(e).delete().catch(()=>{})));
     await db.collection("clientes").doc(id).delete();
     await recarregar();
     irPara("clientes");
