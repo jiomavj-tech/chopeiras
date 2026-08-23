@@ -451,6 +451,29 @@ function cnpjValido(v){
   return dv2 === Number(d[13]);
 }
 
+/* CPF: formatação e validação */
+function cpfFormatado(v){
+  const d = soDigitos(v).slice(0,11);
+  if(d.length <= 3) return d;
+  if(d.length <= 6) return d.slice(0,3)+"."+d.slice(3);
+  if(d.length <= 9) return d.slice(0,3)+"."+d.slice(3,6)+"."+d.slice(6);
+  return d.slice(0,3)+"."+d.slice(3,6)+"."+d.slice(6,9)+"-"+d.slice(9);
+}
+
+function cpfValido(v){
+  const d = soDigitos(v);
+  if(d.length !== 11) return false;
+  if(/^(\d)\1{10}$/.test(d)) return false;
+  const calc = (base, pos1, pos2) => {
+    let s = 0;
+    for(let i=0;i<pos1;i++) s += Number(base[i]) * (pos1+1-i);
+    const r = s % 11;
+    const dv = r < 2 ? 0 : 11 - r;
+    return dv === Number(base[pos2]);
+  };
+  return calc(d, 9, 9) && calc(d, 10, 10);
+}
+
 /* ── telefone só para exibição, sem exigir formato ── */
 function soWhats(v){
   const d = soDigitos(v);
@@ -616,7 +639,7 @@ function telaClientes(){
   const busca = (window.__buscaCli || "").toLowerCase();
   const lista = CLIENTES.filter(c=>{
     if(!busca) return true;
-    return [c.nomeFantasia, c.razaoSocial, c.cnpj, c.cidade]
+    return [c.nomeFantasia, c.razaoSocial, c.cnpj, c.cpf, c.cidade]
       .map(x => x || "").join(" ").toLowerCase().includes(busca);
   });
 
@@ -625,7 +648,7 @@ function telaClientes(){
       '<button class="btn pri" onclick="novoCliente()">+ Nova empresa</button>' +
       '<button class="btn" onclick="atualizar()">Atualizar</button>' +
     '</div>' +
-    '<div class="busca"><input placeholder="Buscar por nome, CNPJ ou cidade" value="'+esc(window.__buscaCli||"")+
+    '<div class="busca"><input placeholder="Buscar por nome, CNPJ, CPF ou cidade" value="'+esc(window.__buscaCli||"")+
       '" oninput="window.__buscaCli=this.value;telaClientes()"></div>' +
     (lista.length ? lista.map(cartaoCliente).join("") :
       '<div class="vazio">' + (CLIENTES.length ? "Nada encontrado." :
@@ -651,6 +674,7 @@ function cartaoCliente(c){
 
 function novoCliente(){
   editando = {tipo:"cliente", id:null, dados:{
+    tipoPessoa:"juridica",
     cnpj:"", razaoSocial:"", nomeFantasia:"", endereco:"", cidade:"", uf:"",
     contato:"", telefone:"", whatsapp:"", emailsAutorizados:[], observacoes:""
   }};
@@ -663,20 +687,53 @@ function editarCliente(id){
   telaClientes();
 }
 
+function alterarTipo(){
+  const tipo = document.querySelector('input[name="tipo"]:checked').value;
+  editando.dados.tipoPessoa = tipo;
+  formCliente();
+}
+
+function checarCpf(){
+  const v = $("f_cpf").value, a = $("cpfAviso");
+  const d = soDigitos(v);
+  if(!d.length){ a.textContent = ""; a.style.color = ""; return; }
+  if(d.length < 11){ a.textContent = "faltam " + (11-d.length) + " dígitos"; a.style.color = ""; return; }
+  const ok = cpfValido(v);
+  a.textContent = ok ? "CPF confere" : "dígito verificador não bate — confira";
+  a.style.color = ok ? "var(--ok)" : "var(--danger)";
+}
+
 function formCliente(){
   const d = editando.dados;
+  const ehPessoaFisica = d.tipoPessoa === "fisica";
   $("tela").innerHTML =
     '<div class="card">' +
-      '<h2>'+(editando.id ? "Editar empresa" : "Nova empresa")+'</h2>' +
-      '<div class="muted">O CNPJ identifica a empresa. Os e-mails liberados entram direto, sem passar pela fila.</div>' +
+      '<h2>'+(editando.id ? "Editar cliente" : "Novo cliente")+'</h2>' +
+      '<div class="muted">Identifique se é pessoa jurídica (CNPJ) ou pessoa física (CPF).</div>' +
+
+      '<h3>Tipo de Cliente</h3>' +
+      '<div class="lin" style="gap:20px">' +
+        '<div><label><input type="radio" name="tipo" value="juridica" ' +
+          ((!ehPessoaFisica) ? "checked" : "") + ' onchange="alterarTipo()"> Pessoa Jurídica (CNPJ)</label></div>' +
+        '<div><label><input type="radio" name="tipo" value="fisica" ' +
+          (ehPessoaFisica ? "checked" : "") + ' onchange="alterarTipo()"> Pessoa Física (CPF)</label></div>' +
+      '</div>' +
 
       '<h3>Identificação</h3>' +
-      '<label>CNPJ</label>' +
-      '<input id="f_cnpj" inputmode="numeric" value="'+esc(cnpjFormatado(d.cnpj))+'" ' +
-        'oninput="this.value=cnpjFormatado(this.value);checarCnpj()">' +
-      '<div class="esc" id="cnpjAviso"></div>' +
-      '<label>Razão social</label><input id="f_razao" value="'+esc(d.razaoSocial)+'">' +
-      '<label>Nome fantasia</label><input id="f_fantasia" value="'+esc(d.nomeFantasia)+'">' +
+      (ehPessoaFisica ?
+        '<label>CPF</label>' +
+        '<input id="f_cpf" inputmode="numeric" value="'+esc(cpfFormatado(d.cpf))+'" ' +
+          'oninput="this.value=cpfFormatado(this.value);checarCpf()">' +
+        '<div class="esc" id="cpfAviso"></div>' +
+        '<label>Nome completo</label><input id="f_nome" value="'+esc(d.nome)+'">'
+      :
+        '<label>CNPJ</label>' +
+        '<input id="f_cnpj" inputmode="numeric" value="'+esc(cnpjFormatado(d.cnpj))+'" ' +
+          'oninput="this.value=cnpjFormatado(this.value);checarCnpj()">' +
+        '<div class="esc" id="cnpjAviso"></div>' +
+        '<label>Razão social</label><input id="f_razao" value="'+esc(d.razaoSocial)+'">' +
+        '<label>Nome fantasia</label><input id="f_fantasia" value="'+esc(d.nomeFantasia)+'">'
+      ) + +
 
       '<h3>Onde fica</h3>' +
       '<label>Endereço</label><input id="f_endereco" value="'+esc(d.endereco)+'">' +
@@ -709,7 +766,11 @@ function formCliente(){
         (editando.id ? '<button class="btn dg" onclick="apagarCliente()">Apagar</button>' : '') +
       '</div>' +
     '</div>';
-  checarCnpj();
+  if(ehPessoaFisica){
+    checarCpf();
+  } else {
+    checarCnpj();
+  }
 }
 
 function checarCnpj(){
@@ -725,10 +786,11 @@ function checarCnpj(){
 async function salvarCliente(){
   const emails = $("f_emails").value.split("\n")
     .map(s=>s.trim().toLowerCase()).filter(s=>s.includes("@"));
+
+  const ehPessoaFisica = document.querySelector('input[name="tipo"]:checked').value === "fisica";
+
   const dados = {
-    cnpj: soDigitos($("f_cnpj").value),
-    razaoSocial: $("f_razao").value.trim(),
-    nomeFantasia: $("f_fantasia").value.trim(),
+    tipoPessoa: ehPessoaFisica ? "fisica" : "juridica",
     endereco: $("f_endereco").value.trim(),
     cidade: $("f_cidade").value.trim(),
     uf: $("f_uf").value.trim().toUpperCase(),
@@ -739,15 +801,40 @@ async function salvarCliente(){
     observacoes: $("f_obs").value.trim()
   };
 
-  if(!dados.razaoSocial && !dados.nomeFantasia){
-    return toast("Falta o nome da empresa.", "err");
-  }
-  if(dados.cnpj && !cnpjValido(dados.cnpj)){
-    return toast("O CNPJ não confere. Corrija ou deixe em branco.", "err");
-  }
-  const repetido = CLIENTES.find(c => c.cnpj && c.cnpj === dados.cnpj && c.id !== editando.id);
+  if(ehPessoaFisica){
+    const cpf = soDigitos($("f_cpf").value);
+    const nome = $("f_nome").value.trim();
+
+    if(!nome){
+      return toast("Falta o nome da pessoa.", "err");
+    }
+    if(cpf && !cpfValido(cpf)){
+      return toast("O CPF não confere. Corrija ou deixe em branco.", "err");
+    }
+
+    dados.cpf = cpf;
+    dados.nome = nome;
+    dados.nomeFantasia = nome;
+
+    const repetido = CLIENTES.find(c => c.cpf && c.cpf === cpf && c.id !== editando.id);
+    if(repetido){
+      return toast("Este CPF já está cadastrado.", "err");
+    }
+  } else {
+    dados.cnpj = soDigitos($("f_cnpj").value);
+    dados.razaoSocial = $("f_razao").value.trim();
+    dados.nomeFantasia = $("f_fantasia").value.trim();
+
+    if(!dados.razaoSocial && !dados.nomeFantasia){
+      return toast("Falta o nome da empresa.", "err");
+    }
+    if(dados.cnpj && !cnpjValido(dados.cnpj)){
+      return toast("O CNPJ não confere. Corrija ou deixe em branco.", "err");
+    }
+
+    var repetido = CLIENTES.find(c => c.cnpj && c.cnpj === dados.cnpj && c.id !== editando.id);
   if(repetido){
-    return toast("Este CNPJ já está em " + (repetido.nomeFantasia || repetido.razaoSocial) + ".", "err");
+    return toast("Esta empresa já está em " + (repetido.nomeFantasia || repetido.razaoSocial) + ".", "err");
   }
 
   $("btSalvar").disabled = true;
@@ -1169,8 +1256,13 @@ function telaEmpresa(){
     '<div class="card">' +
       '<h2>'+esc(c.nomeFantasia || c.razaoSocial)+'</h2>' +
       '<table style="width:100%;margin-top:8px">' +
-        linha("Razão social", c.razaoSocial) +
-        linha("CNPJ", cnpjFormatado(c.cnpj)) +
+        (c.tipoPessoa === "fisica" ?
+          linha("Pessoa", "Física") +
+          linha("CPF", cpfFormatado(c.cpf))
+        :
+          linha("Razão social", c.razaoSocial) +
+          linha("CNPJ", cnpjFormatado(c.cnpj))
+        ) +
         linha("Endereço", c.endereco) +
         linha("Cidade", [c.cidade, c.uf].filter(Boolean).join(" · ")) +
         linha("Contato", c.contato) +
