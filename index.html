@@ -789,7 +789,8 @@ function checarCnpj(){
 }
 
 function renderizarEmails(){
-  const lista = editando.dados.emailsAutorizados || [];
+  const lista = (editando.dados.emailsAutorizados || []).map(e => e.toLowerCase());
+  editando.dados.emailsAutorizados = lista;
   const html = lista.map((e, i) =>
     '<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;background:var(--panel2);border-radius:8px;padding:10px;border:1px solid var(--line)">' +
       '<div style="flex:1">'+esc(e)+'</div>' +
@@ -811,7 +812,7 @@ function adicionarEmail(){
   }
 
   if(!editando.dados.emailsAutorizados) editando.dados.emailsAutorizados = [];
-  if(editando.dados.emailsAutorizados.includes(email)){
+  if(editando.dados.emailsAutorizados.map(e => e.toLowerCase()).includes(email)){
     return toast("Este e-mail já foi adicionado", "err");
   }
 
@@ -836,7 +837,7 @@ async function salvarCliente(){
     contato: $("f_contato").value.trim(),
     telefone: $("f_telefone").value.trim(),
     whatsapp: $("f_whats").value.trim(),
-    emailsAutorizados: editando.dados.emailsAutorizados || [],
+    emailsAutorizados: (editando.dados.emailsAutorizados || []).map(e => e.toLowerCase()),
     observacoes: $("f_obs").value.trim()
   };
 
