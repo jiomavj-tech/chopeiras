@@ -325,7 +325,7 @@ async function portao(user){
 
       await ref.set({
         nome:  user.displayName || "",
-        email: user.email || "",
+        email: email,
         foto:  user.photoURL || "",
         papel: "cliente",
         ativo: !!convite,
@@ -342,7 +342,7 @@ async function portao(user){
     if(admin || d.ativo === true){
       EU = {
         uid: user.uid,
-        email: user.email || "",
+        email: email,
         nome: d.nome || user.displayName || "",
         foto: d.foto || user.photoURL || "",
         papel: admin ? "admin" : (d.papel || "cliente"),
@@ -879,7 +879,7 @@ async function salvarCliente(){
   $("btSalvar").disabled = true;
   try{
     const anteriores = editando.id
-      ? ((CLIENTES.find(c=>c.id === editando.id) || {}).emailsAutorizados || [])
+      ? ((CLIENTES.find(c=>c.id === editando.id) || {}).emailsAutorizados || []).map(e => e.toLowerCase())
       : [];
     let id = editando.id;
 
