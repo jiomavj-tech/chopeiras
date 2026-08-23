@@ -237,6 +237,52 @@ const JPEG_2x2 = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgc
     ? ok('a demonstração troca para o lado do cliente')
     : falha('papel trocado: ' + comoCliente.join('|'));
 
+  // ── 18. a página por configurar cai na demonstração, e o rodapé leva às instruções
+  const pg3 = await b.newPage({ viewport: { width: 412, height: 900 } });
+  pg3.on('pageerror', e => erros.push('cru pageerror: ' + e.message));
+  await pg3.route('**/gstatic.com/**', r => r.abort());
+  await pg3.route('**/sw.js', r => r.abort());
+  await pg3.goto(URL_BASE.replace('index.html', 'cru.html'));
+  await pg3.waitForSelector('#faixaDemo', { timeout: 10000 });
+  ok('página sem configuração abre em demonstração, não em erro');
+
+  await pg3.click('a:has-text("como ligar ao Firebase")');
+  await pg3.waitForSelector('#agColar', { timeout: 5000 });
+  ok('o rodapé leva ao passo a passo, com a caixa de colar');
+
+  // ── 19. o bloco copiado do console é lido inteiro
+  const lido = await pg3.evaluate(() => lerConfigColada(`
+    const firebaseConfig = {
+      apiKey: "AIzaSyExemplo-123",
+      authDomain: "giba-chopeiras.firebaseapp.com",
+      projectId: "giba-chopeiras",
+      storageBucket: "giba-chopeiras.firebasestorage.app",
+      messagingSenderId: "691468510418",
+      appId: "1:691468510418:web:5f82bc4de3cbde79"
+    };`));
+  (lido.apiKey === 'AIzaSyExemplo-123' && lido.projectId === 'giba-chopeiras'
+    && lido.appId.startsWith('1:691468510418') && lido.messagingSenderId === '691468510418')
+    ? ok('o bloco do console é lido inteiro, sem separar campo por campo')
+    : falha('parser: ' + JSON.stringify(lido));
+
+  // ── 20. o JSON puro também serve
+  const json = await pg3.evaluate(() => lerConfigColada(
+    '{"apiKey":"AIza-json","authDomain":"x.firebaseapp.com","projectId":"x","appId":"1:2:web:3"}'));
+  (json.apiKey === 'AIza-json' && json.appId === '1:2:web:3')
+    ? ok('JSON puro também é aceito') : falha('json: ' + JSON.stringify(json));
+
+  // ── 21. bloco incompleto diz o que falta, em vez de falhar depois no login
+  await pg3.fill('#agColar', 'apiKey: "AIza-so-isso"');
+  await pg3.click('button:has-text("Ligar com esta configuração")');
+  await pg3.waitForTimeout(300);
+  const erroColar = await pg3.textContent('#agColarErro');
+  (erroColar.includes('authDomain') && erroColar.includes('projectId') && erroColar.includes('appId'))
+    ? ok('configuração incompleta nomeia os campos que faltam')
+    : falha('erro ao colar: ' + erroColar);
+
+  const guardou = await pg3.evaluate(() => localStorage.getItem('chopeiras.cfg'));
+  !guardou ? ok('configuração incompleta não é guardada') : falha('guardou meia configuração');
+
   await b.close();
   console.log(passos.join('\n'));
   console.log('\n' + (erros.length ? erros.length + ' PROBLEMA(S):\n - ' + erros.join('\n - ')

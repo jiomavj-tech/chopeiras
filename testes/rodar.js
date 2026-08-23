@@ -28,6 +28,9 @@ let html = fs.readFileSync(path.join(RAIZ, 'index.html'), 'utf8');
 ['projectId','appId','apiKey','authDomain','storageBucket','messagingSenderId']
   .forEach(k => { html = html.split('"COLE_AQUI_' + k + '"').join('"teste"'); });
 fs.writeFileSync(path.join(temporaria, 'index.html'), html);
+/* o arquivo por configurar também é servido: é nele que se testa a tela
+   de configuração e o atalho de colar */
+fs.copyFileSync(path.join(RAIZ, 'index.html'), path.join(temporaria, 'cru.html'));
 ['icone-192.png','icone-512.png','icone-mascara.png','manifest.webmanifest']
   .forEach(f => fs.copyFileSync(path.join(RAIZ, f), path.join(temporaria, f)));
 

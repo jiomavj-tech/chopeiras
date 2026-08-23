@@ -123,6 +123,12 @@ O aplicativo abre já com as instruções na tela enquanto não estiver ligado. 
    `firebaseConfig`.
 5. Colar esses valores na constante `CFG`, no topo do `index.html`.
 6. Publicar as regras: `firebase deploy --only firestore`.
+
+**Atalho para experimentar antes de editar o arquivo.** A tela de configuração tem uma caixa onde
+se cola o bloco `firebaseConfig` inteiro, tal como o console o mostra. Ele fica guardado só naquele
+navegador e o aplicativo liga na hora — serve para conferir que o projeto está de pé sem publicar
+nada. Para os clientes verem, os valores têm de acabar mesmo no `index.html`; enquanto isso, o
+rodapé avisa que a configuração é local e oferece esquecê-la.
 7. **Authentication → Settings → Domínios autorizados**: acrescentar o domínio onde a página está
    publicada. Sem este passo o login abre e fecha sem dizer porquê.
 

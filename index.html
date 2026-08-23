@@ -164,6 +164,21 @@
           a página está publicada.</li>
       </ol>
       <div class="setup" id="agDominio"></div>
+
+      <h3 style="margin-top:20px">Atalho: colar a configuração aqui</h3>
+      <p class="muted" style="font-size:13px">Para experimentar já, sem editar arquivo nenhum:
+        cole o bloco <span class="mono">firebaseConfig</span> do passo 4. Ele fica guardado
+        <b>só neste aparelho</b> — os seus clientes só passam a ver quando os valores forem para
+        o <span class="mono">index.html</span>.</p>
+      <textarea id="agColar" style="min-height:110px;font-family:ui-monospace,monospace;font-size:12px"
+        placeholder="const firebaseConfig = {&#10;  apiKey: &quot;...&quot;,&#10;  authDomain: &quot;...&quot;,&#10;  projectId: &quot;...&quot;,&#10;  ...&#10;};"></textarea>
+      <p id="agColarErro" class="alert red" style="display:none"></p>
+      <div class="btns">
+        <button class="btn pri" onclick="ligarConfigColada()">Ligar com esta configuração</button>
+      </div>
+      <p class="esc">Estes valores não são segredo: numa página web são públicos por definição.
+        Quem protege os dados são as regras do passo 6. <b>Nunca</b> cole aqui senha, nem chave
+        de conta de serviço.</p>
     </div>
   </div>
 </div>
@@ -176,7 +191,7 @@
    em firestore.rules, conferidas no servidor do Google.
    ───────────────────────────────────────────────────────────── */
 const ADMIN_EMAIL = "gibasolucoes@gmail.com";
-const CFG = {
+const CFG_ARQUIVO = {
   projectId:         "COLE_AQUI_projectId",
   appId:             "COLE_AQUI_appId",
   apiKey:            "COLE_AQUI_apiKey",
@@ -184,7 +199,63 @@ const CFG = {
   storageBucket:     "COLE_AQUI_storageBucket",
   messagingSenderId: "COLE_AQUI_messagingSenderId"
 };
+
+/* Enquanto o arquivo não tiver a configuração, ela pode ser colada no
+   próprio aparelho — serve para experimentar com o Firebase de verdade
+   sem ter de editar e publicar nada. Fica só neste navegador: para os
+   clientes verem, os valores têm de acabar no arquivo. */
+function cfgColada(){
+  try{ const v = localStorage.getItem("chopeiras.cfg"); return v ? JSON.parse(v) : null; }
+  catch(e){ return null; }
+}
+const CFG_VAZIA = String(CFG_ARQUIVO.apiKey).startsWith("COLE_AQUI");
+const CFG = CFG_VAZIA ? (cfgColada() || CFG_ARQUIVO) : CFG_ARQUIVO;
 const CONFIGURADO = !String(CFG.apiKey).startsWith("COLE_AQUI");
+const USANDO_COLADA = CONFIGURADO && CFG_VAZIA;
+
+/* Aceita o bloco inteiro copiado do console — const firebaseConfig = {…},
+   ou o JSON puro. Ninguém devia ter de separar campo por campo. */
+function lerConfigColada(t){
+  const pega = k => {
+    /* a aspa depois do nome é opcional: no JSON a chave vem entre aspas
+       ("apiKey": "..."), no JavaScript não (apiKey: "..."). */
+    const m = String(t).match(new RegExp(k + "[\"'`]?\\s*[:=]\\s*[\"'`]([^\"'`]+)[\"'`]"));
+    return m ? m[1].trim() : "";
+  };
+  return {
+    apiKey:            pega("apiKey"),
+    authDomain:        pega("authDomain"),
+    projectId:         pega("projectId"),
+    storageBucket:     pega("storageBucket"),
+    messagingSenderId: pega("messagingSenderId"),
+    appId:             pega("appId")
+  };
+}
+
+function ligarConfigColada(){
+  const c = lerConfigColada(document.getElementById("agColar").value);
+  const faltam = ["apiKey","authDomain","projectId","appId"].filter(k => !c[k]);
+  const aviso = document.getElementById("agColarErro");
+  if(faltam.length){
+    aviso.style.display = "";
+    aviso.innerHTML = "<b>Falta " + faltam.join(", ") + ".</b> Cole o bloco inteiro que o " +
+      "console mostra, do <code>{</code> ao <code>}</code>.";
+    return;
+  }
+  try{ localStorage.setItem("chopeiras.cfg", JSON.stringify(c)); }
+  catch(e){
+    aviso.style.display = "";
+    aviso.textContent = "Este navegador não deixou guardar a configuração.";
+    return;
+  }
+  location.reload();
+}
+
+function esquecerConfig(){
+  if(!confirm("Esquecer a configuração colada e voltar à demonstração?")) return;
+  try{ localStorage.removeItem("chopeiras.cfg"); }catch(e){}
+  location.reload();
+}
 
 let db = null;
 /* EU: quem está usando o app agora. Preenchido depois do portão. */
@@ -306,6 +377,7 @@ async function portao(user){
   <span id="versaoApp">versão 5</span> ·
   <a href="#" onclick="sair();return false;">sair</a> ·
   <a href="#" onclick="verConfiguracao();return false;">como ligar ao Firebase</a>
+  <span id="avisoColada"></span>
 </div>
 
 <div id="toast"></div>
@@ -332,6 +404,14 @@ function sair(){
 }
 
 /* O passo a passo do Firebase continua ali, mesmo em demonstração. */
+if(typeof USANDO_COLADA !== "undefined" && USANDO_COLADA){
+  window.addEventListener("DOMContentLoaded", () => {
+    const e = document.getElementById("avisoColada");
+    if(e) e.innerHTML = ' · configuração colada neste aparelho ' +
+      '(<a href="#" onclick="esquecerConfig();return false;">esquecer</a>)';
+  });
+}
+
 function verConfiguracao(){
   const g = $("authGate");
   g.style.display = "flex";
