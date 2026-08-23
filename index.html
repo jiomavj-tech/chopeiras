@@ -893,8 +893,8 @@ async function salvarCliente(){
 
     /* Os convites são o que permite a pessoa entrar já ligada à empresa.
        Um documento por e-mail, que só o dono daquele e-mail consegue ler. */
-    const add = emails.filter(e => !anteriores.includes(e));
-    const rem = anteriores.filter(e => !emails.includes(e));
+    const add = dados.emailsAutorizados.filter(e => !anteriores.includes(e));
+    const rem = anteriores.filter(e => !dados.emailsAutorizados.includes(e));
     await Promise.all([].concat(
       add.map(e => db.collection("convites").doc(e).set({
         clienteId: id, criadoEm: firebase.firestore.FieldValue.serverTimestamp()
