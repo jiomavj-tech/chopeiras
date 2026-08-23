@@ -20,17 +20,31 @@ const RAIZ = path.join(__dirname, '..');
    falhar por já haver algo a ouvir nela, que não é falha nenhuma. */
 const PORTA = Number(process.env.PORTA || 0);
 
-/* O app recusa-se a arrancar sem a configuração do Firebase — e ainda
-   bem. Para o teste, uma configuração de faz de conta basta: o SDK
-   verdadeiro nunca chega a ser carregado. */
+/* Duas cópias do aplicativo, e nenhuma delas depende de o arquivo estar
+   ou não configurado — o teste tem de correr igual antes e depois de o
+   Firebase ser ligado:
+
+     index.html  sempre COM configuração, para o app passar do portão;
+     cru.html    sempre SEM, que é onde se testa a tela de configuração,
+                 o atalho de colar e a queda para a demonstração.
+
+   O SDK verdadeiro nunca chega a ser carregado: as suítes barram-no e
+   põem um Firestore de mentira no lugar. */
+const CAMPOS = ['projectId','appId','apiKey','authDomain','storageBucket','messagingSenderId'];
+
+function reescreverConfig(html, valor){
+  CAMPOS.forEach(k => {
+    html = html.replace(
+      new RegExp('(' + k + ':\\s*)"[^"]*"'),
+      (m, antes) => antes + '"' + (valor === null ? 'COLE_AQUI_' + k : valor) + '"');
+  });
+  return html;
+}
+
 const temporaria = fs.mkdtempSync(path.join(os.tmpdir(), 'chopeiras-teste-'));
-let html = fs.readFileSync(path.join(RAIZ, 'index.html'), 'utf8');
-['projectId','appId','apiKey','authDomain','storageBucket','messagingSenderId']
-  .forEach(k => { html = html.split('"COLE_AQUI_' + k + '"').join('"teste"'); });
-fs.writeFileSync(path.join(temporaria, 'index.html'), html);
-/* o arquivo por configurar também é servido: é nele que se testa a tela
-   de configuração e o atalho de colar */
-fs.copyFileSync(path.join(RAIZ, 'index.html'), path.join(temporaria, 'cru.html'));
+const original = fs.readFileSync(path.join(RAIZ, 'index.html'), 'utf8');
+fs.writeFileSync(path.join(temporaria, 'index.html'), reescreverConfig(original, 'teste'));
+fs.writeFileSync(path.join(temporaria, 'cru.html'), reescreverConfig(original, null));
 ['icone-192.png','icone-512.png','icone-mascara.png','manifest.webmanifest']
   .forEach(f => fs.copyFileSync(path.join(RAIZ, f), path.join(temporaria, f)));
 
