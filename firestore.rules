@@ -149,6 +149,8 @@ service cloud.firestore {
         )
       );
 
+      allow update: if ehAdmin();
+
       allow delete: if ehAdmin();
     }
 

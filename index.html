@@ -1180,6 +1180,7 @@ const STATUS = [
   {id:"orcamento_reprovado", rot:"Orçamento não aprovado", pill:"dg", cli:"O orçamento não foi aprovado. Combinamos a devolução."},
   {id:"concluido",        rot:"Manutenção concluída", pill:"ok",   cli:"O serviço está pronto."},
   {id:"entrega_agendada", rot:"Entrega agendada",     pill:"ok",   cli:"A entrega está agendada."},
+  {id:"saiu_pra_entrega", rot:"Saiu para entrega",    pill:"ok",   cli:"Sua chopeira saiu para entrega!"},
   {id:"entregue",         rot:"Entregue",             pill:"ok",   cli:"Chopeira entregue. Obrigado!"},
   {id:"cancelado",        rot:"Cancelado",            pill:"dg",   cli:"O chamado foi cancelado."}
 ];
@@ -1189,6 +1190,28 @@ const ABERTOS = ["aberto","recolha_agendada","recebido","em_teste","em_manutenca
 
 function status(id){ return STATUS.find(s => s.id === id) || {id:id, rot:id, pill:"", cli:""}; }
 function ehAberto(o){ return ABERTOS.includes(o.status); }
+
+/* Fluxo sugerido de status baseado na lógica do processo */
+const FLUXO_PADRAO = {
+  "aberto": "recolha_agendada",
+  "recolha_agendada": "recebido",
+  "recebido": "em_teste",
+  "em_teste": "em_manutencao",
+  "em_manutencao": "concluido",
+  "aguardando_peca": "em_manutencao",
+  "orcamento_enviado": "orcamento_aprovado",
+  "orcamento_aprovado": "concluido",
+  "orcamento_reprovado": "cancelado",
+  "concluido": "entrega_agendada",
+  "entrega_agendada": "saiu_pra_entrega",
+  "saiu_pra_entrega": "entregue",
+  "entregue": "entregue",
+  "cancelado": "cancelado"
+};
+
+function proximoStatusSugerido(statusAtual){
+  return FLUXO_PADRAO[statusAtual] || null;
+}
 
 function numeroOS(){
   const d = new Date(), p = n => String(n).padStart(2,"0");
@@ -1540,18 +1563,29 @@ function verOrdem(){
 
 function painelAdmin(o){
   const seguintes = STATUS.filter(s => s.id !== o.status);
+  const proximoSugerido = proximoStatusSugerido(o.status);
+  const temOrca = o.orcamento && Object.keys(o.orcamento).length > 1;
+
   return '<h3>Orçamento</h3>' +
     '<div class="btns" style="margin-top:0">' +
       '<button class="btn" onclick="montarOrcamento()">' +
-        (o.orcamento ? "Rever o orçamento" : "Montar o orçamento") + '</button>' +
-      (o.orcamento ? '<span class="muted" style="align-self:center">' +
+        (temOrca ? "Editar orçamento" : "Montar o orçamento") + '</button>' +
+      (temOrca ? '<span class="muted" style="align-self:center">' +
         esc(reais(o.orcamento.total)) + '</span>' : '') +
     '</div>' +
 
     '<h3>Mover o chamado</h3>' +
     '<label>Novo status</label>' +
-    '<select id="os_status">' + seguintes.map(s =>
-      '<option value="' + s.id + '">' + esc(s.rot) + '</option>').join("") + '</select>' +
+    '<select id="os_status">' +
+      (proximoSugerido ?
+        '<option value="' + proximoSugerido + '" style="font-weight:bold;background:#6ba3ff">' +
+          esc(status(proximoSugerido).rot) + ' (sugerido)' + '</option>' +
+        '<optgroup label="Outros status:">' : '') +
+      seguintes.map(s =>
+        (s.id === proximoSugerido ? '' :
+          '<option value="' + s.id + '">' + esc(s.rot) + '</option>')).join("") +
+      (proximoSugerido ? '</optgroup>' : '') +
+    '</select>' +
     '<label>Recado para o cliente (opcional)</label>' +
     '<input id="os_nota" placeholder="Compressor testado, o problema é o pressostato">' +
     '<div class="lin">' +
@@ -1560,6 +1594,13 @@ function painelAdmin(o){
       '<div><label>Entrega prevista</label><input type="date" id="os_entrega" value="' +
         esc((o.agenda&&o.agenda.entregaPrevista)||"") + '"></div>' +
     '</div>' +
+    (["entrega_agendada","saiu_pra_entrega","entregue"].includes(o.status) ?
+      '<div class="lin">' +
+        '<div><label>Data/hora entrega</label><input type="datetime-local" id="os_entrega_real" value="' +
+          esc((o.entrega&&o.entrega.quando)||"") + '"></div>' +
+        '<div><label>Local entrega</label><input id="os_entrega_local" placeholder="Endereço de entrega" value="' +
+          esc((o.entrega&&o.entrega.local)||"") + '"></div>' +
+      '</div>' : '') +
     '<div class="btns">' +
       '<button class="btn pri" id="btMover" onclick="moverOrdem()">Registrar mudança</button>' +
       botaoWhats(o) +
@@ -1606,22 +1647,37 @@ async function moverOrdem(){
     recolhaPrevista: $("os_recolha").value || "",
     entregaPrevista: $("os_entrega").value || ""
   };
+
+  const updateObj = {
+    status: novo,
+    agenda: agenda,
+    historico: firebase.firestore.FieldValue.arrayUnion({status:novo, quando:new Date().toISOString(),
+                      quem: EU.nome || "Giba", nota:nota}),
+    naoLidoCliente: true,
+    atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
+  };
+
+  if(["entrega_agendada","saiu_pra_entrega","entregue"].includes(novo)){
+    const entregaQuando = $("os_entrega_real");
+    const entregaLocal = $("os_entrega_local");
+    if(entregaQuando && entregaQuando.value){
+      updateObj.entrega = {
+        quando: entregaQuando.value,
+        local: (entregaLocal && entregaLocal.value) || ""
+      };
+    }
+  }
+
   if(!novo) return;
 
   $("btMover").disabled = true;
   try{
-    const registro = {status:novo, quando:new Date().toISOString(),
-                      quem: EU.nome || "Giba", nota:nota};
-    await db.collection("ordens").doc(o.id).update({
-      status: novo,
-      agenda: agenda,
-      historico: firebase.firestore.FieldValue.arrayUnion(registro),
-      naoLidoCliente: true,
-      atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
-    });
+    await db.collection("ordens").doc(o.id).update(updateObj);
     o.status = novo;
     o.agenda = agenda;
-    o.historico = (o.historico || []).concat([registro]);
+    if(updateObj.entrega) o.entrega = updateObj.entrega;
+    o.historico = (o.historico || []).concat([{status:novo, quando:new Date().toISOString(),
+                      quem: EU.nome || "Giba", nota:nota}]);
     o.naoLidoCliente = true;
     verOrdem();
     desenharSino();
