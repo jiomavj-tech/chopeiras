@@ -50,7 +50,7 @@ const falha = t => { passos.push('  FALHA ' + t); erros.push(t); };
 
   // ── 1. o Giba tem a aba de peças
   const abas = await pg.$$eval('#nav button', bs => bs.map(b => b.textContent));
-  abas.join('|') === 'Chamados|Chopeiras|Clientes|Peças|Acessos'
+  abas.join('|') === 'Semana|Chamados|Chopeiras|Clientes|Peças|Acessos'
     ? ok('aba Peças no lugar') : falha('abas: ' + abas.join('|'));
 
   // ── 2. cadastrar uma peça, com preço em vírgula

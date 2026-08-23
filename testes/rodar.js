@@ -62,7 +62,7 @@ servidor.listen(PORTA, '127.0.0.1', async () => {
   const ambiente = Object.assign({}, process.env, { URL_TESTE: url });
   let falhou = 0;
 
-  for (const suite of ['1-cadastros.js', '2-chamados.js', '3-orcamento.js']) {
+  for (const suite of ['1-cadastros.js', '2-chamados.js', '3-orcamento.js', '4-laudo-e-semana.js']) {
     if (!await correr(suite, ambiente)) falhou++;
   }
 

@@ -71,6 +71,9 @@
   .pill.orc{border-color:#C97B3D66;background:#C97B3D22;color:var(--copperhi)}
   .itemOrc{border:1px solid var(--line);border-radius:10px;padding:11px;margin-bottom:9px;
     background:var(--bg)}
+  #faixaDemo{background:#C97B3D1F;border-bottom:1px solid #C97B3D55;color:var(--text);
+    padding:11px 14px;font-size:12.5px;text-align:center;line-height:1.45}
+  #faixaDemo b{color:var(--copperhi)}
   /* linha do tempo do chamado: a bolinha carrega a cor do status */
   .linha{display:flex;flex-direction:column;gap:2px;margin-top:4px}
   .passo{display:grid;grid-template-columns:20px 1fr;gap:12px}
@@ -107,9 +110,10 @@
     border-radius:8px;padding:11px;white-space:pre-wrap;word-break:break-word;color:var(--dim);margin-top:8px}
   ol.passos{margin:8px 0 0;padding-left:20px;font-size:13.5px;color:var(--dim)}
   ol.passos li{margin-bottom:7px}
-  /* três abas têm de caber numa linha só: em duas, a de baixo fica centrada
-     e parece um botão solto em vez de aba. */
-  @media(max-width:430px){nav button{flex:1 1 0;min-width:0;font-size:12.5px;padding:9px 4px}}
+  /* Seis abas não cabem numa linha de celular sem cortar palavra. A 28%
+     elas se arrumam em duas fileiras de três — e as três do cliente
+     continuam numa fileira só. */
+  @media(max-width:430px){nav button{flex:1 1 28%;min-width:0;font-size:12px;padding:9px 4px}}
 </style>
 </head>
 <body>
@@ -204,10 +208,18 @@ function agEntrar(){
 }
 function agSair(){ firebase.auth().signOut().then(()=>location.reload()); }
 
-if(!CONFIGURADO){
+const QUER_DEMO = /[?&]demo\b/.test(location.search);
+
+if(!CONFIGURADO || QUER_DEMO){
+  /* Sem Firebase o aplicativo não teria o que mostrar. Em vez de uma
+     página de instruções e mais nada, ele abre em demonstração — e as
+     instruções ficam a um toque, no rodapé da faixa. */
   document.getElementById("agDominio").textContent =
     "Domínio desta página:\n" + location.origin;
-  agMostrar("agSetup");
+  window.addEventListener("DOMContentLoaded", () => {
+    try{ ligarDemo(); }
+    catch(e){ agMostrar("agSetup"); }
+  });
 } else {
   firebase.initializeApp(CFG);
   db = firebase.firestore();
@@ -291,8 +303,9 @@ async function portao(user){
 <main class="wrap" id="tela"></main>
 
 <div class="foot">
-  <span id="versaoApp">versão 3</span> ·
-  <a href="#" onclick="sair();return false;">sair</a>
+  <span id="versaoApp">versão 5</span> ·
+  <a href="#" onclick="sair();return false;">sair</a> ·
+  <a href="#" onclick="verConfiguracao();return false;">como ligar ao Firebase</a>
 </div>
 
 <div id="toast"></div>
@@ -313,7 +326,23 @@ function toast(msg, tipo){
   clearTimeout(toastTimer);
   toastTimer = setTimeout(()=>{ t.style.display = "none"; }, 3200);
 }
-function sair(){ firebase.auth().signOut().then(()=>location.reload()); }
+function sair(){
+  if(window.__demoLoja) return location.reload();
+  firebase.auth().signOut().then(() => location.reload());
+}
+
+/* O passo a passo do Firebase continua ali, mesmo em demonstração. */
+function verConfiguracao(){
+  const g = $("authGate");
+  g.style.display = "flex";
+  agMostrar("agSetup");
+  const s = $("agSetup");
+  if(s && !$("btFecharSetup")){
+    s.insertAdjacentHTML("beforeend",
+      '<div class="btns"><button class="btn" id="btFecharSetup" ' +
+      'onclick="document.getElementById(\'authGate\').style.display=\'none\'">Voltar ao app</button></div>');
+  }
+}
 
 /* ── CNPJ: máscara e conferência dos dois dígitos ── */
 function soDigitos(s){ return String(s||"").replace(/\D/g,""); }
@@ -376,6 +405,7 @@ let VISTA = "chamados";
 let editando = null;   // rascunho do formulário aberto
 
 const ABAS_ADMIN = [
+  {id:"semana",    rot:"Semana"},
   {id:"chamados",  rot:"Chamados"},
   {id:"chopeiras", rot:"Chopeiras"},
   {id:"clientes",  rot:"Clientes"},
@@ -394,7 +424,7 @@ async function iniciar(){
     : esc(EU.nome || EU.email);
   desenharNav();
   await recarregar();
-  irPara("chamados");
+  irPara(EU.admin ? "semana" : "chamados");
 }
 
 function desenharNav(){
@@ -467,6 +497,7 @@ function nomeCliente(id){
 }
 
 function desenhar(){
+  if(VISTA === "semana")    return telaSemana();
   if(VISTA === "chamados")  return telaChamados();
   if(VISTA === "clientes")  return telaClientes();
   if(VISTA === "pecas")     return telaPecas();
@@ -1413,10 +1444,15 @@ function verOrdem(){
         '</div>' : '') +
 
       blocoOrcamento(o) +
+      blocoLaudo(o) +
 
       '<h3>Andamento</h3><div class="linha">' + linhaTempo + '</div>' +
 
-      (EU.admin ? (editando.modo === "orcamento" ? editorOrcamento() : painelAdmin(o)) : '') +
+      (EU.admin
+        ? (editando.modo === "orcamento" ? editorOrcamento()
+          : editando.modo === "laudo"    ? formLaudo()
+          : painelAdmin(o))
+        : '') +
 
       '<div class="btns"><button class="btn" onclick="irPara(\'chamados\')">Voltar</button></div>' +
     '</div>';
@@ -2030,6 +2066,1138 @@ async function salvarOrcamento(enviar){
     toast("Não deu para salvar: " + (err.message || err), "err");
     if(b) b.disabled = false;
   }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   GERADOR DE PDF
+
+   Escrito à mão, sem biblioteca — portado do app de Laudo, onde já
+   passou por campo. As fotos entram como JPEG cru (filtro DCTDecode),
+   que é o formato que o PDF aceita sem conversão; é por isso que a
+   foto é recomprimida em JPEG logo na captura.
+
+   O texto usa Helvetica, das fontes que todo leitor de PDF já tem,
+   com codificação WinAnsi — acento de português passa. A tabela de
+   larguras abaixo existe para quebrar as linhas na medida certa: o
+   PDF não quebra nada sozinho, cada linha é posta por coordenada.
+   ═══════════════════════════════════════════════════════════════════ */
+const LARG_N = [278,278,355,556,556,889,667,191,333,333,389,584,278,333,278,278,
+  556,556,556,556,556,556,556,556,556,556,278,278,584,584,584,556,1015,
+  667,667,722,722,667,611,778,722,278,500,667,556,833,722,778,667,778,722,667,611,722,667,944,667,667,611,
+  278,278,278,469,556,333,
+  556,556,500,556,556,278,556,556,222,222,500,222,833,556,556,556,556,333,500,278,556,500,722,500,500,500,
+  334,260,334,584];
+const LARG_B = [278,333,474,556,556,889,722,238,333,333,389,584,278,333,278,278,
+  556,556,556,556,556,556,556,556,556,556,333,333,584,584,584,611,975,
+  722,722,722,722,667,611,778,722,278,556,722,611,833,722,778,667,778,722,667,611,722,667,944,667,667,611,
+  333,278,333,584,556,333,
+  556,611,556,611,556,333,611,611,278,278,556,278,889,611,611,611,611,389,556,333,611,556,778,556,556,500,
+  389,280,389,584];
+
+/* Acentuados: cada um empresta a largura da letra base — a de "A com
+   acento" e a de "A" são a mesma. O "?" marca os que não seguem essa
+   regra e estão listados em EXTRAS. */
+const BASES  = 'AAAAAA?CEEEEIIIIDNOOOOO?OUUUUYP?aaaaaa?ceeeeIIIIonooooo?ouuuuypy';
+const EXTRAS = {
+  0x85:[1000,1000], 0x91:[222,278], 0x92:[222,278], 0x93:[333,500], 0x94:[333,500],
+  0x95:[350,350], 0x96:[556,556], 0x97:[1000,1000], 0xA0:[278,278], 0xA7:[556,556],
+  0xA9:[737,737], 0xAA:[370,370], 0xAE:[737,737], 0xB0:[400,400], 0xB2:[333,333],
+  0xB3:[333,333], 0xB5:[556,556], 0xB7:[278,278], 0xB9:[333,333], 0xBA:[365,365],
+  0xC6:[1000,1000], 0xD7:[584,584], 0xDF:[611,611], 0xE6:[889,889], 0xF7:[584,584]
+};
+
+/* Sinais fora do WinAnsi. Uns têm código próprio na tabela do PDF (a
+   aspa curva não é a aspa reta), outros só se resolvem por escrito —
+   e num laudo de refrigeração há mais destes do que parece: µF, Ω, °C. */
+const TRANSLITERA = {};
+[[0x2018,0x91],[0x2019,0x92],[0x201C,0x93],[0x201D,0x94],
+ [0x2013,0x96],[0x2014,0x97],[0x2026,0x85],[0x2022,0x95],
+ [0x00A0,0x20],[0x2212,0x2D],[0x2032,0x27],[0x2033,0x22],
+ [0x00B5,0xB5],[0x00B0,0xB0]
+].forEach(p => { TRANSLITERA[String.fromCharCode(p[0])] = String.fromCharCode(p[1]); });
+[[0x2192,'->'],[0x2190,'<-'],[0x2265,'>='],[0x2264,'<='],
+ [0x00BD,'1/2'],[0x00BC,'1/4'],[0x2122,'(TM)'],[0x20AC,'EUR'],
+ [0x03A9,'ohm'],[0x2126,'ohm'],[0x00B3,'3'],[0x00B2,'2']
+].forEach(p => { TRANSLITERA[String.fromCharCode(p[0])] = p[1]; });
+
+function paraWinAnsi(s){
+  s = String(s == null ? "" : s).replace(/\r\n?/g, "\n");
+  let saida = "";
+  for(let i = 0; i < s.length; i++){
+    const ch = s.charAt(i), cod = s.charCodeAt(i);
+    if(cod === 10 || (cod >= 32 && cod <= 126)){ saida += ch; continue; }
+    if(TRANSLITERA[ch] !== undefined){ saida += TRANSLITERA[ch]; continue; }
+    /* 0x80–0x9F já são códigos WinAnsi de uma passagem anterior: o texto
+       passa por aqui duas vezes, ao quebrar em linhas e ao escrever. */
+    if(cod >= 0x80 && cod <= 0xFF){ saida += ch; continue; }
+    saida += "?";
+  }
+  return saida;
+}
+
+function largCod(cod, negrito){
+  if(cod >= 32 && cod <= 126) return (negrito ? LARG_B : LARG_N)[cod - 32];
+  if(cod >= 192 && cod <= 255){
+    const b = BASES.charAt(cod - 192);
+    if(b !== "?") return (negrito ? LARG_B : LARG_N)[b.charCodeAt(0) - 32];
+  }
+  const e = EXTRAS[cod];
+  return e ? e[negrito ? 1 : 0] : 556;
+}
+function largura(s, tam, negrito){
+  let t = 0;
+  for(let i = 0; i < s.length; i++) t += largCod(s.charCodeAt(i), negrito);
+  return t * tam / 1000;
+}
+
+/* Quebra por palavra; palavra maior que a linha (um código, um modelo de
+   compressor) é partida. */
+function quebrar(s, larg, tam, negrito){
+  const saida = [];
+  paraWinAnsi(s).split("\n").forEach(bruta => {
+    const palavras = bruta.split(/\s+/).filter(p => p.length);
+    if(!palavras.length){ saida.push(""); return; }
+    let linha = "";
+    palavras.forEach(p => {
+      while(largura(p, tam, negrito) > larg && p.length > 1){
+        let corte = p.length;
+        while(corte > 1 && largura(p.slice(0, corte), tam, negrito) > larg) corte--;
+        if(linha){ saida.push(linha); linha = ""; }
+        saida.push(p.slice(0, corte));
+        p = p.slice(corte);
+      }
+      const tentativa = linha ? linha + " " + p : p;
+      if(largura(tentativa, tam, negrito) <= larg) linha = tentativa;
+      else { if(linha) saida.push(linha); linha = p; }
+    });
+    if(linha) saida.push(linha);
+  });
+  return saida;
+}
+
+function escPDF(s){
+  let saida = "";
+  for(let i = 0; i < s.length; i++){
+    const c = s.charAt(i), cod = s.charCodeAt(i);
+    if(c === "\\" || c === "(" || c === ")") saida += "\\" + c;
+    else if(cod < 32 || cod > 126) saida += "\\" + ("00" + cod.toString(8)).slice(-3);
+    else saida += c;
+  }
+  return saida;
+}
+function n2(v){ return String(Math.round(v * 100) / 100); }
+function bytesLatin(s){
+  const b = new Uint8Array(s.length);
+  for(let i = 0; i < s.length; i++) b[i] = s.charCodeAt(i) & 255;
+  return b;
+}
+function bytesDeDataUrl(dataUrl){
+  const bin = atob(String(dataUrl).split(",")[1] || "");
+  const u8 = new Uint8Array(bin.length);
+  for(let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+  return u8;
+}
+function medirImagem(dataUrl){
+  return new Promise(ok => {
+    const im = new Image();
+    im.onload  = () => ok({w: im.naturalWidth, h: im.naturalHeight});
+    im.onerror = () => ok(null);
+    im.src = dataUrl;
+  });
+}
+
+const PAG = {w:595.28, h:841.89, ml:46, mr:46, mt:48, mb:56};
+const COR = {
+  tinta:[0.078,0.110,0.200], fraca:[0.400,0.431,0.549], linha:[0.788,0.804,0.863],
+  marca:[0.788,0.482,0.239], papel:[1,1,1],
+  ok:[0.118,0.420,0.271], atencao:[0.659,0.314,0.059], critico:[0.608,0.106,0.133]
+};
+
+/* Duas passagens: primeiro o conteúdo, que vai criando páginas conforme
+   o texto e as fotos ocupam a folha; só no fim se sabe o total, e aí o
+   rodapé é escrito em todas. */
+function montarLaudo(dados, imagens){
+  const LU = PAG.w - PAG.ml - PAG.mr;
+  const paginas = [];
+  let ops = null, y = 0;
+
+  const cor = (c, traco) => n2(c[0]) + " " + n2(c[1]) + " " + n2(c[2]) + (traco ? " RG" : " rg");
+
+  function escrever(x, base, s, tam, negrito, c){
+    s = paraWinAnsi(s);
+    if(!s) return;
+    ops.push("BT " + cor(c || COR.tinta) + " /" + (negrito ? "F2" : "F1") + " " + n2(tam) +
+             " Tf 1 0 0 1 " + n2(x) + " " + n2(base) + " Tm (" + escPDF(s) + ") Tj ET");
+  }
+  function caixa(x, yy, w, h, c){
+    ops.push(cor(c) + " " + n2(x) + " " + n2(yy) + " " + n2(w) + " " + n2(h) + " re f");
+  }
+  function risco(x1, y1, x2, y2, c, esp){
+    ops.push(cor(c || COR.linha, true) + " " + n2(esp || 0.7) + " w " +
+             n2(x1) + " " + n2(y1) + " m " + n2(x2) + " " + n2(y2) + " l S");
+  }
+  function novaPagina(){
+    ops = []; paginas.push(ops);
+    y = PAG.h - PAG.mt;
+    if(paginas.length > 1){
+      escrever(PAG.ml, y - 7, "Laudo técnico · " + dados.numero + " · chopeira " +
+               dados.chopeiraCodigo, 8, false, COR.fraca);
+      risco(PAG.ml, y - 13, PAG.w - PAG.mr, y - 13, COR.linha, 0.7);
+      y -= 26;
+    }
+  }
+  const garantir = h => { if(y - h < PAG.mb) novaPagina(); };
+
+  function paragrafo(s, x, larg, tam, negrito, c, entre){
+    entre = entre || tam * 1.38;
+    quebrar(s, larg, tam, negrito).forEach(l => {
+      if(l === ""){ y -= entre * 0.5; return; }
+      garantir(entre);
+      escrever(x, y - tam * 0.86, l, tam, negrito, c);
+      y -= entre;
+    });
+  }
+  function titulo(texto, arrasta){
+    garantir(40 + Math.min(arrasta || 30, 300));
+    y -= 6;
+    escrever(PAG.ml, y - 13, texto, 13, true, COR.tinta);
+    caixa(PAG.ml, y - 19, largura(paraWinAnsi(texto), 13, true), 3.5, COR.marca);
+    y -= 30;
+  }
+  function campo(rot, valor, x, larg){
+    if(!valor) return;
+    escrever(x, y - 7, rot.toUpperCase(), 7, true, COR.fraca);
+    y -= 11;
+    paragrafo(valor, x, larg, 10, false, COR.tinta, 13);
+    y -= 4;
+  }
+
+  /* ── capa ── */
+  novaPagina();
+  escrever(PAG.ml, y - 8, "GIBA SOLUÇÕES", 9, true, COR.marca);
+  y -= 24;
+  escrever(PAG.ml, y - 20, "Laudo técnico de manutenção", 21, true, COR.tinta);
+  y -= 30;
+  escrever(PAG.ml, y - 10, dados.numero + "  ·  chopeira " + dados.chopeiraCodigo +
+           "  ·  " + dados.dataLaudo, 10, false, COR.fraca);
+  y -= 20;
+  risco(PAG.ml, y, PAG.w - PAG.mr, y, COR.linha, 1);
+  y -= 20;
+
+  /* ── cliente e equipamento, lado a lado ── */
+  const meia = (LU - 18) / 2;
+  const yTopo = y;
+  escrever(PAG.ml, y - 8, "CLIENTE", 8, true, COR.fraca);
+  y -= 16;
+  [dados.cliente.nome, dados.cliente.razao, dados.cliente.cnpj ? "CNPJ " + dados.cliente.cnpj : "",
+   dados.cliente.endereco, dados.cliente.cidade].filter(Boolean).forEach(l => {
+    paragrafo(l, PAG.ml, meia, 9.5, false, COR.tinta, 12.5);
+  });
+  const yEsq = y;
+
+  y = yTopo;
+  const xd = PAG.ml + meia + 18;
+  escrever(xd, y - 8, "EQUIPAMENTO", 8, true, COR.fraca);
+  y -= 16;
+  [dados.equipamento.codigo, dados.equipamento.marcaModelo, dados.equipamento.tipo,
+   dados.equipamento.compressor, dados.equipamento.gas].filter(Boolean).forEach(l => {
+    paragrafo(l, xd, meia, 9.5, false, COR.tinta, 12.5);
+  });
+  y = Math.min(yEsq, y) - 10;
+  risco(PAG.ml, y, PAG.w - PAG.mr, y, COR.linha, 0.7);
+  y -= 6;
+
+  /* ── o corpo ── */
+  if(dados.problemaRelatado){
+    titulo("Reclamação do cliente");
+    paragrafo(dados.problemaRelatado, PAG.ml, LU, 10.5, false, COR.tinta, 14);
+  }
+  if(dados.problemaConstatado){
+    titulo("Problema constatado");
+    paragrafo(dados.problemaConstatado, PAG.ml, LU, 10.5, false, COR.tinta, 14);
+  }
+
+  if((dados.componentes || []).length){
+    titulo("Ensaios realizados");
+    dados.componentes.forEach(c => {
+      garantir(46);
+      y -= 4;
+      escrever(PAG.ml, y - 10, c.nome, 10.5, true, COR.tinta);
+      y -= 17;
+      paragrafo(c.ensaios, PAG.ml + 10, LU - 10, 9.8, false, COR.tinta, 13);
+      if(c.conclusao){
+        const c1 = /condena|substitu|troca|defeit/i.test(c.conclusao) ? COR.critico : COR.ok;
+        garantir(14);
+        escrever(PAG.ml + 10, y - 9, "→ " + c.conclusao, 9.8, true, c1);
+        y -= 16;
+      }
+      y -= 3;
+    });
+  }
+
+  if(dados.servicoExecutado){
+    titulo("Serviço executado");
+    paragrafo(dados.servicoExecutado, PAG.ml, LU, 10.5, false, COR.tinta, 14);
+  }
+
+  if((dados.pecas || []).length){
+    titulo("Peças substituídas");
+    dados.pecas.forEach(p => {
+      garantir(15);
+      escrever(PAG.ml, y - 9, "•", 10, false, COR.fraca);
+      const t = p.qtd ? p.qtd + " × " + p.descricao : p.descricao;
+      paragrafo(t, PAG.ml + 12, LU - 12 - (p.valor ? 90 : 0), 10, false, COR.tinta, 13.5);
+      if(p.valor){
+        escrever(PAG.w - PAG.mr - largura(paraWinAnsi(p.valor), 10, true), y + 13.5 - 9,
+                 p.valor, 10, true, COR.tinta);
+      }
+    });
+    if(dados.totais){
+      y -= 6;
+      risco(PAG.ml, y, PAG.w - PAG.mr, y, COR.linha, 0.7);
+      y -= 16;
+      escrever(PAG.ml, y, "Total do serviço", 10, true, COR.tinta);
+      escrever(PAG.w - PAG.mr - largura(paraWinAnsi(dados.totais), 11, true), y,
+               dados.totais, 11, true, COR.marca);
+      y -= 18;
+    }
+  }
+
+  if(dados.recomendacoes){
+    titulo("Recomendações");
+    paragrafo(dados.recomendacoes, PAG.ml, LU, 10.5, false, COR.tinta, 14);
+  }
+
+  /* ── fotos ── */
+  const fotos = (dados.fotos || []).map(id => imagens[id]).filter(Boolean);
+  if(fotos.length){
+    titulo("Registro fotográfico", 200);
+    fotos.forEach(img => {
+      const larg = Math.min(LU, 330);
+      const alt = larg * img.h / img.w;
+      garantir(alt + 14);
+      ops.push("q " + n2(larg) + " 0 0 " + n2(alt) + " " + n2(PAG.ml) + " " +
+               n2(y - alt) + " cm /" + img.nome + " Do Q");
+      y -= alt + 14;
+    });
+  }
+
+  /* ── assinaturas ── */
+  garantir(96);
+  y -= 24;
+  risco(PAG.ml, y, PAG.w - PAG.mr, y, COR.linha, 0.7);
+  y -= 34;
+  const larguraAss = (LU - 30) / 2;
+  risco(PAG.ml, y, PAG.ml + larguraAss, y, COR.tinta, 0.7);
+  risco(PAG.ml + larguraAss + 30, y, PAG.w - PAG.mr, y, COR.tinta, 0.7);
+  y -= 12;
+  escrever(PAG.ml, y, dados.tecnico || "Técnico responsável", 9, false, COR.tinta);
+  escrever(PAG.ml + larguraAss + 30, y, dados.cliente.nome || "Cliente", 9, false, COR.tinta);
+  y -= 11;
+  escrever(PAG.ml, y, "Técnico responsável", 8, false, COR.fraca);
+  escrever(PAG.ml + larguraAss + 30, y, "Recebido por", 8, false, COR.fraca);
+
+  /* ── rodapé em todas as páginas, agora que se sabe quantas são ── */
+  paginas.forEach((pg, i) => {
+    const guarda = ops;
+    ops = pg;
+    risco(PAG.ml, PAG.mb - 14, PAG.w - PAG.mr, PAG.mb - 14, COR.linha, 0.7);
+    escrever(PAG.ml, PAG.mb - 26, "Giba Soluções · laudo emitido em " + dados.dataLaudo,
+             8, false, COR.fraca);
+    const p = "Página " + (i + 1) + " de " + paginas.length;
+    escrever(PAG.w - PAG.mr - largura(paraWinAnsi(p), 8, false), PAG.mb - 26, p, 8, false, COR.fraca);
+    ops = guarda;
+  });
+
+  return paginas;
+}
+
+function escreverPDF(paginas, imagens, dados){
+  const partes = [], offsets = {};
+  let tam = 0, proximo = 1;
+
+  const emitir = u8 => { partes.push(u8); tam += u8.length; };
+  const alocar = () => proximo++;
+  function objeto(num, corpo, fluxo){
+    offsets[num] = tam;
+    emitir(bytesLatin(num + " 0 obj\n" + corpo));
+    if(fluxo){
+      emitir(bytesLatin("\nstream\n"));
+      emitir(fluxo);
+      emitir(bytesLatin("\nendstream"));
+    }
+    emitir(bytesLatin("\nendobj\n"));
+  }
+
+  const nCatalogo = alocar(), nPaginas = alocar(), nF1 = alocar(), nF2 = alocar(), nInfo = alocar();
+  const listaImg = Object.keys(imagens).map(k => imagens[k]);
+  listaImg.forEach(img => { img.num = alocar(); });
+
+  const nPag = [], nConteudo = [];
+  paginas.forEach(() => { nPag.push(alocar()); nConteudo.push(alocar()); });
+
+  emitir(bytesLatin("%PDF-1.4\n%\xE2\xE3\xCF\xD3\n"));
+  objeto(nCatalogo, "<< /Type /Catalog /Pages " + nPaginas + " 0 R >>");
+
+  const recImg = listaImg.map(i => "/" + i.nome + " " + i.num + " 0 R").join(" ");
+  objeto(nPaginas,
+    "<< /Type /Pages /Count " + paginas.length +
+    " /Kids [" + nPag.map(n => n + " 0 R").join(" ") + "]" +
+    " /MediaBox [0 0 " + n2(PAG.w) + " " + n2(PAG.h) + "]" +
+    " /Resources << /Font << /F1 " + nF1 + " 0 R /F2 " + nF2 + " 0 R >>" +
+    (recImg ? " /XObject << " + recImg + " >>" : "") + " >> >>");
+
+  objeto(nF1, "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>");
+  objeto(nF2, "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>");
+
+  const agora = new Date(), dois = v => ("0" + v).slice(-2);
+  const carimbo = "D:" + agora.getFullYear() + dois(agora.getMonth()+1) + dois(agora.getDate()) +
+                  dois(agora.getHours()) + dois(agora.getMinutes()) + dois(agora.getSeconds());
+  objeto(nInfo,
+    "<< /Title (" + escPDF(paraWinAnsi("Laudo técnico " + dados.numero)) + ")" +
+    " /Author (" + escPDF(paraWinAnsi(dados.tecnico || "Giba Soluções")) + ")" +
+    " /Creator (Chopeiras) /Producer (Chopeiras) /CreationDate (" + carimbo + ") >>");
+
+  listaImg.forEach(img => {
+    objeto(img.num,
+      "<< /Type /XObject /Subtype /Image /Width " + img.w + " /Height " + img.h +
+      " /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length " +
+      img.bytes.length + " >>", img.bytes);
+  });
+
+  paginas.forEach((pgOps, i) => {
+    const fluxo = bytesLatin(pgOps.join("\n"));
+    objeto(nConteudo[i], "<< /Length " + fluxo.length + " >>", fluxo);
+    objeto(nPag[i], "<< /Type /Page /Parent " + nPaginas + " 0 R /Contents " +
+                    nConteudo[i] + " 0 R >>");
+  });
+
+  const inicioXref = tam, total = proximo;
+  let xref = "xref\n0 " + total + "\n0000000000 65535 f \n";
+  for(let n = 1; n < total; n++){
+    xref += ("0000000000" + (offsets[n] || 0)).slice(-10) + " 00000 n \n";
+  }
+  xref += "trailer\n<< /Size " + total + " /Root " + nCatalogo + " 0 R /Info " + nInfo +
+          " 0 R >>\nstartxref\n" + inicioXref + "\n%%EOF\n";
+  emitir(bytesLatin(xref));
+
+  return new Blob(partes, {type:"application/pdf"});
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LAUDO
+
+   O texto dos ensaios não é inventado aqui: veio da tabela "Testando
+   cada peça do diagrama" do app de compressores, escrita pelo Giba e
+   marcada lá como CAMPO — critério de técnico, não do fabricante.
+
+   Nenhum ensaio entra sozinho no laudo. O técnico escolhe o que de
+   facto mediu, e o texto fica editável: um laudo que descreve um
+   ensaio que não foi feito é pior do que laudo nenhum, porque é
+   assinado por quem o entrega.
+   ═══════════════════════════════════════════════════════════════════ */
+const ENSAIOS = [
+  {nome:"Protetor térmico", origem:"CAMPO", texto:
+    "Continuidade entre os dois terminais no ohmímetro. Sem continuidade a frio, sem ter " +
+    "disparado, o componente está condenado."},
+
+  {nome:"Relé de partida magnético", origem:"CAMPO", texto:
+    "Resistência da bobina no ohmímetro — poucos ohms, é enrolamento de fio grosso."},
+
+  {nome:"Relé de partida voltimétrico", origem:"CAMPO", texto:
+    "Escala 20 kΩ para testar a bobina, entre os terminais 5 e 2. Escala 200 Ω para testar o " +
+    "contato, entre 2 e 1 — deve haver continuidade com o relé em repouso, ao contrário do " +
+    "relé de corrente comum."},
+
+  {nome:"Capacitor de partida", origem:"CAMPO", texto:
+    "Capacitor descarregado antes de qualquer medição, com resistor de 150 kΩ 2 W entre os " +
+    "terminais — nunca em curto direto. Medido no capacímetro e comparado com o valor " +
+    "impresso no corpo."},
+
+  {nome:"Capacitor permanente", origem:"CAMPO", texto:
+    "Mesmo procedimento do capacitor de partida: descarregado antes, medido no capacímetro e " +
+    "comparado com o valor impresso no corpo."},
+
+  {nome:"Válvula solenoide", origem:"CAMPO", texto:
+    "Resistência da bobina no ohmímetro. Conferida a tensão de alimentação e verificada a " +
+    "atração magnética com a bobina energizada, encostando objeto ferroso no núcleo."},
+
+  {nome:"Micromotor do ventilador", origem:"CAMPO", texto:
+    "Eixo verificado quanto a giro livre, sem travamento. Resistência da bobina do motor e " +
+    "tensão de alimentação medidas. Motor energizado diretamente para confirmar rotação."},
+
+  {nome:"Pressostato de alta (cartucho)", origem:"CAMPO", texto:
+    "Continuidade no ohmímetro entre os dois terminais, que deve fechar. Com manifold, " +
+    "aplicada pressão para confirmar o desarme no ponto de ajuste."},
+
+  {nome:"Pressostato de baixa (KP1)", origem:"CAMPO", texto:
+    "Verificado o corte e o religamento pela pressão de sucção, com manifold, contra os " +
+    "pontos de ajuste do equipamento."},
+
+  {nome:"Compressor — checklist completo", origem:"CAMPO", texto:
+    "Isolação para a carcaça verificada: nenhum terminal apresenta continuidade com a " +
+    "carcaça. Medida a resistência entre as três combinações de terminais e identificados " +
+    "comum, start e run pela resistência. Ligação direta com medição de corrente e teste de " +
+    "compressão com manifold."},
+
+  {nome:"Estanqueidade e carga", origem:"CAMPO", texto:
+    "Sistema pressurizado e verificado quanto a vazamento. Vácuo aplicado antes da carga, e " +
+    "carga de gás refrigerante conferida pelas pressões de trabalho."}
+];
+
+/* Aviso que anda junto do relé e do protetor: os testes são opostos, e
+   trocar um pelo outro condena peça boa e aprova peça ruim. */
+const AVISO_RELE = "Relé de corrente e protetor térmico têm testes opostos: em repouso e frio, " +
+  "o contato do relé está aberto e o do protetor está fechado. Relé colado fechado mantém o " +
+  "enrolamento de partida energizado e queima o compressor em poucos dias.";
+
+function podeLaudo(o){
+  return ["concluido", "entrega_agendada", "entregue", "orcamento_reprovado"].includes(o.status);
+}
+
+/* ── o que os dois lados veem, depois de emitido ── */
+function blocoLaudo(o){
+  const l = o.laudo;
+  if(!l) return EU.admin && podeLaudo(o)
+    ? '<h3>Laudo</h3><div class="btns" style="margin-top:0">' +
+      '<button class="btn pri" onclick="montarLaudoForm()">Emitir o laudo</button></div>' +
+      '<div class="esc">O laudo é o documento que fica com o cliente: o que foi constatado, ' +
+      'o que foi ensaiado e o que foi trocado.</div>'
+    : '';
+
+  const comp = (l.componentes || []).map(c =>
+    '<div style="margin-bottom:10px">' +
+      '<div style="font-weight:700">' + esc(c.nome) + '</div>' +
+      '<div class="muted" style="white-space:pre-wrap">' + esc(c.ensaios) + '</div>' +
+      (c.conclusao ? '<div style="font-weight:700;color:' +
+        (/condena|substitu|troca|defeit/i.test(c.conclusao) ? 'var(--danger)' : 'var(--ok)') +
+        '">→ ' + esc(c.conclusao) + '</div>' : '') +
+    '</div>').join("");
+
+  return '<h3>Laudo</h3>' +
+    '<div class="alert grn" style="margin-top:0"><b>Laudo emitido</b> em ' +
+      esc(quando(l.emitidoEm)) + (l.tecnico ? ' por ' + esc(l.tecnico) : '') + '.</div>' +
+    (l.problemaConstatado ? '<div style="margin-top:10px"><b>Problema constatado</b>' +
+      '<div class="muted" style="white-space:pre-wrap">' + esc(l.problemaConstatado) + '</div></div>' : '') +
+    (comp ? '<div style="margin-top:12px"><b>Ensaios realizados</b><div style="margin-top:6px">' +
+      comp + '</div></div>' : '') +
+    (l.servicoExecutado ? '<div style="margin-top:6px"><b>Serviço executado</b>' +
+      '<div class="muted" style="white-space:pre-wrap">' + esc(l.servicoExecutado) + '</div></div>' : '') +
+    (l.recomendacoes ? '<div style="margin-top:10px"><b>Recomendações</b>' +
+      '<div class="muted" style="white-space:pre-wrap">' + esc(l.recomendacoes) + '</div></div>' : '') +
+    '<div class="btns">' +
+      '<button class="btn pri" id="btPdf" onclick="baixarLaudo()">Baixar o PDF</button>' +
+      (EU.admin ? '<button class="btn" onclick="montarLaudoForm()">Refazer</button>' : '') +
+    '</div>';
+}
+
+/* ── o formulário, só do lado do Giba ── */
+function montarLaudoForm(){
+  const o = editando.dados, l = o.laudo;
+  const aprovado = o.decisaoCliente && o.decisaoCliente.valor === "aprovado";
+  const pecasDoOrcamento = (aprovado && o.orcamento ? o.orcamento.itens : [])
+    .filter(i => i.tipo === "peca")
+    .map(i => ({descricao:i.descricao, qtd:i.qtd, valorUnit:i.valorUnit}));
+
+  editando.laudo = {
+    problemaConstatado: l ? l.problemaConstatado : "",
+    componentes: l ? JSON.parse(JSON.stringify(l.componentes || [])) : [],
+    servicoExecutado: l ? l.servicoExecutado : "",
+    recomendacoes: l ? l.recomendacoes : "",
+    pecas: l ? JSON.parse(JSON.stringify(l.pecas || [])) : pecasDoOrcamento,
+    tecnico: l ? l.tecnico : (EU.nome || "Giba Soluções")
+  };
+  editando.modo = "laudo";
+  verOrdem();
+}
+
+function formLaudo(){
+  const e = editando.laudo;
+  const usados = e.componentes.map(c => c.nome);
+
+  const cartaoComp = (c, i) =>
+    '<div class="itemOrc">' +
+      '<div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline">' +
+        '<b>' + esc(c.nome) + '</b>' +
+        '<button class="btn dg sm" onclick="tirarEnsaio(' + i + ')">×</button>' +
+      '</div>' +
+      '<label style="margin-top:8px">Ensaios (edite para o que você fez de verdade)</label>' +
+      '<textarea oninput="mudarEnsaio(' + i + ',\'ensaios\',this.value)" ' +
+        'style="min-height:88px">' + esc(c.ensaios) + '</textarea>' +
+      '<label>Conclusão</label>' +
+      '<input value="' + esc(c.conclusao || "") + '" list="conclusoes" ' +
+        'placeholder="componente condenado, substituído" ' +
+        'oninput="mudarEnsaio(' + i + ',\'conclusao\',this.value)">' +
+    '</div>';
+
+  return '<div style="border-top:1px solid var(--line);margin-top:16px;padding-top:4px">' +
+    '<h3>Emitir o laudo</h3>' +
+    '<div class="alert blu" style="margin-top:0">Os textos de ensaio vêm da sua tabela de testes ' +
+      'do app de compressores. <b>Escolha só o que você mediu</b>, e corrija o texto se o ' +
+      'ensaio foi outro — quem assina é você.</div>' +
+
+    '<label>Problema constatado</label>' +
+    '<textarea id="l_constatado" placeholder="Pressostato de baixa não fechava o contato, ' +
+      'deixando o compressor sem partir." style="min-height:80px">' +
+      esc(e.problemaConstatado) + '</textarea>' +
+
+    '<h3>Ensaios realizados</h3>' +
+    (e.componentes.length ? e.componentes.map(cartaoComp).join("") :
+      '<div class="esc">Nenhum ensaio no laudo ainda.</div>') +
+    '<datalist id="conclusoes">' +
+      ['componente aprovado no ensaio','componente condenado, substituído',
+       'dentro do valor especificado','fora do valor especificado',
+       'sem continuidade, condenado','substituído por peça nova'].map(c =>
+        '<option value="' + esc(c) + '"></option>').join("") +
+    '</datalist>' +
+    '<label>Acrescentar ensaio</label>' +
+    '<select onchange="porEnsaio(this)">' +
+      '<option value="">— escolha o componente —</option>' +
+      ENSAIOS.map((s, i) => '<option value="' + i + '"' +
+        (usados.includes(s.nome) ? " disabled" : "") + '>' + esc(s.nome) + '</option>').join("") +
+      '<option value="livre">— outro, escrevo eu —</option>' +
+    '</select>' +
+
+    '<h3>Serviço executado</h3>' +
+    '<textarea id="l_servico" placeholder="Substituído o pressostato de baixa, refeita a ' +
+      'conexão elétrica e testado o ciclo completo." style="min-height:80px">' +
+      esc(e.servicoExecutado) + '</textarea>' +
+
+    '<h3>Peças substituídas</h3>' +
+    (e.pecas.length
+      ? '<div class="esc">Vieram do orçamento aprovado. Tire as que não foram trocadas.</div>' +
+        e.pecas.map((p, i) =>
+          '<div class="itemOrc" style="display:flex;justify-content:space-between;gap:10px;' +
+            'align-items:center"><div>' + esc(p.qtd) + ' × ' + esc(p.descricao) +
+            '<div class="dt">' + esc(reais((Number(p.qtd)||0)*(Number(p.valorUnit)||0))) + '</div></div>' +
+            '<button class="btn dg sm" onclick="tirarPecaLaudo(' + i + ')">×</button></div>').join("")
+      : '<div class="esc">Nenhuma peça — ou o orçamento não foi aprovado, ou o serviço não ' +
+        'trocou nada.</div>') +
+
+    '<h3>Recomendações</h3>' +
+    '<textarea id="l_recomenda" placeholder="Recomendada a limpeza do condensador a cada ' +
+      'três meses.">' + esc(e.recomendacoes) + '</textarea>' +
+
+    '<label>Assina o laudo</label>' +
+    '<input id="l_tecnico" value="' + esc(e.tecnico) + '">' +
+
+    '<div class="btns">' +
+      '<button class="btn pri" id="btLaudo" onclick="salvarLaudo()">Salvar o laudo</button>' +
+      '<button class="btn" onclick="editando.modo=null;verOrdem()">Cancelar</button>' +
+    '</div>' +
+  '</div>';
+}
+
+function porEnsaio(sel){
+  const v = sel.value;
+  sel.value = "";
+  if(!v) return;
+  if(v === "livre"){
+    const nome = prompt("Nome do componente ou do ensaio:");
+    if(!nome || !nome.trim()) return;
+    editando.laudo.componentes.push({nome:nome.trim(), ensaios:"", conclusao:""});
+  } else {
+    const s = ENSAIOS[Number(v)];
+    if(!s) return;
+    const releOuProtetor = /relé|protetor/i.test(s.nome);
+    editando.laudo.componentes.push({
+      nome: s.nome,
+      ensaios: s.texto + (releOuProtetor ? "\n\n" + AVISO_RELE : ""),
+      conclusao: ""
+    });
+  }
+  verOrdem();
+}
+function mudarEnsaio(i, campo, valor){
+  const c = editando.laudo.componentes[i];
+  if(c) c[campo] = valor;      /* sem redesenhar: o cursor ficaria para trás */
+}
+function tirarEnsaio(i){ editando.laudo.componentes.splice(i,1); verOrdem(); }
+function tirarPecaLaudo(i){ editando.laudo.pecas.splice(i,1); verOrdem(); }
+
+async function salvarLaudo(){
+  const e = editando.laudo, o = editando.dados;
+  const laudo = {
+    problemaConstatado: $("l_constatado").value.trim(),
+    componentes: e.componentes.filter(c => c.nome).map(c => ({
+      nome: c.nome, ensaios: (c.ensaios||"").trim(), conclusao: (c.conclusao||"").trim()})),
+    servicoExecutado: $("l_servico").value.trim(),
+    recomendacoes: $("l_recomenda").value.trim(),
+    pecas: e.pecas,
+    tecnico: $("l_tecnico").value.trim() || "Giba Soluções",
+    emitidoEm: new Date().toISOString()
+  };
+  if(!laudo.problemaConstatado && !laudo.servicoExecutado){
+    return toast("Um laudo sem problema constatado nem serviço executado não diz nada.", "err");
+  }
+
+  const b = $("btLaudo"); if(b) b.disabled = true;
+  try{
+    await db.collection("ordens").doc(o.id).update({
+      laudo: laudo,
+      naoLidoCliente: true,
+      atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    o.laudo = laudo;
+    o.naoLidoCliente = true;
+    editando.modo = null;
+    verOrdem();
+    desenharSino();
+    toast("Laudo emitido. O cliente já pode baixar o PDF.", "ok");
+  }catch(err){
+    toast("Não deu para salvar: " + (err.message || err), "err");
+    if(b) b.disabled = false;
+  }
+}
+
+/* ── o PDF ── */
+async function baixarLaudo(){
+  const o = editando.dados, l = o.laudo;
+  if(!l) return;
+  const b = $("btPdf");
+  if(b){ b.disabled = true; b.textContent = "Montando…"; }
+  try{
+    const c = CLIENTES.find(x => x.id === o.clienteId) || {};
+    const cho = CHOPEIRAS.find(x => x.id === o.chopeiraId) || {};
+
+    /* As fotos do chamado entram no laudo: são a prova do estado em que
+       o equipamento chegou. */
+    const imagens = {};
+    let n = 0;
+    for(const fid of (o.fotos || [])){
+      try{
+        const snap = await db.collection("fotos").doc(fid).get();
+        if(!snap.exists) continue;
+        const url = snap.data().dataUrl;
+        const dim = await medirImagem(url);
+        if(!dim) continue;
+        n++;
+        imagens[fid] = {nome:"Im" + n, w:dim.w, h:dim.h, bytes:bytesDeDataUrl(url)};
+      }catch(e){ /* uma foto que não vem não impede o laudo */ }
+    }
+
+    const aprovado = o.decisaoCliente && o.decisaoCliente.valor === "aprovado";
+    const dados = {
+      numero: o.numero,
+      chopeiraCodigo: o.chopeiraCodigo,
+      dataLaudo: quando(l.emitidoEm),
+      cliente: {
+        nome: c.nomeFantasia || c.razaoSocial || "",
+        razao: c.razaoSocial && c.nomeFantasia ? c.razaoSocial : "",
+        cnpj: c.cnpj ? cnpjFormatado(c.cnpj) : "",
+        endereco: c.endereco || "",
+        cidade: [c.cidade, c.uf].filter(Boolean).join(" · ")
+      },
+      equipamento: {
+        codigo: "Chopeira " + (cho.codigo || o.chopeiraCodigo),
+        marcaModelo: [cho.marca, cho.modelo].filter(Boolean).join(" "),
+        tipo: cho.tipo ? cho.tipo + (cho.torneiras ? " · " + cho.torneiras + " torneiras" : "") : "",
+        compressor: [cho.compressorMarca, cho.compressorModelo, cho.compressorHp]
+          .filter(Boolean).join(" "),
+        gas: cho.compressorGas ? "Gás " + cho.compressorGas : ""
+      },
+      problemaRelatado: o.problemaRelatado || "",
+      problemaConstatado: l.problemaConstatado,
+      componentes: l.componentes,
+      servicoExecutado: l.servicoExecutado,
+      recomendacoes: l.recomendacoes,
+      pecas: (l.pecas || []).map(p => ({
+        descricao: p.descricao, qtd: p.qtd,
+        valor: aprovado ? reais((Number(p.qtd)||0) * (Number(p.valorUnit)||0)) : ""
+      })),
+      totais: aprovado && o.orcamento ? reais(o.orcamento.total) : "",
+      fotos: o.fotos || [],
+      tecnico: l.tecnico
+    };
+
+    const paginas = montarLaudo(dados, imagens);
+    const blob = escreverPDF(paginas, imagens, dados);
+    const nome = "laudo-" + String(o.numero).toLowerCase().replace(/[^a-z0-9]+/g, "-") + ".pdf";
+
+    /* Partilhar, no celular, abre o WhatsApp direto. Onde não houver,
+       cai no download de sempre. */
+    const arquivo = new File([blob], nome, {type:"application/pdf"});
+    if(navigator.canShare && navigator.canShare({files:[arquivo]})){
+      try{
+        await navigator.share({files:[arquivo], title:"Laudo " + o.numero});
+        return;
+      }catch(err){ if(err && err.name === "AbortError") return; }
+    }
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = nome;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    toast("PDF gerado.", "ok");
+  }catch(err){
+    toast("Não deu para gerar o PDF: " + (err.message || err), "err");
+  }finally{
+    const bb = $("btPdf");
+    if(bb){ bb.disabled = false; bb.textContent = "Baixar o PDF"; }
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   SEMANA
+
+   A fila de chamados responde "em que pé está cada um". Esta tela
+   responde outra pergunta, que é a que faz sair de casa: o que buscar,
+   o que está parado na bancada, e o que entregar.
+   ═══════════════════════════════════════════════════════════════════ */
+const GRUPOS = [
+  {id:"buscar",  rot:"Buscar",     status:["aberto","recolha_agendada"],
+   data:"recolhaPrevista",
+   vazio:"Nada para buscar."},
+  {id:"oficina", rot:"Na oficina", status:["recebido","em_teste","em_manutencao",
+                                           "aguardando_peca","orcamento_enviado",
+                                           "orcamento_aprovado","orcamento_reprovado"],
+   data:null,
+   vazio:"A bancada está limpa."},
+  {id:"entregar", rot:"Entregar",  status:["concluido","entrega_agendada"],
+   data:"entregaPrevista",
+   vazio:"Nada pronto para entregar."}
+];
+
+function hojeISO(){
+  const d = new Date(), p = n => String(n).padStart(2,"0");
+  return d.getFullYear() + "-" + p(d.getMonth()+1) + "-" + p(d.getDate());
+}
+
+/* Quantos dias faltam (negativo = atrasado). Comparação por texto ISO
+   não serve: "2026-09-01" é menor que "2026-1-5" em texto. */
+function diasAte(iso){
+  if(!iso) return null;
+  const [a,m,d] = String(iso).split("-").map(Number);
+  if(!a || !m || !d) return null;
+  const alvo = new Date(a, m-1, d), hoje = new Date();
+  hoje.setHours(0,0,0,0); alvo.setHours(0,0,0,0);
+  return Math.round((alvo - hoje) / 86400000);
+}
+
+function telaSemana(){
+  if(editando && editando.tipo === "verOrdem") return verOrdem();
+
+  const abertas = ORDENS.filter(ehAberto);
+  const parados = abertas.filter(o => o.status === "aguardando_peca").length;
+  const esperando = abertas.filter(o => o.status === "orcamento_enviado").length;
+
+  const grupo = g => {
+    const itens = abertas.filter(o => g.status.includes(o.status))
+      .sort((a,b) => {
+        const da = g.data && a.agenda ? a.agenda[g.data] : "";
+        const db_ = g.data && b.agenda ? b.agenda[g.data] : "";
+        if(da && db_) return da.localeCompare(db_);
+        if(da) return -1;
+        if(db_) return 1;
+        return 0;
+      });
+    return '<h3>' + esc(g.rot) + ' (' + itens.length + ')</h3>' +
+      (itens.length ? itens.map(o => cartaoSemana(o, g)).join("") :
+        '<div class="esc">' + esc(g.vazio) + '</div>');
+  };
+
+  $("tela").innerHTML =
+    '<div class="btns" style="margin:0 0 12px"><button class="btn" onclick="atualizar()">Atualizar</button></div>' +
+    '<div class="card" style="padding:13px">' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
+        '<span class="pill cold">' + abertas.length + ' em aberto</span>' +
+        (parados ? '<span class="pill pend">' + parados + ' esperando peça</span>' : '') +
+        (esperando ? '<span class="pill orc">' + esperando + ' esperando resposta</span>' : '') +
+      '</div>' +
+    '</div>' +
+    GRUPOS.map(grupo).join("");
+}
+
+function cartaoSemana(o, g){
+  const s = status(o.status);
+  const iso = g.data && o.agenda ? o.agenda[g.data] : "";
+  const d = diasAte(iso);
+  let selo = "";
+  if(d !== null){
+    if(d < 0)       selo = '<span class="pill dg">atrasado ' + (-d) + ' dia' + (d === -1 ? "" : "s") + '</span>';
+    else if(d === 0) selo = '<span class="pill pend">hoje</span>';
+    else if(d === 1) selo = '<span class="pill cold">amanhã</span>';
+    else             selo = '<span class="pill">em ' + d + ' dias</span>';
+  } else if(g.data){
+    selo = '<span class="pill">sem data</span>';
+  }
+
+  return '<div class="reg' + (d !== null && d <= 0 ? " pend" : "") + '"><div class="top">' +
+    '<div style="min-width:0">' +
+      '<div class="nm mono">' + esc(o.chopeiraCodigo) + '</div>' +
+      '<div class="dt">' + esc(nomeCliente(o.clienteId)) + '</div>' +
+      (iso ? '<div class="dt">' + esc(dataCurta(iso)) + '</div>' : '') +
+    '</div>' +
+    '<button class="btn sm" onclick="abrirDaSemana(\'' + o.id + '\')">Abrir</button>' +
+  '</div>' +
+  '<div style="margin-top:9px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">' +
+    '<span class="pill ' + s.pill + '">' + esc(s.rot) + '</span>' + selo +
+  '</div></div>';
+}
+
+function abrirDaSemana(id){
+  VISTA = "chamados";
+  (EU.admin ? ABAS_ADMIN : ABAS_CLIENTE).forEach(a => {
+    const b = $("nav_" + a.id);
+    if(b) b.className = (a.id === "chamados" ? "on" : "");
+  });
+  abrirOrdem(id);
+}
+/* ═══════════════════════════════════════════════════════════════════
+   MODO DEMONSTRAÇÃO
+
+   Liga sozinho quando o Firebase ainda não está configurado, e à mão
+   com ?demo na barra de endereço. Põe no lugar do Firestore um banco
+   que vive dentro do navegador, com dados de exemplo — dá para
+   percorrer o aplicativo inteiro, dos dois lados, sem conta, sem
+   servidor e sem internet.
+
+   Nada daqui sai do aparelho, e nada aqui é real: é para ver como
+   funciona antes de ligar ao Firebase de verdade.
+   ═══════════════════════════════════════════════════════════════════ */
+function ligarDemo(){
+  const ler = (k, p) => {
+    try{ const v = sessionStorage.getItem(k); return v ? JSON.parse(v) : p; }catch(e){ return p; }
+  };
+  const gravar = (k, v) => { try{ sessionStorage.setItem(k, JSON.stringify(v)); }catch(e){} };
+
+  const LOJA = ler("demo.loja", null) || semear();
+  const salvar = () => gravar("demo.loja", LOJA);
+  let seq = ler("demo.seq", 100);
+  const novoId = () => { seq++; gravar("demo.seq", seq); return "d" + seq; };
+  const clonar = o => JSON.parse(JSON.stringify(o));
+
+  /* devolve o carimbo com toDate(), como faz o Firestore */
+  function reviver(o){
+    if(o === null || typeof o !== "object") return o;
+    if(Array.isArray(o)) return o.map(reviver);
+    if(typeof o.__ts === "number"){
+      const ms = o.__ts;
+      return {toDate: () => new Date(ms), seconds: Math.floor(ms/1000)};
+    }
+    const r = {};
+    Object.keys(o).forEach(k => { r[k] = reviver(o[k]); });
+    return r;
+  }
+
+  function docRef(col, id){
+    return {
+      id: id,
+      get: () => {
+        const d = LOJA[col] && LOJA[col][id];
+        return Promise.resolve({exists: !!d, id: id,
+          data: () => d ? reviver(clonar(d)) : undefined});
+      },
+      set: v => { LOJA[col] = LOJA[col] || {}; LOJA[col][id] = clonar(v); salvar();
+                  return Promise.resolve(); },
+      update: v => {
+        if(!(LOJA[col] && LOJA[col][id])) return Promise.reject(new Error("não existe"));
+        const alvo = LOJA[col][id];
+        Object.keys(v).forEach(k => {
+          const val = v[k];
+          if(val && val.__arrayUnion) alvo[k] = (alvo[k] || []).concat(clonar(val.__arrayUnion));
+          else alvo[k] = clonar(val);
+        });
+        salvar();
+        return Promise.resolve();
+      },
+      delete: () => { if(LOJA[col]) delete LOJA[col][id]; salvar(); return Promise.resolve(); }
+    };
+  }
+  function consulta(col, filtros, ordem){
+    return {
+      where: (c,o,v) => consulta(col, filtros.concat([[c,o,v]]), ordem),
+      orderBy: c => consulta(col, filtros, c),
+      get: () => {
+        let itens = Object.keys(LOJA[col] || {}).map(id => ({id:id, d:LOJA[col][id]}));
+        filtros.forEach(([c,,v]) => { itens = itens.filter(x => x.d[c] === v); });
+        if(ordem) itens.sort((a,b) =>
+          String(a.d[ordem]||"").localeCompare(String(b.d[ordem]||""), "pt-BR"));
+        return Promise.resolve({
+          docs: itens.map(x => ({id:x.id, data:() => reviver(clonar(x.d))})),
+          size: itens.length, empty: !itens.length});
+      }
+    };
+  }
+  function colRef(col){
+    const q = consulta(col, [], null);
+    return {
+      doc: id => docRef(col, id || novoId()),
+      add: v => { const id = novoId(); LOJA[col] = LOJA[col] || {}; LOJA[col][id] = clonar(v);
+                  salvar(); return Promise.resolve({id:id}); },
+      where: q.where, orderBy: q.orderBy, get: q.get
+    };
+  }
+
+  window.__demoLoja = LOJA;
+  db = {collection: colRef, enablePersistence: () => Promise.resolve()};
+  window.firebase = window.firebase || {};
+  firebase.firestore = firebase.firestore || {};
+  firebase.firestore.FieldValue = {
+    serverTimestamp: () => ({__ts: Date.now()}),
+    arrayUnion: (...itens) => ({__arrayUnion: itens})
+  };
+
+  const papel = ler("demo.papel", "admin");
+  EU = papel === "admin"
+    ? {uid:"demo-giba", email:"gibasolucoes@gmail.com", nome:"Giba", foto:"",
+       papel:"admin", clienteId:null, admin:true}
+    : {uid:"demo-ze", email:"ze@bardoze.com.br", nome:"Zé", foto:"",
+       papel:"cliente", clienteId:"cli1", admin:false};
+
+  window.demoTrocarPapel = () => {
+    gravar("demo.papel", ler("demo.papel","admin") === "admin" ? "cliente" : "admin");
+    location.reload();
+  };
+  window.demoRecomecar = () => {
+    if(!confirm("Apagar tudo o que você mexeu na demonstração e voltar ao exemplo?")) return;
+    try{ sessionStorage.removeItem("demo.loja"); sessionStorage.removeItem("demo.seq"); }catch(e){}
+    location.reload();
+  };
+
+  document.getElementById("authGate").style.display = "none";
+  document.body.insertAdjacentHTML("afterbegin",
+    '<div id="faixaDemo">' +
+      '<b>Modo demonstração</b> — dados de exemplo, guardados só neste aparelho. ' +
+      'Você está vendo como <b>' + (EU.admin ? "Giba" : "o cliente Zé") + '</b>.' +
+      '<div class="btns" style="margin-top:8px;justify-content:center">' +
+        '<button class="btn sm" onclick="demoTrocarPapel()">Ver como ' +
+          (EU.admin ? "o cliente" : "o Giba") + '</button>' +
+        '<button class="btn sm" onclick="demoRecomecar()">Recomeçar</button>' +
+      '</div>' +
+    '</div>');
+  iniciar();
+}
+
+/* Um exemplo que já tem história: uma chopeira à espera de peça, outra
+   com orçamento na mesa, e uma terceira já entregue com laudo. */
+function semear(){
+  const t = Date.now(), dia = 86400000;
+  const iso = n => new Date(t - n*dia).toISOString();
+  const data = n => {
+    const d = new Date(t + n*dia), p = x => String(x).padStart(2,"0");
+    return d.getFullYear() + "-" + p(d.getMonth()+1) + "-" + p(d.getDate());
+  };
+  return {
+    clientes: {
+      cli1:{cnpj:"11222333000181", razaoSocial:"Zé Comércio de Bebidas Ltda",
+        nomeFantasia:"Bar do Zé", endereco:"Rua das Palmeiras, 210", cidade:"Florianópolis",
+        uf:"SC", contato:"Zé", telefone:"(48) 3333-1234", whatsapp:"48 99999-1234",
+        emailsAutorizados:["ze@bardoze.com.br"], observacoes:"", criadoEm:{__ts:t-40*dia}},
+      cli2:{cnpj:"04252011000110", razaoSocial:"Choperia Trilho Norte Ltda",
+        nomeFantasia:"Trilho Norte", endereco:"Av. Central, 1500", cidade:"São José",
+        uf:"SC", contato:"Marcia", telefone:"(48) 3222-8080", whatsapp:"48 98888-7777",
+        emailsAutorizados:["marcia@trilhonorte.com.br"], observacoes:"", criadoEm:{__ts:t-30*dia}}
+    },
+    usuarios: {
+      "demo-ze":{nome:"Zé", email:"ze@bardoze.com.br", papel:"cliente", ativo:true,
+        clienteId:"cli1", criadoEm:{__ts:t-40*dia}, ultimoAcesso:{__ts:t-dia}},
+      "demo-marcia":{nome:"Marcia", email:"marcia@trilhonorte.com.br", papel:"cliente",
+        ativo:false, clienteId:null, criadoEm:{__ts:t-2*dia}, ultimoAcesso:{__ts:t-2*dia}}
+    },
+    chopeiras: {
+      cho1:{codigo:"CH-014", clienteId:"cli1", local:"balcão da frente", marca:"Beertec",
+        modelo:"BT-2T", tipo:"Banco de gelo", torneiras:"2", compressorMarca:"Embraco",
+        compressorModelo:"EMIS70HER", compressorHp:"1/5 HP", compressorGas:"R134a",
+        compressorAplicacao:"MBP", provisorio:false, observacoes:"", criadoEm:{__ts:t-40*dia}},
+      cho2:{codigo:"CH-021", clienteId:"cli1", local:"depósito", marca:"Gelopar",
+        modelo:"GRBC-2", tipo:"Direta", torneiras:"2", compressorMarca:"Tecumseh",
+        compressorGas:"R134a", compressorAplicacao:"MBP", provisorio:false,
+        observacoes:"", criadoEm:{__ts:t-38*dia}},
+      cho3:{codigo:"TN-003", clienteId:"cli2", local:"salão", marca:"Maxbeer", modelo:"MX-4",
+        tipo:"Banco de gelo", torneiras:"4", compressorMarca:"Embraco",
+        compressorGas:"R290", compressorAplicacao:"MBP", provisorio:false,
+        observacoes:"", criadoEm:{__ts:t-30*dia}}
+    },
+    pecas: {
+      pe1:{codigo:"KP1-060", descricao:"Pressostato de baixa (KP1 Danfoss)", unidade:"un",
+        precoVenda:289.9, aplicacao:"chopeira com banco de gelo", observacoes:""},
+      pe2:{codigo:"CAP-330", descricao:"Capacitor de partida (eletrolítico)", unidade:"un",
+        precoVenda:48.5, aplicacao:"324–389 µF, 110/120 VAC", observacoes:""},
+      pe3:{codigo:"REL-VOLT", descricao:"Relé de partida voltimétrico", unidade:"un",
+        precoVenda:132, aplicacao:"compressor de chopeira", observacoes:""},
+      pe4:{codigo:"FS-032", descricao:"Filtro secador", unidade:"un", precoVenda:34.9,
+        aplicacao:"", observacoes:""}
+    },
+    ordens: {
+      os1:{numero:"OS-260819-K7QP", clienteId:"cli1", chopeiraId:"cho1", chopeiraCodigo:"CH-014",
+        status:"orcamento_enviado",
+        problemaRelatado:"O chope está saindo quente desde ontem de manhã. O motor liga mas não gela como antes.",
+        fotos:[], thumb:null,
+        historico:[
+          {status:"aberto", quando:iso(4), quem:"Zé", nota:""},
+          {status:"recolha_agendada", quando:iso(4), quem:"Giba", nota:"Passo aí quinta de manhã."},
+          {status:"recebido", quando:iso(3), quem:"Giba", nota:""},
+          {status:"em_teste", quando:iso(2), quem:"Giba", nota:"Compressor parte e roda. Pressostato não fecha o contato."},
+          {status:"orcamento_enviado", quando:iso(0), quem:"Giba", nota:"Orçamento de R$ 469,90."}],
+        agenda:{recolhaPrevista:data(-3), entregaPrevista:""},
+        orcamento:{itens:[
+          {tipo:"peca", pecaId:"pe1", descricao:"Pressostato de baixa (KP1 Danfoss)", qtd:1, valorUnit:289.9},
+          {tipo:"servico", pecaId:null, descricao:"Mão de obra — troca de componente", qtd:1, valorUnit:180}],
+          totalPecas:289.9, totalServico:180, total:469.9, validadeDias:15, enviadoEm:iso(0)},
+        decisaoCliente:null,
+        abertoPor:{uid:"demo-ze", nome:"Zé", email:"ze@bardoze.com.br"},
+        naoLidoAdmin:false, naoLidoCliente:true,
+        abertoEm:{__ts:t-4*dia}, atualizadoEm:{__ts:t-3600000}},
+
+      os2:{numero:"OS-260821-M3XZ", clienteId:"cli2", chopeiraId:"cho3", chopeiraCodigo:"TN-003",
+        status:"aguardando_peca", problemaRelatado:"Torneira 3 pingando sem parar.",
+        fotos:[], thumb:null,
+        historico:[
+          {status:"aberto", quando:iso(2), quem:"Marcia", nota:""},
+          {status:"recebido", quando:iso(1), quem:"Giba", nota:""},
+          {status:"aguardando_peca", quando:iso(0), quem:"Giba", nota:"Guarnição encomendada, chega quarta."}],
+        agenda:{recolhaPrevista:data(-1), entregaPrevista:data(3)},
+        abertoPor:{uid:"demo-marcia", nome:"Marcia", email:"marcia@trilhonorte.com.br"},
+        naoLidoAdmin:true, naoLidoCliente:false,
+        abertoEm:{__ts:t-2*dia}, atualizadoEm:{__ts:t-7200000}},
+
+      os3:{numero:"OS-260805-B9TR", clienteId:"cli1", chopeiraId:"cho2", chopeiraCodigo:"CH-021",
+        status:"entregue", problemaRelatado:"Não estava ligando de jeito nenhum.",
+        fotos:[], thumb:null,
+        historico:[
+          {status:"aberto", quando:iso(18), quem:"Zé", nota:""},
+          {status:"recebido", quando:iso(17), quem:"Giba", nota:""},
+          {status:"em_teste", quando:iso(16), quem:"Giba", nota:""},
+          {status:"orcamento_enviado", quando:iso(15), quem:"Giba", nota:"Orçamento de R$ 312,00."},
+          {status:"orcamento_aprovado", quando:iso(14), quem:"Zé", nota:""},
+          {status:"concluido", quando:iso(12), quem:"Giba", nota:""},
+          {status:"entregue", quando:iso(11), quem:"Giba", nota:""}],
+        agenda:{recolhaPrevista:data(-18), entregaPrevista:data(-11)},
+        orcamento:{itens:[
+          {tipo:"peca", pecaId:"pe3", descricao:"Relé de partida voltimétrico", qtd:1, valorUnit:132},
+          {tipo:"servico", pecaId:null, descricao:"Mão de obra — troca de componente", qtd:1, valorUnit:180}],
+          totalPecas:132, totalServico:180, total:312, validadeDias:15, enviadoEm:iso(15)},
+        decisaoCliente:{valor:"aprovado", motivo:"", quando:iso(14), por:"Zé", porUid:"demo-ze"},
+        laudo:{
+          problemaConstatado:"Compressor não partia. O relé voltimétrico apresentava continuidade " +
+            "no contato fora da condição de repouso, mantendo o enrolamento de partida energizado.",
+          componentes:[
+            {nome:"Relé de partida voltimétrico",
+             ensaios:"Escala 20 kΩ para testar a bobina, entre os terminais 5 e 2. Escala 200 Ω " +
+               "para testar o contato, entre 2 e 1 — deve haver continuidade com o relé em " +
+               "repouso, ao contrário do relé de corrente comum.",
+             conclusao:"componente condenado, substituído"},
+            {nome:"Compressor — checklist completo",
+             ensaios:"Isolação para a carcaça verificada: nenhum terminal apresenta continuidade " +
+               "com a carcaça. Medida a resistência entre as três combinações de terminais e " +
+               "identificados comum, start e run pela resistência. Ligação direta com medição de " +
+               "corrente e teste de compressão com manifold.",
+             conclusao:"componente aprovado no ensaio"}],
+          servicoExecutado:"Substituído o relé de partida voltimétrico. Refeita a conexão " +
+            "elétrica e testado o ciclo completo de partida e corte.",
+          recomendacoes:"Recomendada a limpeza do condensador a cada três meses.",
+          pecas:[{descricao:"Relé de partida voltimétrico", qtd:1, valorUnit:132}],
+          tecnico:"Giba", emitidoEm:iso(12)},
+        abertoPor:{uid:"demo-ze", nome:"Zé", email:"ze@bardoze.com.br"},
+        naoLidoAdmin:false, naoLidoCliente:false,
+        abertoEm:{__ts:t-18*dia}, atualizadoEm:{__ts:t-11*dia}}
+    },
+    convites: {"ze@bardoze.com.br":{clienteId:"cli1", criadoEm:{__ts:t-40*dia}}},
+    fotos: {}
+  };
 }
 
 async function atualizar(){

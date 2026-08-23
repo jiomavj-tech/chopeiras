@@ -5,8 +5,17 @@
 Cadastro das chopeiras de cada cliente, com acesso controlado: o cliente entra com a conta Google
 dele e vê apenas os equipamentos da própria empresa. O Giba vê e mantém tudo.
 
-Estão feitas as **três primeiras das cinco entregas** planeadas: os cadastros, o fluxo do chamado
-e o orçamento. O que ainda não está vem listado no fim.
+**As cinco entregas planeadas estão feitas.** O que continua de fora, e porquê, está no fim.
+
+## Experimentar sem configurar nada
+
+Enquanto o Firebase não estiver ligado — ou acrescentando `?demo` ao endereço — o aplicativo abre
+em **modo demonstração**: um banco de exemplo que vive dentro do navegador, com duas empresas,
+três chopeiras, um orçamento à espera de resposta e um serviço já entregue com laudo.
+
+Dá para percorrer tudo, dos dois lados: a faixa no topo tem o botão **Ver como o cliente**, que
+troca de papel sem sair da página, e **Recomeçar**, que devolve o exemplo ao estado inicial. Nada
+sai do aparelho e nada ali é real — é para ver como funciona antes de ligar ao Firebase.
 
 ## O que já funciona
 
@@ -54,6 +63,23 @@ serviço é sempre escrito. Cada grupo tem o seu subtotal, e o total soma os doi
 cliente decide, porque ele aceita pagar a peça e discute a mão de obra, ou o contrário. O valor
 total é recalculado enquanto se digita.
 
+**Semana.** A fila de chamados diz em que pé está cada um; esta tela responde a outra pergunta,
+que é a que faz sair de casa: o que **buscar**, o que está **na oficina** e o que **entregar**.
+Data vencida vira selo de *atrasado* com a contagem de dias, e o resumo do topo diz quantos
+esperam peça e quantos esperam resposta do cliente.
+
+**Laudo com os ensaios que você faz.** Ao concluir, o app monta o laudo a partir da sua própria
+tabela de testes do app de compressores — protetor térmico, relé magnético e voltimétrico,
+capacitores, solenoide, micromotor, pressostatos e o checklist do compressor. **Nenhum ensaio
+entra sozinho**: você escolhe o que mediu, e o texto fica editável. Relé e protetor vêm com o
+aviso de que os testes são opostos, porque trocar um pelo outro condena peça boa e aprova peça
+ruim.
+
+**PDF com as fotos, sem biblioteca nenhuma.** Capa com cliente e equipamento, reclamação,
+problema constatado, ensaios com a conclusão de cada um, serviço executado, peças substituídas
+com valores, recomendações, as fotos do chamado e as duas linhas de assinatura. No celular, o
+botão abre a folha de partilha e vai direto para o WhatsApp.
+
 **Aprovação do cliente, por escrito.** Quando o orçamento é enviado, aparecem no aplicativo dele os
 botões de **aprovar** e **não aprovar** — este último pedindo o motivo. A resposta fica gravada com
 o nome de quem respondeu e a data, e entra na linha do tempo. Depois de respondido, os botões dão
@@ -76,6 +102,8 @@ equipamentos dele com a ficha completa de cada um.
 | Cadastro de peças e preços | não vê | tudo |
 | Valores do orçamento | vê os da ordem dele; não altera | é quem lança |
 | Aprovar ou não aprovar | responde uma vez, só com orçamento na mesa | pode registrar por ele |
+| Laudo | lê e baixa o PDF | emite e refaz |
+| Semana | não vê | é a tela de abertura |
 | Fotos | lê só as da empresa dele; pode criar | tudo |
 | O próprio acesso | não se aprova | aprova e bloqueia |
 | Empresa a que pertence | não escolhe | define |
@@ -121,7 +149,7 @@ Publicando assim, as regras do Firestore continuam a ter de ser enviadas à part
 | `firebase.json`, `.firebaserc` | Hospedagem e projeto |
 | `manifest.webmanifest` | Nome, cores e ícones para instalar no celular |
 | `sw.js` | Faz o app abrir sem rede depois de instalado |
-| `testes/` | As três suítes e o Firestore de mentira |
+| `testes/` | As quatro suítes e o Firestore de mentira |
 | `robots.txt` | Pede aos buscadores que não indexem: é app de uso restrito |
 
 Ao publicar uma alteração, incrementar `VERSAO` no `sw.js` e o número em `#versaoApp` no
@@ -136,15 +164,19 @@ node testes/rodar.js
 ```
 
 Abre o aplicativo num Chromium de verdade, com um Firestore de mentira no lugar do Google, e
-percorre os três fluxos inteiros — 56 verificações. Detalhe do que cobre e do que **não** cobre
+percorre os fluxos inteiros — **75 verificações**, incluindo gerar o PDF e conferir que o arquivo
+é mesmo um PDF, com a foto embutida. Detalhe do que cobre e do que **não** cobre
 em [`testes/LEIAME.md`](testes/LEIAME.md).
 
-## O que ainda não está aqui
+## O que ficou de fora, e porquê
 
-As duas entregas seguintes, por ordem:
+**Notificação push automática.** Exige um servidor para disparar — uma página estática não pode
+guardar a chave de envio — e isso pede o plano pago do Firebase. Enquanto isso o aviso sai pelo
+sino dentro do app e pelo WhatsApp, com a mensagem pronta. No iPhone, push exigiria ainda que o
+cliente tivesse o app na tela inicial.
 
-4. **Laudo.** Texto montado a partir do que foi feito, PDF com as fotos, guardado junto da ordem.
-5. **Avisos e agenda.** Notificação push, agendamento de recolha e entrega, visão da semana.
+**Desconto e imposto no orçamento.** É soma de linhas: quantidade × valor, em dois grupos.
+Desconto, por ora, é uma linha de serviço com valor negativo.
 
 ## Limitações conhecidas
 

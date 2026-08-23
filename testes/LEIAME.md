@@ -15,6 +15,7 @@ preenchida de faz de conta, serve numa porta local e corre as suítes.
 | `1-cadastros.js` | Portão de acesso, convite por e-mail, CNPJ, cadastro de chopeiras, painel de acessos, e o cliente a ver só o que é dele |
 | `2-chamados.js` | Abertura de chamado, chopeira provisória, mudança de status, linha do tempo, sino e o link do WhatsApp |
 | `3-orcamento.js` | Cadastro de peças, preço em vírgula, orçamento com peças e serviço separados, envio, e a aprovação e a recusa do cliente |
+| `4-laudo-e-semana.js` | Agenda da semana com selo de atraso, emissão do laudo com os ensaios reais, geração do PDF (o arquivo é aberto e conferido), e o modo demonstração dos dois lados |
 | `firestore-de-mentira.js` | O dublê: guarda tudo na sessão do navegador e imita a API do Firestore, incluindo `arrayUnion` e os carimbos de tempo |
 
 ## O que estes testes NÃO cobrem
@@ -25,6 +26,9 @@ servidor do Google. O que se testa aqui é o comportamento do aplicativo
 emulador do Firebase, com `firebase emulators:exec`.
 
 **O ditado e a câmera.** Precisam de microfone e de internet de verdade.
+
+**A aparência do PDF.** O teste confirma que o arquivo é um PDF válido, com a foto embutida e as
+páginas declaradas — não que a folha está bonita. Isso continua a pedir olho humano.
 
 ## Se o Chromium não for encontrado
 
