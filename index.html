@@ -752,8 +752,12 @@ function formCliente(){
       '<div class="esc">O WhatsApp é por onde os avisos de status vão sair.</div>' +
 
       '<h3>Quem pode entrar no aplicativo</h3>' +
-      '<label>E-mails liberados (um por linha)</label>' +
-      '<textarea id="f_emails" placeholder="fulano@empresa.com.br">'+esc((d.emailsAutorizados||[]).join("\n"))+'</textarea>' +
+      '<label>E-mails liberados</label>' +
+      '<div id="f_emails_lista" style="margin-bottom:10px"></div>' +
+      '<div class="lin" style="margin-bottom:10px">' +
+        '<div><input id="f_email_novo" type="email" placeholder="novo@empresa.com.br" onkeypress="if(event.key===\'Enter\')adicionarEmail();event.preventDefault()"></div>' +
+        '<div style="flex:0 0 auto"><button class="btn" onclick="adicionarEmail()" style="width:100%">Adicionar</button></div>' +
+      '</div>' +
       '<div class="esc">Quem entrar com um destes e-mails já cai ligado a esta empresa e liberado. ' +
         'Quem entrar com outro fica na fila da aba Acessos.</div>' +
 
@@ -771,6 +775,7 @@ function formCliente(){
   } else {
     checarCnpj();
   }
+  renderizarEmails();
 }
 
 function checarCnpj(){
@@ -783,10 +788,44 @@ function checarCnpj(){
   a.style.color = ok ? "var(--ok)" : "var(--danger)";
 }
 
-async function salvarCliente(){
-  const emails = $("f_emails").value.split("\n")
-    .map(s=>s.trim().toLowerCase()).filter(s=>s.includes("@"));
+function renderizarEmails(){
+  const lista = editando.dados.emailsAutorizados || [];
+  const html = lista.map((e, i) =>
+    '<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;background:var(--panel2);border-radius:8px;padding:10px;border:1px solid var(--line)">' +
+      '<div style="flex:1">'+esc(e)+'</div>' +
+      '<button class="btn sm" onclick="removerEmail('+i+')" style="flex:0 0 auto;background:#E0655533;border-color:#E0655566;color:var(--danger)">Remover</button>' +
+    '</div>'
+  ).join("");
+  $("f_emails_lista").innerHTML = html || '<div class="muted" style="padding:8px">Nenhum e-mail adicionado ainda</div>';
+}
 
+function adicionarEmail(){
+  const input = $("f_email_novo");
+  const email = input.value.trim().toLowerCase();
+
+  if(!email){
+    return toast("Digite um e-mail", "err");
+  }
+  if(!email.includes("@")){
+    return toast("E-mail inválido", "err");
+  }
+
+  if(!editando.dados.emailsAutorizados) editando.dados.emailsAutorizados = [];
+  if(editando.dados.emailsAutorizados.includes(email)){
+    return toast("Este e-mail já foi adicionado", "err");
+  }
+
+  editando.dados.emailsAutorizados.push(email);
+  input.value = "";
+  renderizarEmails();
+}
+
+function removerEmail(i){
+  editando.dados.emailsAutorizados.splice(i, 1);
+  renderizarEmails();
+}
+
+async function salvarCliente(){
   const ehPessoaFisica = document.querySelector('input[name="tipo"]:checked').value === "fisica";
 
   const dados = {
@@ -797,7 +836,7 @@ async function salvarCliente(){
     contato: $("f_contato").value.trim(),
     telefone: $("f_telefone").value.trim(),
     whatsapp: $("f_whats").value.trim(),
-    emailsAutorizados: emails,
+    emailsAutorizados: editando.dados.emailsAutorizados || [],
     observacoes: $("f_obs").value.trim()
   };
 
