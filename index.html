@@ -315,26 +315,28 @@ async function portao(user){
     let snap = await ref.get();
 
     if(!snap.exists){
-      /* Primeiro acesso. Se houver convite para este e-mail, a pessoa já
-         nasce ligada à empresa e liberada; se não, entra na fila. */
-      let convite = null;
+      /* Primeiro acesso. Procura na lista de e-mails autorizados. */
+      let clienteId = null;
       try{
-        console.log("🔍 Procurando convite para:", email);
-        const c = await db.collection("convites").doc(email).get();
-        console.log("📄 Convite encontrado:", c.exists, c.data());
-        if(c.exists) convite = c.data();
+        console.log("🔍 Procurando e-mail:", email);
+        const idx = await db.collection("admin").doc("emailIndex").get();
+        if(idx.exists){
+          const emails = idx.data() || {};
+          clienteId = emails[email];
+          console.log("📄 E-mail encontrado na lista:", !!clienteId, clienteId);
+        }
       }catch(e){
-        console.error("❌ Erro ao buscar convite:", e);
+        console.error("❌ Erro ao buscar índice:", e);
       }
 
-      console.log("✍️ Salvando usuário com convite:", !!convite, convite);
+      console.log("✍️ Salvando usuário com clienteId:", clienteId);
       await ref.set({
         nome:  user.displayName || "",
         email: email,
         foto:  user.photoURL || "",
         papel: "cliente",
-        ativo: !!convite,
-        clienteId: convite ? convite.clienteId : null,
+        ativo: !!clienteId,
+        clienteId: clienteId,
         criadoEm: firebase.firestore.FieldValue.serverTimestamp(),
         ultimoAcesso: firebase.firestore.FieldValue.serverTimestamp()
       });
@@ -897,24 +899,15 @@ async function salvarCliente(){
       id = ref.id;
     }
 
-    /* Os convites são o que permite a pessoa entrar já ligada à empresa.
-       Um documento por e-mail, que só o dono daquele e-mail consegue ler. */
-    const add = dados.emailsAutorizados.filter(e => !anteriores.includes(e));
-    const rem = anteriores.filter(e => !dados.emailsAutorizados.includes(e));
-    console.log("📧 E-mails para adicionar convites:", add);
-    console.log("🗑️  E-mails para remover convites:", rem);
-    await Promise.all([].concat(
-      add.map(e => {
-        console.log("➕ Criando convite para:", e);
-        return db.collection("convites").doc(e).set({
-          clienteId: id, criadoEm: firebase.firestore.FieldValue.serverTimestamp()
-        });
-      }),
-      rem.map(e => {
-        console.log("➖ Deletando convite para:", e);
-        return db.collection("convites").doc(e).delete();
-      })
-    ));
+    /* Atualizar índice de e-mails autorizados em um único documento.
+       Todos os e-mails desta empresa apontam para o mesmo clienteId. */
+    const emailIndex = {};
+    dados.emailsAutorizados.forEach(e => {
+      emailIndex[e] = id;
+    });
+    console.log("📧 Atualizando índice de e-mails:", dados.emailsAutorizados);
+
+    await db.collection("admin").doc("emailIndex").set(emailIndex, {merge: true});
 
     await recarregar();
     irPara("clientes");
@@ -935,7 +928,13 @@ async function apagarCliente(){
   if(!confirm("Apagar esta empresa? Não dá para desfazer.")) return;
   try{
     const emails = (editando.dados.emailsAutorizados || []);
-    await Promise.all(emails.map(e => db.collection("convites").doc(e).delete().catch(()=>{})));
+    const updates = {};
+    emails.forEach(e => {
+      updates[e] = firebase.firestore.FieldValue.delete();
+    });
+    if(emails.length > 0){
+      await db.collection("admin").doc("emailIndex").update(updates);
+    }
     await db.collection("clientes").doc(id).delete();
     await recarregar();
     irPara("clientes");

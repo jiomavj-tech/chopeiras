@@ -40,13 +40,12 @@ service cloud.firestore {
       return eu().clienteId;
     }
 
-    /* ── Convites ─────────────────────────────────────────────────
-       Um documento por e-mail, criado pelo administrador ao cadastrar
-       a empresa. Só o dono daquele e-mail consegue ler o seu — é o que
-       permite a pessoa entrar já ligada à empresa certa, sem ter de
-       ler a lista de clientes (que ela não pode ver).             */
-    match /convites/{email} {
-      allow read:  if autenticado() && email == meuEmail();
+    /* ── Índice de e-mails ─────────────────────────────────────────
+       Um único documento que mapeia e-mails autorizados para clienteIds.
+       Qualquer usuário autenticado consegue ler para descobrir sua empresa.
+       Só o administrador consegue escrever. */
+    match /admin/emailIndex {
+      allow read:  if autenticado();
       allow write: if ehAdmin();
     }
 
