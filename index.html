@@ -1,0 +1,2049 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Chopeiras — Giba Soluções</title>
+<meta name="description" content="Gestão de manutenção de chopeiras: clientes, equipamentos, ordens de serviço e laudo.">
+<meta name="theme-color" content="#101820">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icone-192.png">
+<link rel="apple-touch-icon" href="./icone-192.png">
+<style>
+  :root{--bg:#101820;--panel:#1A2530;--panel2:#223140;--line:#2E4152;
+    --text:#E8EEF3;--dim:#8FA3B3;--copper:#C97B3D;--copperhi:#E29455;
+    --cold:#4DA8C9;--ok:#5FBF7A;--warn:#E0B341;--danger:#E06555}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+    font-size:15px;line-height:1.5;-webkit-text-size-adjust:100%}
+  .wrap{max-width:820px;margin:0 auto;padding:0 14px}
+  header{padding:16px 0 12px;border-bottom:1px solid var(--line)}
+  .brand{font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--copper)}
+  h1{font-size:19px;margin:4px 0 0;font-weight:800;letter-spacing:-.2px}
+  .sub{font-size:12px;color:var(--dim);margin-top:3px}
+  nav{display:flex;gap:5px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);
+    border-radius:12px;padding:5px;margin:12px 0}
+  nav button{flex:1 1 auto;padding:9px 12px;border:0;border-radius:8px;background:transparent;
+    color:var(--dim);font:800 13px inherit;font-family:inherit;cursor:pointer;white-space:nowrap}
+  nav button.on{background:var(--copper);color:#14100C}
+  main{padding:4px 0 40px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
+  .card.pend{border-left:4px solid var(--warn)}
+  h2{font-size:15px;font-weight:800;margin:0 0 3px}
+  h3{font-size:11px;font-weight:800;margin:18px 0 8px;color:var(--copperhi);
+    text-transform:uppercase;letter-spacing:1.4px}
+  h3:first-child{margin-top:0}
+  .muted{color:var(--dim);font-size:13px}
+  .mono{font-family:ui-monospace,'Courier New',monospace;font-weight:800;color:var(--copperhi);letter-spacing:.5px}
+  .alert{border-radius:10px;padding:11px 13px;font-size:13.5px;margin:10px 0}
+  .alert.red{background:#E0655514;border:1px solid #E0655544}
+  .alert.yel{background:#E0B34114;border:1px solid #E0B34144}
+  .alert.blu{background:#4DA8C914;border:1px solid #4DA8C944}
+  .alert.grn{background:#5FBF7A14;border:1px solid #5FBF7A44}
+  input,textarea,select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--line);
+    background:var(--bg);color:var(--text);font-size:16px;font-family:inherit;outline:none}
+  input:focus,textarea:focus,select:focus{border-color:var(--copper)}
+  textarea{min-height:76px;resize:vertical}
+  label{display:block;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;
+    color:var(--dim);margin:13px 0 5px}
+  .lin{display:flex;gap:10px;flex-wrap:wrap}
+  .lin>div{flex:1 1 150px;min-width:0}
+  .btn{padding:11px 16px;border-radius:10px;border:1px solid var(--line);
+    background:var(--panel2);color:var(--text);font:800 14px inherit;font-family:inherit;
+    cursor:pointer;white-space:nowrap}
+  .btn.pri{background:var(--copper);color:#14100C;border-color:var(--copper)}
+  .btn.dg{background:transparent;border:1px solid #E0655566;color:var(--danger)}
+  .btn.sm{padding:7px 12px;font-size:12.5px}
+  .btn:disabled{opacity:.45;cursor:default}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+  .reg{border:1px solid var(--line);border-radius:12px;padding:13px;margin-bottom:10px;background:var(--panel)}
+  .reg .top{display:flex;gap:10px;align-items:flex-start;justify-content:space-between}
+  .reg .nm{font-weight:800;font-size:14.5px}
+  .reg .dt{font-size:12.5px;color:var(--dim);margin-top:2px}
+  .pill{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:800;
+    border:1px solid var(--line);background:var(--panel2);color:var(--dim);white-space:nowrap}
+  .pill.ok{border-color:#5FBF7A55;background:#5FBF7A18;color:var(--ok)}
+  .pill.pend{border-color:#E0B34155;background:#E0B34118;color:var(--warn)}
+  .pill.adm{border-color:#C97B3D55;background:#C97B3D18;color:var(--copperhi)}
+  .pill.cold{border-color:#4DA8C955;background:#4DA8C918;color:var(--cold)}
+  .pill.dg{border-color:#E0655555;background:#E0655518;color:var(--danger)}
+  .pill.orc{border-color:#C97B3D66;background:#C97B3D22;color:var(--copperhi)}
+  .itemOrc{border:1px solid var(--line);border-radius:10px;padding:11px;margin-bottom:9px;
+    background:var(--bg)}
+  /* linha do tempo do chamado: a bolinha carrega a cor do status */
+  .linha{display:flex;flex-direction:column;gap:2px;margin-top:4px}
+  .passo{display:grid;grid-template-columns:20px 1fr;gap:12px}
+  .passo .bola{position:relative;display:flex;justify-content:center;padding-top:13px}
+  .passo .bola::before{content:"";position:absolute;top:0;bottom:-2px;width:1px;background:var(--line)}
+  .passo:last-child .bola::before{bottom:auto;height:13px}
+  .passo:first-child .bola::before{top:13px}
+  .passo .bola i{position:relative;width:9px;height:9px;border-radius:50%;
+    background:var(--dim);box-shadow:0 0 0 4px var(--panel)}
+  .passo .bola i.p-ok{background:var(--ok)}
+  .passo .bola i.p-pend{background:var(--warn)}
+  .passo .bola i.p-cold{background:var(--cold)}
+  .passo .bola i.p-dg{background:var(--danger)}
+  .passo .bola i.p-orc{background:var(--copper)}
+  .passo .txt{padding:8px 0 10px}
+  .passo.agora .pt{color:var(--copperhi)}
+  .passo .pt{font-weight:800;font-size:14px}
+  .passo .pd{font-size:12px;color:var(--dim)}
+  .passo .pn{font-size:13px;margin-top:3px;white-space:pre-wrap}
+  .foto{width:100%;max-height:260px;object-fit:cover;border-radius:10px;border:1px solid var(--line);
+    display:block;margin-top:8px;background:var(--bg)}
+  .th{width:54px;height:54px;object-fit:cover;border-radius:8px;border:1px solid var(--line);flex:0 0 auto}
+  .vazio{text-align:center;color:var(--dim);font-size:13.5px;padding:26px 10px}
+  .busca{margin-bottom:12px}
+  .foot{text-align:center;color:var(--dim);font-size:12px;padding:26px 10px 40px}
+  a{color:var(--cold)}
+  #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:24px;z-index:9999;
+    background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:11px 18px;
+    font-size:13.5px;font-weight:700;box-shadow:0 8px 30px #0009;display:none;max-width:90vw}
+  #toast.ok{border-color:#5FBF7A66;color:var(--ok)}
+  #toast.err{border-color:#E0655566;color:var(--danger)}
+  .esc{font-size:12px;color:var(--dim);margin-top:5px}
+  .setup{font-family:ui-monospace,monospace;font-size:12px;background:var(--bg);border:1px solid var(--line);
+    border-radius:8px;padding:11px;white-space:pre-wrap;word-break:break-word;color:var(--dim);margin-top:8px}
+  ol.passos{margin:8px 0 0;padding-left:20px;font-size:13.5px;color:var(--dim)}
+  ol.passos li{margin-bottom:7px}
+  /* três abas têm de caber numa linha só: em duas, a de baixo fica centrada
+     e parece um botão solto em vez de aba. */
+  @media(max-width:430px){nav button{flex:1 1 0;min-width:0;font-size:12.5px;padding:9px 4px}}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ PORTÃO DE ACESSO ══════════════ -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+
+<div id="authGate" style="position:fixed;inset:0;z-index:99999;background:var(--bg);display:flex;
+     align-items:center;justify-content:center;padding:20px;overflow:auto">
+  <div style="max-width:400px;width:100%;text-align:center">
+    <img src="./icone-192.png" alt="" width="72" height="72" style="border-radius:16px;margin-bottom:14px">
+    <div class="brand">Giba Soluções</div>
+    <h1 style="margin-bottom:18px">Chopeiras</h1>
+
+    <div id="agLoading"><p class="muted">Verificando acesso…</p></div>
+
+    <div id="agLogin" style="display:none">
+      <p class="muted" style="margin-bottom:16px">Acesso restrito aos clientes cadastrados.
+        Entre com a sua conta Google para continuar.</p>
+      <button class="btn pri" style="width:100%;padding:13px" onclick="agEntrar()">Entrar com Google</button>
+      <p id="agErro" class="alert red" style="display:none;text-align:left"></p>
+    </div>
+
+    <div id="agPendente" style="display:none">
+      <p class="muted" style="margin-bottom:10px">Entrou como <b id="agEmail"></b>.</p>
+      <div class="alert yel" style="text-align:left">Seu acesso ainda não foi liberado.
+        Assim que o Giba aprovar, é só abrir de novo — não precisa cadastrar outra vez.</div>
+      <button class="btn sm" style="margin-top:12px" onclick="agSair()">Sair</button>
+    </div>
+
+    <div id="agSetup" style="display:none;text-align:left">
+      <div class="alert yel"><b>Falta ligar o Firebase.</b> O aplicativo está pronto, mas ainda não
+        sabe com qual banco falar.</div>
+      <ol class="passos">
+        <li>Em <a href="https://console.firebase.google.com" target="_blank" rel="noopener">console.firebase.google.com</a>,
+          crie o projeto <b>giba-chopeiras</b>.</li>
+        <li><b>Authentication → Sign-in method → Google</b>: ativar.</li>
+        <li><b>Firestore Database → Criar banco</b>: modo produção, região
+          <span class="mono">southamerica-east1</span>.</li>
+        <li><b>Configurações do projeto → Seus apps → Web</b>: registre um app e copie o bloco
+          <span class="mono">firebaseConfig</span>.</li>
+        <li>Cole esse bloco em <span class="mono">index.html</span>, na constante
+          <span class="mono">CFG</span>, e publique as regras com
+          <span class="mono">firebase deploy --only firestore</span>.</li>
+        <li>Em <b>Authentication → Settings → Domínios autorizados</b>, acrescente o domínio onde
+          a página está publicada.</li>
+      </ol>
+      <div class="setup" id="agDominio"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ─────────────────────────────────────────────────────────────
+   Configuração do Firebase.
+   Estes valores NÃO são segredo: numa página web eles são
+   públicos por definição. Quem protege os dados são as regras
+   em firestore.rules, conferidas no servidor do Google.
+   ───────────────────────────────────────────────────────────── */
+const ADMIN_EMAIL = "gibasolucoes@gmail.com";
+const CFG = {
+  projectId:         "COLE_AQUI_projectId",
+  appId:             "COLE_AQUI_appId",
+  apiKey:            "COLE_AQUI_apiKey",
+  authDomain:        "COLE_AQUI_authDomain",
+  storageBucket:     "COLE_AQUI_storageBucket",
+  messagingSenderId: "COLE_AQUI_messagingSenderId"
+};
+const CONFIGURADO = !String(CFG.apiKey).startsWith("COLE_AQUI");
+
+let db = null;
+/* EU: quem está usando o app agora. Preenchido depois do portão. */
+let EU = { uid:null, email:"", nome:"", foto:"", papel:"cliente", clienteId:null, admin:false };
+
+function agMostrar(id){
+  ["agLoading","agLogin","agPendente","agSetup"].forEach(k=>{
+    const e = document.getElementById(k);
+    if(e) e.style.display = (k === id ? "" : "none");
+  });
+}
+
+function agEntrar(){
+  const p = new firebase.auth.GoogleAuthProvider();
+  p.setCustomParameters({prompt:"select_account"});
+  firebase.auth().signInWithPopup(p).catch(e=>{
+    const erro = document.getElementById("agErro");
+    erro.style.display = "";
+    erro.innerHTML = "<b>Não deu para entrar.</b> " + (e && e.message ? e.message : "Tente de novo.");
+  });
+}
+function agSair(){ firebase.auth().signOut().then(()=>location.reload()); }
+
+if(!CONFIGURADO){
+  document.getElementById("agDominio").textContent =
+    "Domínio desta página:\n" + location.origin;
+  agMostrar("agSetup");
+} else {
+  firebase.initializeApp(CFG);
+  db = firebase.firestore();
+  db.enablePersistence({synchronizeTabs:true}).catch(()=>{});
+
+  firebase.auth().onAuthStateChanged(function(user){
+    if(!user){ agMostrar("agLogin"); return; }
+    agMostrar("agLoading");
+    portao(user);
+  });
+}
+
+/* O portão decide três coisas: quem é a pessoa, se está liberada,
+   e a qual empresa pertence. */
+async function portao(user){
+  const email = (user.email || "").toLowerCase();
+  const admin = email === ADMIN_EMAIL.toLowerCase();
+  const ref = db.collection("usuarios").doc(user.uid);
+
+  try{
+    let snap = await ref.get();
+
+    if(!snap.exists){
+      /* Primeiro acesso. Se houver convite para este e-mail, a pessoa já
+         nasce ligada à empresa e liberada; se não, entra na fila. */
+      let convite = null;
+      try{
+        const c = await db.collection("convites").doc(email).get();
+        if(c.exists) convite = c.data();
+      }catch(e){ /* sem convite, segue para a fila */ }
+
+      await ref.set({
+        nome:  user.displayName || "",
+        email: user.email || "",
+        foto:  user.photoURL || "",
+        papel: "cliente",
+        ativo: !!convite,
+        clienteId: convite ? convite.clienteId : null,
+        criadoEm: firebase.firestore.FieldValue.serverTimestamp(),
+        ultimoAcesso: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      snap = await ref.get();
+    } else {
+      ref.update({ultimoAcesso: firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
+    }
+
+    const d = snap.data() || {};
+    if(admin || d.ativo === true){
+      EU = {
+        uid: user.uid,
+        email: user.email || "",
+        nome: d.nome || user.displayName || "",
+        foto: d.foto || user.photoURL || "",
+        papel: admin ? "admin" : (d.papel || "cliente"),
+        clienteId: d.clienteId || null,
+        admin: admin
+      };
+      document.getElementById("authGate").style.display = "none";
+      iniciar();
+    } else {
+      document.getElementById("agEmail").textContent = user.email || "";
+      agMostrar("agPendente");
+    }
+  }catch(e){
+    document.getElementById("agEmail").textContent = user.email || "";
+    agMostrar("agPendente");
+  }
+}
+</script>
+
+<header>
+  <div class="wrap">
+    <div class="brand">Giba Soluções</div>
+    <h1>Chopeiras</h1>
+    <div class="sub" id="quemSou"></div>
+    <div id="sino"></div>
+    <nav id="nav"></nav>
+  </div>
+</header>
+
+<main class="wrap" id="tela"></main>
+
+<div class="foot">
+  <span id="versaoApp">versão 3</span> ·
+  <a href="#" onclick="sair();return false;">sair</a>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ═══════════════════ ferramentas ═══════════════════ */
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? "" : s)
+  .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+  .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+
+let toastTimer = null;
+function toast(msg, tipo){
+  const t = $("toast");
+  t.textContent = msg;
+  t.className = tipo || "";
+  t.style.display = "block";
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>{ t.style.display = "none"; }, 3200);
+}
+function sair(){ firebase.auth().signOut().then(()=>location.reload()); }
+
+/* ── CNPJ: máscara e conferência dos dois dígitos ── */
+function soDigitos(s){ return String(s||"").replace(/\D/g,""); }
+function cnpjFormatado(v){
+  const d = soDigitos(v).slice(0,14);
+  if(d.length <= 2) return d;
+  if(d.length <= 5) return d.slice(0,2)+"."+d.slice(2);
+  if(d.length <= 8) return d.slice(0,2)+"."+d.slice(2,5)+"."+d.slice(5);
+  if(d.length <= 12) return d.slice(0,2)+"."+d.slice(2,5)+"."+d.slice(5,8)+"/"+d.slice(8);
+  return d.slice(0,2)+"."+d.slice(2,5)+"."+d.slice(5,8)+"/"+d.slice(8,12)+"-"+d.slice(12);
+}
+function cnpjValido(v){
+  const d = soDigitos(v);
+  if(d.length !== 14) return false;
+  if(/^(\d)\1{13}$/.test(d)) return false;
+  const calc = (base, pesos) => {
+    let s = 0;
+    for(let i=0;i<pesos.length;i++) s += Number(base[i]) * pesos[i];
+    const r = s % 11;
+    return r < 2 ? 0 : 11 - r;
+  };
+  const dv1 = calc(d, [5,4,3,2,9,8,7,6,5,4,3,2]);
+  if(dv1 !== Number(d[12])) return false;
+  const dv2 = calc(d, [6,5,4,3,2,9,8,7,6,5,4,3,2]);
+  return dv2 === Number(d[13]);
+}
+
+/* ── telefone só para exibição, sem exigir formato ── */
+function soWhats(v){
+  const d = soDigitos(v);
+  return d.length >= 10 ? (d.length <= 11 ? "55"+d : d) : "";
+}
+
+/* ── foto: reduz na captura, senão não cabe em lugar nenhum ── */
+function reduzirImagem(file, lado, qualidade){
+  return new Promise((ok, falha)=>{
+    const fr = new FileReader();
+    fr.onerror = ()=> falha(new Error("não deu para ler a imagem"));
+    fr.onload = ()=>{
+      const img = new Image();
+      img.onerror = ()=> falha(new Error("arquivo não é uma imagem"));
+      img.onload = ()=>{
+        let {width:w, height:h} = img;
+        const maior = Math.max(w, h);
+        if(maior > lado){ const f = lado/maior; w = Math.round(w*f); h = Math.round(h*f); }
+        const c = document.createElement("canvas");
+        c.width = w; c.height = h;
+        c.getContext("2d").drawImage(img, 0, 0, w, h);
+        ok(c.toDataURL("image/jpeg", qualidade));
+      };
+      img.src = fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+
+/* ═══════════════════ estado ═══════════════════ */
+let CLIENTES = [], CHOPEIRAS = [], USUARIOS = [], ORDENS = [], PECAS = [];
+let VISTA = "chamados";
+let editando = null;   // rascunho do formulário aberto
+
+const ABAS_ADMIN = [
+  {id:"chamados",  rot:"Chamados"},
+  {id:"chopeiras", rot:"Chopeiras"},
+  {id:"clientes",  rot:"Clientes"},
+  {id:"pecas",     rot:"Peças"},
+  {id:"acessos",   rot:"Acessos"}
+];
+const ABAS_CLIENTE = [
+  {id:"chamados",  rot:"Chamados"},
+  {id:"chopeiras", rot:"Chopeiras"},
+  {id:"empresa",   rot:"Empresa"}
+];
+
+async function iniciar(){
+  $("quemSou").innerHTML = EU.admin
+    ? 'Painel do administrador · <b>' + esc(EU.email) + '</b>'
+    : esc(EU.nome || EU.email);
+  desenharNav();
+  await recarregar();
+  irPara("chamados");
+}
+
+function desenharNav(){
+  const abas = EU.admin ? ABAS_ADMIN : ABAS_CLIENTE;
+  $("nav").innerHTML = abas.map(a =>
+    '<button id="nav_'+a.id+'" onclick="irPara(\''+a.id+'\')">'+esc(a.rot)+'</button>').join("");
+}
+
+function irPara(v){
+  if(typeof pararDitado === "function") pararDitado();
+  VISTA = v; editando = null;
+  (EU.admin ? ABAS_ADMIN : ABAS_CLIENTE).forEach(a=>{
+    const b = $("nav_"+a.id);
+    if(b) b.className = (a.id === v ? "on" : "");
+  });
+  desenhar();
+  window.scrollTo(0,0);
+}
+
+async function recarregar(){
+  try{
+    if(EU.admin){
+      const [c, ch, os, pc] = await Promise.all([
+        db.collection("clientes").orderBy("nomeFantasia").get(),
+        db.collection("chopeiras").orderBy("codigo").get(),
+        db.collection("ordens").get(),
+        db.collection("pecas").orderBy("descricao").get()
+      ]);
+      CLIENTES  = c.docs.map(d=>({id:d.id, ...d.data()}));
+      CHOPEIRAS = ch.docs.map(d=>({id:d.id, ...d.data()}));
+      ORDENS    = ordenar(os.docs.map(d=>({id:d.id, ...d.data()})));
+      PECAS     = pc.docs.map(d=>({id:d.id, ...d.data()}));
+    } else {
+      CLIENTES = [];
+      if(EU.clienteId){
+        const [c, ch, os] = await Promise.all([
+          db.collection("clientes").doc(EU.clienteId).get(),
+          db.collection("chopeiras").where("clienteId","==",EU.clienteId).get(),
+          db.collection("ordens").where("clienteId","==",EU.clienteId).get()
+        ]);
+        if(c.exists) CLIENTES = [{id:c.id, ...c.data()}];
+        CHOPEIRAS = ch.docs.map(d=>({id:d.id, ...d.data()}))
+                      .sort((a,b)=> String(a.codigo||"").localeCompare(String(b.codigo||""), "pt-BR"));
+        ORDENS = ordenar(os.docs.map(d=>({id:d.id, ...d.data()})));
+      } else {
+        CHOPEIRAS = []; ORDENS = [];
+      }
+      PECAS = [];   /* a tabela de preços não é do cliente */
+    }
+  }catch(e){
+    toast("Não deu para carregar: " + (e.message || e), "err");
+  }
+  desenharSino();
+}
+
+/* Mais recente primeiro. Ordenado aqui e não no Firestore de propósito:
+   um campo de servidor fica vazio por um instante depois de gravar, e
+   uma ordem recém-criada sumiria da lista justamente quando importa. */
+function ordenar(lista){
+  const t = o => {
+    const v = o.atualizadoEm || o.abertoEm;
+    return v && v.toDate ? v.toDate().getTime() : 0;
+  };
+  return lista.sort((a,b) => t(b) - t(a));
+}
+
+function nomeCliente(id){
+  const c = CLIENTES.find(x=>x.id === id);
+  return c ? (c.nomeFantasia || c.razaoSocial || "sem nome") : "—";
+}
+
+function desenhar(){
+  if(VISTA === "chamados")  return telaChamados();
+  if(VISTA === "clientes")  return telaClientes();
+  if(VISTA === "pecas")     return telaPecas();
+  if(VISTA === "chopeiras") return telaChopeiras();
+  if(VISTA === "acessos")   return telaAcessos();
+  if(VISTA === "empresa")   return telaEmpresa();
+}
+
+/* ═══════════════════ CLIENTES (admin) ═══════════════════ */
+function telaClientes(){
+  if(editando && editando.tipo === "cliente") return formCliente();
+  const busca = (window.__buscaCli || "").toLowerCase();
+  const lista = CLIENTES.filter(c=>{
+    if(!busca) return true;
+    return [c.nomeFantasia, c.razaoSocial, c.cnpj, c.cidade]
+      .map(x => x || "").join(" ").toLowerCase().includes(busca);
+  });
+
+  $("tela").innerHTML =
+    '<div class="btns" style="margin:0 0 12px">' +
+      '<button class="btn pri" onclick="novoCliente()">+ Nova empresa</button>' +
+      '<button class="btn" onclick="atualizar()">Atualizar</button>' +
+    '</div>' +
+    '<div class="busca"><input placeholder="Buscar por nome, CNPJ ou cidade" value="'+esc(window.__buscaCli||"")+
+      '" oninput="window.__buscaCli=this.value;telaClientes()"></div>' +
+    (lista.length ? lista.map(cartaoCliente).join("") :
+      '<div class="vazio">' + (CLIENTES.length ? "Nada encontrado." :
+        "Nenhuma empresa cadastrada ainda. Comece pela primeira.") + '</div>');
+}
+
+function cartaoCliente(c){
+  const n = CHOPEIRAS.filter(x=>x.clienteId === c.id).length;
+  const convidados = (c.emailsAutorizados || []).length;
+  return '<div class="reg">' +
+    '<div class="top"><div style="min-width:0">' +
+      '<div class="nm">'+esc(c.nomeFantasia || c.razaoSocial || "sem nome")+'</div>' +
+      '<div class="dt">'+esc(c.razaoSocial||"")+'</div>' +
+      '<div class="dt mono">'+esc(cnpjFormatado(c.cnpj))+'</div>' +
+      '<div class="dt">'+esc([c.cidade, c.uf].filter(Boolean).join(" · "))+'</div>' +
+    '</div>' +
+    '<button class="btn sm" onclick="editarCliente(\''+c.id+'\')">Abrir</button></div>' +
+    '<div style="margin-top:9px;display:flex;gap:6px;flex-wrap:wrap">' +
+      '<span class="pill cold">'+n+' chopeira'+(n===1?"":"s")+'</span>' +
+      '<span class="pill">'+convidados+' e-mail'+(convidados===1?"":"s")+' liberado'+(convidados===1?"":"s")+'</span>' +
+    '</div></div>';
+}
+
+function novoCliente(){
+  editando = {tipo:"cliente", id:null, dados:{
+    cnpj:"", razaoSocial:"", nomeFantasia:"", endereco:"", cidade:"", uf:"",
+    contato:"", telefone:"", whatsapp:"", emailsAutorizados:[], observacoes:""
+  }};
+  telaClientes();
+}
+function editarCliente(id){
+  const c = CLIENTES.find(x=>x.id === id);
+  if(!c) return;
+  editando = {tipo:"cliente", id:id, dados:JSON.parse(JSON.stringify(c))};
+  telaClientes();
+}
+
+function formCliente(){
+  const d = editando.dados;
+  $("tela").innerHTML =
+    '<div class="card">' +
+      '<h2>'+(editando.id ? "Editar empresa" : "Nova empresa")+'</h2>' +
+      '<div class="muted">O CNPJ identifica a empresa. Os e-mails liberados entram direto, sem passar pela fila.</div>' +
+
+      '<h3>Identificação</h3>' +
+      '<label>CNPJ</label>' +
+      '<input id="f_cnpj" inputmode="numeric" value="'+esc(cnpjFormatado(d.cnpj))+'" ' +
+        'oninput="this.value=cnpjFormatado(this.value);checarCnpj()">' +
+      '<div class="esc" id="cnpjAviso"></div>' +
+      '<label>Razão social</label><input id="f_razao" value="'+esc(d.razaoSocial)+'">' +
+      '<label>Nome fantasia</label><input id="f_fantasia" value="'+esc(d.nomeFantasia)+'">' +
+
+      '<h3>Onde fica</h3>' +
+      '<label>Endereço</label><input id="f_endereco" value="'+esc(d.endereco)+'">' +
+      '<div class="lin">' +
+        '<div><label>Cidade</label><input id="f_cidade" value="'+esc(d.cidade)+'"></div>' +
+        '<div style="flex:0 0 90px"><label>UF</label><input id="f_uf" maxlength="2" ' +
+          'style="text-transform:uppercase" value="'+esc(d.uf)+'"></div>' +
+      '</div>' +
+
+      '<h3>Contato</h3>' +
+      '<label>Falar com</label><input id="f_contato" value="'+esc(d.contato)+'">' +
+      '<div class="lin">' +
+        '<div><label>Telefone</label><input id="f_telefone" inputmode="tel" value="'+esc(d.telefone)+'"></div>' +
+        '<div><label>WhatsApp</label><input id="f_whats" inputmode="tel" value="'+esc(d.whatsapp)+'"></div>' +
+      '</div>' +
+      '<div class="esc">O WhatsApp é por onde os avisos de status vão sair.</div>' +
+
+      '<h3>Quem pode entrar no aplicativo</h3>' +
+      '<label>E-mails liberados (um por linha)</label>' +
+      '<textarea id="f_emails" placeholder="fulano@empresa.com.br">'+esc((d.emailsAutorizados||[]).join("\n"))+'</textarea>' +
+      '<div class="esc">Quem entrar com um destes e-mails já cai ligado a esta empresa e liberado. ' +
+        'Quem entrar com outro fica na fila da aba Acessos.</div>' +
+
+      '<h3>Observações</h3>' +
+      '<textarea id="f_obs">'+esc(d.observacoes||"")+'</textarea>' +
+
+      '<div class="btns">' +
+        '<button class="btn pri" id="btSalvar" onclick="salvarCliente()">Salvar</button>' +
+        '<button class="btn" onclick="irPara(\'clientes\')">Cancelar</button>' +
+        (editando.id ? '<button class="btn dg" onclick="apagarCliente()">Apagar</button>' : '') +
+      '</div>' +
+    '</div>';
+  checarCnpj();
+}
+
+function checarCnpj(){
+  const v = $("f_cnpj").value, a = $("cnpjAviso");
+  const d = soDigitos(v);
+  if(!d.length){ a.textContent = ""; a.style.color = ""; return; }
+  if(d.length < 14){ a.textContent = "faltam " + (14-d.length) + " dígitos"; a.style.color = ""; return; }
+  const ok = cnpjValido(v);
+  a.textContent = ok ? "CNPJ confere" : "dígito verificador não bate — confira";
+  a.style.color = ok ? "var(--ok)" : "var(--danger)";
+}
+
+async function salvarCliente(){
+  const emails = $("f_emails").value.split("\n")
+    .map(s=>s.trim().toLowerCase()).filter(s=>s.includes("@"));
+  const dados = {
+    cnpj: soDigitos($("f_cnpj").value),
+    razaoSocial: $("f_razao").value.trim(),
+    nomeFantasia: $("f_fantasia").value.trim(),
+    endereco: $("f_endereco").value.trim(),
+    cidade: $("f_cidade").value.trim(),
+    uf: $("f_uf").value.trim().toUpperCase(),
+    contato: $("f_contato").value.trim(),
+    telefone: $("f_telefone").value.trim(),
+    whatsapp: $("f_whats").value.trim(),
+    emailsAutorizados: emails,
+    observacoes: $("f_obs").value.trim()
+  };
+
+  if(!dados.razaoSocial && !dados.nomeFantasia){
+    return toast("Falta o nome da empresa.", "err");
+  }
+  if(dados.cnpj && !cnpjValido(dados.cnpj)){
+    return toast("O CNPJ não confere. Corrija ou deixe em branco.", "err");
+  }
+  const repetido = CLIENTES.find(c => c.cnpj && c.cnpj === dados.cnpj && c.id !== editando.id);
+  if(repetido){
+    return toast("Este CNPJ já está em " + (repetido.nomeFantasia || repetido.razaoSocial) + ".", "err");
+  }
+
+  $("btSalvar").disabled = true;
+  try{
+    const anteriores = editando.id
+      ? ((CLIENTES.find(c=>c.id === editando.id) || {}).emailsAutorizados || [])
+      : [];
+    let id = editando.id;
+
+    if(id){
+      await db.collection("clientes").doc(id).update(dados);
+    } else {
+      dados.criadoEm = firebase.firestore.FieldValue.serverTimestamp();
+      const ref = await db.collection("clientes").add(dados);
+      id = ref.id;
+    }
+
+    /* Os convites são o que permite a pessoa entrar já ligada à empresa.
+       Um documento por e-mail, que só o dono daquele e-mail consegue ler. */
+    const add = emails.filter(e => !anteriores.includes(e));
+    const rem = anteriores.filter(e => !emails.includes(e));
+    await Promise.all([].concat(
+      add.map(e => db.collection("convites").doc(e).set({
+        clienteId: id, criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+      })),
+      rem.map(e => db.collection("convites").doc(e).delete())
+    ));
+
+    await recarregar();
+    irPara("clientes");
+    toast("Empresa salva.", "ok");
+  }catch(e){
+    toast("Não deu para salvar: " + (e.message || e), "err");
+    const b = $("btSalvar"); if(b) b.disabled = false;
+  }
+}
+
+async function apagarCliente(){
+  const id = editando.id;
+  const n = CHOPEIRAS.filter(c=>c.clienteId === id).length;
+  if(n){
+    return toast("Esta empresa tem " + n + " chopeira" + (n===1?"":"s") +
+      ". Mova ou apague antes.", "err");
+  }
+  if(!confirm("Apagar esta empresa? Não dá para desfazer.")) return;
+  try{
+    const emails = (editando.dados.emailsAutorizados || []);
+    await Promise.all(emails.map(e => db.collection("convites").doc(e).delete().catch(()=>{})));
+    await db.collection("clientes").doc(id).delete();
+    await recarregar();
+    irPara("clientes");
+    toast("Empresa apagada.", "ok");
+  }catch(e){
+    toast("Não deu para apagar: " + (e.message || e), "err");
+  }
+}
+
+/* ═══════════════════ CHOPEIRAS ═══════════════════ */
+const TIPOS = ["Direta", "Banco de gelo", "Portátil", "Outra"];
+const APLICACOES = ["LBP", "MBP", "HBP", "não sei"];
+
+function telaChopeiras(){
+  if(editando && editando.tipo === "chopeira") return formChopeira();
+  if(editando && editando.tipo === "verChopeira") return verChopeira();
+
+  if(!EU.admin && !EU.clienteId){
+    $("tela").innerHTML = '<div class="alert yel"><b>Seu acesso ainda não está ligado a uma empresa.</b> ' +
+      'Fale com o Giba para ligar o seu e-mail ao cadastro da sua empresa.</div>';
+    return;
+  }
+
+  const busca = (window.__buscaCho || "").toLowerCase();
+  const lista = CHOPEIRAS.filter(c=>{
+    if(!busca) return true;
+    return [c.codigo, c.marca, c.modelo, c.local, EU.admin ? nomeCliente(c.clienteId) : ""]
+      .map(x => x || "").join(" ").toLowerCase().includes(busca);
+  });
+
+  $("tela").innerHTML =
+    (EU.admin ? '<div class="btns" style="margin:0 0 12px">' +
+      '<button class="btn pri" onclick="novaChopeira()">+ Nova chopeira</button>' +
+      '<button class="btn" onclick="atualizar()">Atualizar</button></div>' : '') +
+    '<div class="busca"><input placeholder="Buscar pelo número, marca ou local" value="'+esc(window.__buscaCho||"")+
+      '" oninput="window.__buscaCho=this.value;telaChopeiras()"></div>' +
+    (lista.length ? lista.map(cartaoChopeira).join("") :
+      '<div class="vazio">' + (CHOPEIRAS.length ? "Nada encontrado." :
+        (EU.admin ? "Nenhuma chopeira cadastrada ainda." :
+          "Nenhuma chopeira cadastrada na sua empresa ainda.")) + '</div>');
+}
+
+function cartaoChopeira(c){
+  return '<div class="reg"><div class="top">' +
+    '<div style="display:flex;gap:11px;min-width:0">' +
+      (c.thumb ? '<img class="th" src="'+esc(c.thumb)+'" alt="">' : '') +
+      '<div style="min-width:0">' +
+        '<div class="nm mono">'+esc(c.codigo || "sem número")+'</div>' +
+        '<div class="dt">'+esc([c.marca, c.modelo].filter(Boolean).join(" ") || "sem marca")+'</div>' +
+        (EU.admin ? '<div class="dt">'+esc(nomeCliente(c.clienteId))+'</div>' : '') +
+        (c.local ? '<div class="dt">'+esc(c.local)+'</div>' : '') +
+      '</div>' +
+    '</div>' +
+    '<button class="btn sm" onclick="verChopeiraId(\''+c.id+'\')">Abrir</button>' +
+  '</div>' +
+  '<div style="margin-top:9px;display:flex;gap:6px;flex-wrap:wrap">' +
+    (c.tipo ? '<span class="pill">'+esc(c.tipo)+'</span>' : '') +
+    (c.torneiras ? '<span class="pill">'+esc(c.torneiras)+' torneira'+(Number(c.torneiras)===1?"":"s")+'</span>' : '') +
+    (c.compressorGas ? '<span class="pill cold">'+esc(c.compressorGas)+'</span>' : '') +
+    (c.provisorio ? '<span class="pill pend">ficha por completar</span>' : '') +
+  '</div></div>';
+}
+
+function verChopeiraId(id){
+  const c = CHOPEIRAS.find(x=>x.id === id);
+  if(!c) return;
+  editando = {tipo:"verChopeira", id:id, dados:c, foto:null};
+  telaChopeiras();
+  if(c.fotoId) carregarFoto(c.fotoId);
+}
+
+async function carregarFoto(fotoId){
+  try{
+    const s = await db.collection("fotos").doc(fotoId).get();
+    if(s.exists && editando && editando.tipo === "verChopeira"){
+      const img = $("fotoGrande");
+      if(img){ img.src = s.data().dataUrl; img.style.display = "block"; }
+    }
+  }catch(e){ /* sem foto, a tela vive sem ela */ }
+}
+
+function verChopeira(){
+  const c = editando.dados;
+  const linha = (r, v) => v ? '<tr><td class="muted" style="padding:6px 10px 6px 0;white-space:nowrap">'+
+    esc(r)+'</td><td style="padding:6px 0;font-weight:700">'+esc(v)+'</td></tr>' : '';
+  $("tela").innerHTML =
+    '<div class="card">' +
+      '<div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">' +
+        '<div><div class="brand" style="letter-spacing:2px">Chopeira</div>' +
+        '<h2 class="mono" style="font-size:22px">'+esc(c.codigo||"sem número")+'</h2></div>' +
+        (EU.admin ? '<button class="btn sm" onclick="editarChopeira(\''+c.id+'\')">Editar</button>' : '') +
+      '</div>' +
+      (c.fotoId ? '<img id="fotoGrande" class="foto" style="display:none" alt="Foto da chopeira">' :
+        (c.thumb ? '<img class="foto" src="'+esc(c.thumb)+'" alt="Foto da chopeira">' : '')) +
+      '<h3>Equipamento</h3><table style="width:100%">' +
+        linha("Marca", c.marca) + linha("Modelo", c.modelo) + linha("Tipo", c.tipo) +
+        linha("Torneiras", c.torneiras) + linha("Local", c.local) +
+        (EU.admin ? linha("Cliente", nomeCliente(c.clienteId)) : "") +
+      '</table>' +
+      ((c.compressorMarca || c.compressorModelo || c.compressorGas || c.compressorHp) ?
+        '<h3>Compressor</h3><table style="width:100%">' +
+          linha("Marca", c.compressorMarca) + linha("Modelo", c.compressorModelo) +
+          linha("Potência", c.compressorHp) + linha("Gás", c.compressorGas) +
+          linha("Aplicação", c.compressorAplicacao) +
+        '</table>' : '') +
+      (c.observacoes ? '<h3>Observações</h3><div class="muted" style="white-space:pre-wrap">'+
+        esc(c.observacoes)+'</div>' : '') +
+      '<div class="btns"><button class="btn" onclick="irPara(\'chopeiras\')">Voltar</button></div>' +
+    '</div>';
+}
+
+function novaChopeira(){
+  editando = {tipo:"chopeira", id:null, novaFoto:null, dados:{
+    codigo:"", clienteId: CLIENTES.length === 1 ? CLIENTES[0].id : "", local:"",
+    marca:"", modelo:"", torneiras:"", tipo:"",
+    compressorMarca:"", compressorModelo:"", compressorHp:"", compressorGas:"", compressorAplicacao:"",
+    observacoes:"", fotoId:null, thumb:null
+  }};
+  telaChopeiras();
+}
+function editarChopeira(id){
+  const c = CHOPEIRAS.find(x=>x.id === id);
+  if(!c) return;
+  editando = {tipo:"chopeira", id:id, novaFoto:null, dados:JSON.parse(JSON.stringify(c))};
+  telaChopeiras();
+}
+
+function formChopeira(){
+  const d = editando.dados;
+  const opcoes = (lista, sel) => lista.map(o =>
+    '<option value="'+esc(o)+'"'+(o === sel ? " selected":"")+'>'+esc(o)+'</option>').join("");
+  $("tela").innerHTML =
+    '<div class="card">' +
+      '<h2>'+(editando.id ? "Editar chopeira" : "Nova chopeira")+'</h2>' +
+      '<div class="muted">O número é a etiqueta do equipamento — é por ele que se busca na hora do chamado.</div>' +
+
+      '<h3>Identificação</h3>' +
+      '<label>Número / código</label><input id="c_codigo" value="'+esc(d.codigo)+'">' +
+      '<label>Empresa dona</label>' +
+      '<select id="c_cliente"><option value="">— escolha —</option>' +
+        CLIENTES.map(c=>'<option value="'+c.id+'"'+(c.id===d.clienteId?" selected":"")+'>'+
+          esc(c.nomeFantasia || c.razaoSocial)+'</option>').join("") +
+      '</select>' +
+      '<label>Local de instalação</label>' +
+      '<input id="c_local" placeholder="salão, depósito, balcão da frente" value="'+esc(d.local)+'">' +
+
+      '<h3>A chopeira</h3>' +
+      '<div class="lin">' +
+        '<div><label>Marca</label><input id="c_marca" value="'+esc(d.marca)+'"></div>' +
+        '<div><label>Modelo</label><input id="c_modelo" value="'+esc(d.modelo)+'"></div>' +
+      '</div>' +
+      '<div class="lin">' +
+        '<div><label>Tipo</label><select id="c_tipo"><option value="">—</option>'+opcoes(TIPOS, d.tipo)+'</select></div>' +
+        '<div><label>Torneiras</label><input id="c_torneiras" inputmode="numeric" value="'+esc(d.torneiras)+'"></div>' +
+      '</div>' +
+
+      '<h3>Compressor</h3>' +
+      '<div class="lin">' +
+        '<div><label>Marca</label><input id="c_cmarca" value="'+esc(d.compressorMarca)+'"></div>' +
+        '<div><label>Modelo</label><input id="c_cmodelo" value="'+esc(d.compressorModelo)+'"></div>' +
+      '</div>' +
+      '<div class="lin">' +
+        '<div><label>Potência</label><input id="c_chp" placeholder="1/3 HP" value="'+esc(d.compressorHp)+'"></div>' +
+        '<div><label>Gás</label><input id="c_cgas" placeholder="R134a" value="'+esc(d.compressorGas)+'"></div>' +
+        '<div><label>Aplicação</label><select id="c_capl"><option value="">—</option>'+
+          opcoes(APLICACOES, d.compressorAplicacao)+'</select></div>' +
+      '</div>' +
+      '<div class="esc">Só o que estiver na plaqueta. O que não souber, deixe em branco — ' +
+        'chute em ficha técnica atrapalha na hora do conserto.</div>' +
+
+      '<h3>Foto</h3>' +
+      '<input type="file" accept="image/*" capture="environment" onchange="pegarFoto(this)">' +
+      '<img id="previa" class="foto" style="display:'+(d.thumb?"block":"none")+'" ' +
+        'src="'+esc(d.thumb||"")+'" alt="">' +
+      '<div class="esc">A foto é reduzida no aparelho antes de subir — ninguém precisa de 4 MB para ' +
+        'reconhecer uma chopeira.</div>' +
+
+      '<h3>Observações</h3>' +
+      '<textarea id="c_obs">'+esc(d.observacoes||"")+'</textarea>' +
+
+      '<div class="btns">' +
+        '<button class="btn pri" id="btSalvarCho" onclick="salvarChopeira()">Salvar</button>' +
+        '<button class="btn" onclick="irPara(\'chopeiras\')">Cancelar</button>' +
+        (editando.id ? '<button class="btn dg" onclick="apagarChopeira()">Apagar</button>' : '') +
+      '</div>' +
+    '</div>';
+
+  /* a miniatura esticada fica borrada: busca a foto inteira para a prévia */
+  if(d.fotoId && !editando.novaFoto){
+    db.collection("fotos").doc(d.fotoId).get().then(s=>{
+      const p = $("previa");
+      if(s.exists && p && editando && editando.tipo === "chopeira"){
+        p.src = s.data().dataUrl; p.style.display = "block";
+      }
+    }).catch(()=>{});
+  }
+}
+
+async function pegarFoto(input){
+  const f = input.files && input.files[0];
+  if(!f) return;
+  try{
+    toast("Preparando a foto…");
+    const grande = await reduzirImagem(f, 1280, 0.72);
+    const thumb  = await reduzirImagem(f, 200, 0.6);
+    editando.novaFoto = grande;
+    editando.dados.thumb = thumb;
+    const p = $("previa");
+    p.src = grande; p.style.display = "block";
+    toast("Foto pronta.", "ok");
+  }catch(e){
+    toast("Não deu para usar essa imagem.", "err");
+  }
+}
+
+async function salvarChopeira(){
+  const d = {
+    codigo: $("c_codigo").value.trim(),
+    clienteId: $("c_cliente").value,
+    local: $("c_local").value.trim(),
+    marca: $("c_marca").value.trim(),
+    modelo: $("c_modelo").value.trim(),
+    tipo: $("c_tipo").value,
+    torneiras: $("c_torneiras").value.trim(),
+    compressorMarca: $("c_cmarca").value.trim(),
+    compressorModelo: $("c_cmodelo").value.trim(),
+    compressorHp: $("c_chp").value.trim(),
+    compressorGas: $("c_cgas").value.trim(),
+    compressorAplicacao: $("c_capl").value,
+    observacoes: $("c_obs").value.trim(),
+    provisorio: false,
+    thumb: editando.dados.thumb || null,
+    fotoId: editando.dados.fotoId || null
+  };
+  if(!d.codigo)    return toast("Falta o número da chopeira.", "err");
+  if(!d.clienteId) return toast("Escolha de qual empresa é.", "err");
+
+  const repetida = CHOPEIRAS.find(c =>
+    String(c.codigo || "").toLowerCase() === d.codigo.toLowerCase() && c.id !== editando.id);
+  if(repetida) return toast("Já existe uma chopeira com este número.", "err");
+
+  $("btSalvarCho").disabled = true;
+  try{
+    if(editando.novaFoto){
+      const ref = await db.collection("fotos").add({
+        dataUrl: editando.novaFoto,
+        clienteId: d.clienteId,
+        de: "chopeira",
+        criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      const antiga = d.fotoId;
+      d.fotoId = ref.id;
+      if(antiga) db.collection("fotos").doc(antiga).delete().catch(()=>{});
+    }
+    if(editando.id){
+      await db.collection("chopeiras").doc(editando.id).update(d);
+    } else {
+      d.criadoEm = firebase.firestore.FieldValue.serverTimestamp();
+      await db.collection("chopeiras").add(d);
+    }
+    await recarregar();
+    irPara("chopeiras");
+    toast("Chopeira salva.", "ok");
+  }catch(e){
+    toast("Não deu para salvar: " + (e.message || e), "err");
+    const b = $("btSalvarCho"); if(b) b.disabled = false;
+  }
+}
+
+async function apagarChopeira(){
+  if(!confirm("Apagar esta chopeira? Não dá para desfazer.")) return;
+  try{
+    const f = editando.dados.fotoId;
+    if(f) db.collection("fotos").doc(f).delete().catch(()=>{});
+    await db.collection("chopeiras").doc(editando.id).delete();
+    await recarregar();
+    irPara("chopeiras");
+    toast("Chopeira apagada.", "ok");
+  }catch(e){
+    toast("Não deu para apagar: " + (e.message || e), "err");
+  }
+}
+
+/* ═══════════════════ ACESSOS (admin) ═══════════════════ */
+async function telaAcessos(){
+  $("tela").innerHTML = '<div class="vazio">Carregando…</div>';
+  try{
+    const s = await db.collection("usuarios").orderBy("criadoEm","desc").get();
+    USUARIOS = s.docs.map(d=>({uid:d.id, ...d.data()}));
+  }catch(e){
+    $("tela").innerHTML = '<div class="alert red">Não deu para carregar: '+esc(e.message||e)+'</div>';
+    return;
+  }
+  const pend = USUARIOS.filter(u => !u.ativo && !ehAdminEmail(u.email));
+  const lib  = USUARIOS.filter(u => u.ativo || ehAdminEmail(u.email));
+
+  $("tela").innerHTML =
+    '<div class="btns" style="margin:0 0 12px"><button class="btn" onclick="telaAcessos()">Atualizar</button></div>' +
+    (pend.length
+      ? '<h3>Esperando aprovação ('+pend.length+')</h3>' + pend.map(u=>cartaoUsuario(u,true)).join("")
+      : '<div class="alert grn">Ninguém na fila.</div>') +
+    '<h3>Com acesso liberado ('+lib.length+')</h3>' +
+    (lib.length ? lib.map(u=>cartaoUsuario(u,false)).join("") : '<div class="vazio">Ninguém ainda.</div>');
+}
+
+function ehAdminEmail(e){ return !!(e && e.toLowerCase() === ADMIN_EMAIL.toLowerCase()); }
+
+function cartaoUsuario(u, pendente){
+  const admin = ehAdminEmail(u.email);
+  const sel = '<select id="vinc_'+u.uid+'" onchange="vincular(\''+u.uid+'\')">' +
+    '<option value="">— sem empresa —</option>' +
+    CLIENTES.map(c=>'<option value="'+c.id+'"'+(c.id===u.clienteId?" selected":"")+'>'+
+      esc(c.nomeFantasia || c.razaoSocial)+'</option>').join("") + '</select>';
+  return '<div class="reg'+(pendente?" pend":"")+'">' +
+    '<div class="top"><div style="min-width:0">' +
+      '<div class="nm">'+esc(u.nome || "sem nome")+'</div>' +
+      '<div class="dt">'+esc(u.email)+'</div>' +
+      '<div class="dt">'+(u.ultimoAcesso && u.ultimoAcesso.toDate ?
+        "último acesso: " + u.ultimoAcesso.toDate().toLocaleString("pt-BR") : "")+'</div>' +
+    '</div>' +
+    '<div style="text-align:right">' +
+      (admin ? '<span class="pill adm">Administrador</span>'
+             : '<span class="pill '+(u.ativo?"ok":"pend")+'">'+(u.ativo?"liberado":"na fila")+'</span>') +
+    '</div></div>' +
+    (admin ? '' :
+      '<label>Empresa</label>' + sel +
+      '<div class="btns">' +
+        (u.ativo
+          ? '<button class="btn dg sm" onclick="liberar(\''+u.uid+'\',false)">Bloquear</button>'
+          : '<button class="btn pri sm" onclick="liberar(\''+u.uid+'\',true)">Aprovar</button>') +
+      '</div>' +
+      (!u.clienteId ? '<div class="esc" style="color:var(--warn)">Sem empresa ligada, esta pessoa ' +
+        'entra e não vê chopeira nenhuma.</div>' : '')) +
+  '</div>';
+}
+
+async function liberar(uid, valor){
+  const u = USUARIOS.find(x=>x.uid === uid);
+  if(valor && u && !u.clienteId && !confirm(
+      "Esta pessoa ainda não está ligada a nenhuma empresa e vai entrar sem ver nada. Aprovar assim mesmo?")){
+    return;
+  }
+  try{
+    await db.collection("usuarios").doc(uid).update({ativo: !!valor});
+    toast(valor ? "Acesso liberado." : "Acesso bloqueado.", "ok");
+    telaAcessos();
+  }catch(e){ toast("Não deu: " + (e.message||e), "err"); }
+}
+
+async function vincular(uid){
+  const v = $("vinc_"+uid).value || null;
+  try{
+    await db.collection("usuarios").doc(uid).update({clienteId: v});
+    toast(v ? "Ligado a " + nomeCliente(v) + "." : "Desligado da empresa.", "ok");
+    telaAcessos();
+  }catch(e){ toast("Não deu: " + (e.message||e), "err"); }
+}
+
+/* ═══════════════════ MINHA EMPRESA (cliente) ═══════════════════ */
+function telaEmpresa(){
+  const c = CLIENTES[0];
+  if(!c){
+    $("tela").innerHTML = '<div class="alert yel"><b>Seu acesso ainda não está ligado a uma empresa.</b> ' +
+      'Fale com o Giba.</div>';
+    return;
+  }
+  const linha = (r,v) => v ? '<tr><td class="muted" style="padding:6px 10px 6px 0;white-space:nowrap">'+
+    esc(r)+'</td><td style="padding:6px 0;font-weight:700">'+esc(v)+'</td></tr>' : '';
+  const n = CHOPEIRAS.length;
+  $("tela").innerHTML =
+    '<div class="card">' +
+      '<h2>'+esc(c.nomeFantasia || c.razaoSocial)+'</h2>' +
+      '<table style="width:100%;margin-top:8px">' +
+        linha("Razão social", c.razaoSocial) +
+        linha("CNPJ", cnpjFormatado(c.cnpj)) +
+        linha("Endereço", c.endereco) +
+        linha("Cidade", [c.cidade, c.uf].filter(Boolean).join(" · ")) +
+        linha("Contato", c.contato) +
+        linha("Telefone", c.telefone) +
+      '</table>' +
+      '<div style="margin-top:12px"><span class="pill cold">'+n+' chopeira'+(n===1?"":"s")+
+        ' cadastrada'+(n===1?"":"s")+'</span></div>' +
+      '<div class="esc" style="margin-top:12px">Algum dado errado? Avise o Giba — o cadastro é ' +
+        'mantido por ele para não haver duas versões da mesma empresa.</div>' +
+    '</div>';
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   CHAMADOS (ordens de serviço)
+
+   O cliente abre; o Giba move o status; os dois veem a mesma linha do
+   tempo. Cada mudança acende um aviso do outro lado — e, quando é o
+   cliente que precisa saber, oferece a mensagem pronta no WhatsApp.
+   ═══════════════════════════════════════════════════════════════════ */
+
+const STATUS = [
+  {id:"aberto",           rot:"Chamado aberto",       pill:"cold", cli:"Recebemos o seu chamado. Em breve combinamos a recolha."},
+  {id:"recolha_agendada", rot:"Recolha agendada",     pill:"cold", cli:"A recolha está agendada."},
+  {id:"recebido",         rot:"Recebido na oficina",  pill:"",     cli:"A chopeira chegou na oficina."},
+  {id:"em_teste",         rot:"Em teste",             pill:"",     cli:"Estamos testando para achar o problema."},
+  {id:"em_manutencao",    rot:"Em manutenção",        pill:"",     cli:"O conserto está em andamento."},
+  {id:"aguardando_peca",  rot:"Aguardando peça",      pill:"pend", cli:"O serviço está parado esperando peça."},
+  {id:"orcamento_enviado",   rot:"Orçamento enviado",    pill:"orc", cli:"O orçamento está no aplicativo, esperando a sua resposta."},
+  {id:"orcamento_aprovado",  rot:"Orçamento aprovado",   pill:"ok",  cli:"Orçamento aprovado. O serviço segue."},
+  {id:"orcamento_reprovado", rot:"Orçamento não aprovado", pill:"dg", cli:"O orçamento não foi aprovado. Combinamos a devolução."},
+  {id:"concluido",        rot:"Manutenção concluída", pill:"ok",   cli:"O serviço está pronto."},
+  {id:"entrega_agendada", rot:"Entrega agendada",     pill:"ok",   cli:"A entrega está agendada."},
+  {id:"entregue",         rot:"Entregue",             pill:"ok",   cli:"Chopeira entregue. Obrigado!"},
+  {id:"cancelado",        rot:"Cancelado",            pill:"dg",   cli:"O chamado foi cancelado."}
+];
+const ABERTOS = ["aberto","recolha_agendada","recebido","em_teste","em_manutencao",
+                 "aguardando_peca","orcamento_enviado","orcamento_aprovado",
+                 "orcamento_reprovado","concluido","entrega_agendada"];
+
+function status(id){ return STATUS.find(s => s.id === id) || {id:id, rot:id, pill:"", cli:""}; }
+function ehAberto(o){ return ABERTOS.includes(o.status); }
+
+function numeroOS(){
+  const d = new Date(), p = n => String(n).padStart(2,"0");
+  const sufixo = Math.random().toString(36).slice(2,6).toUpperCase();
+  return "OS-" + String(d.getFullYear()).slice(2) + p(d.getMonth()+1) + p(d.getDate()) + "-" + sufixo;
+}
+
+function quando(v){
+  if(!v) return "";
+  const d = v.toDate ? v.toDate() : new Date(v);
+  if(isNaN(d)) return "";
+  return d.toLocaleString("pt-BR", {day:"2-digit", month:"2-digit", year:"2-digit",
+                                    hour:"2-digit", minute:"2-digit"});
+}
+function dataCurta(s){
+  if(!s) return "";
+  const [a,m,d] = String(s).split("-");
+  return d ? d + "/" + m + "/" + a.slice(2) : s;
+}
+
+/* ── o sino ───────────────────────────────────────────────────────── */
+function naoLidas(){
+  return ORDENS.filter(o => EU.admin ? o.naoLidoAdmin : o.naoLidoCliente).length;
+}
+function desenharSino(){
+  const n = naoLidas(), s = $("sino");
+  if(!s) return;
+  s.innerHTML = n
+    ? '<button class="btn sm" style="border-color:var(--copper);color:var(--copperhi);margin-top:8px" ' +
+      'onclick="irPara(\'chamados\')">' + n + ' novidade' + (n===1?"":"s") + ' nos chamados</button>'
+    : "";
+}
+
+/* ── lista ────────────────────────────────────────────────────────── */
+function telaChamados(){
+  if(editando && editando.tipo === "novoChamado") return formChamado();
+  if(editando && editando.tipo === "verOrdem")    return verOrdem();
+
+  if(!EU.admin && !EU.clienteId){
+    $("tela").innerHTML = '<div class="alert yel"><b>Seu acesso ainda não está ligado a uma empresa.</b> ' +
+      'Fale com o Giba.</div>';
+    return;
+  }
+
+  const soAbertos = window.__soAbertos !== false;
+  const lista = ORDENS.filter(o => soAbertos ? ehAberto(o) : true);
+  const fechados = ORDENS.length - ORDENS.filter(ehAberto).length;
+
+  $("tela").innerHTML =
+    '<div class="btns" style="margin:0 0 12px">' +
+      (EU.admin ? '' : '<button class="btn pri" onclick="novoChamado()">Preciso de manutenção</button>') +
+      '<button class="btn" onclick="atualizar()">Atualizar</button>' +
+      (fechados ? '<button class="btn sm" onclick="window.__soAbertos=' + (soAbertos?'false':'true') +
+        ';telaChamados()">' + (soAbertos ? "Ver encerrados ("+fechados+")" : "Ver só os abertos") +
+        '</button>' : '') +
+    '</div>' +
+    (lista.length ? lista.map(cartaoOrdem).join("") :
+      '<div class="vazio">' +
+        (soAbertos && ORDENS.length ? "Nenhum chamado aberto." :
+          (EU.admin ? "Nenhum chamado ainda." :
+            "Nenhum chamado ainda. Quando uma chopeira der problema, abra por aqui.")) +
+      '</div>');
+}
+
+function cartaoOrdem(o){
+  const s = status(o.status);
+  const novo = EU.admin ? o.naoLidoAdmin : o.naoLidoCliente;
+  return '<div class="reg' + (novo ? " pend" : "") + '"><div class="top">' +
+    '<div style="display:flex;gap:11px;min-width:0">' +
+      (o.thumb ? '<img class="th" src="' + esc(o.thumb) + '" alt="">' : '') +
+      '<div style="min-width:0">' +
+        '<div class="nm mono">' + esc(o.chopeiraCodigo || "sem número") + '</div>' +
+        '<div class="dt">' + esc(o.numero) + '</div>' +
+        (EU.admin ? '<div class="dt">' + esc(nomeCliente(o.clienteId)) + '</div>' : '') +
+        '<div class="dt">' + esc(quando(o.abertoEm)) + '</div>' +
+      '</div>' +
+    '</div>' +
+    '<button class="btn sm" onclick="abrirOrdem(\'' + o.id + '\')">Abrir</button>' +
+  '</div>' +
+  '<div style="margin-top:9px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">' +
+    '<span class="pill ' + s.pill + '">' + esc(s.rot) + '</span>' +
+    (novo ? '<span class="pill pend">novidade</span>' : '') +
+    (o.agenda && o.agenda.recolhaPrevista && o.status === "recolha_agendada"
+      ? '<span class="pill cold">recolha ' + esc(dataCurta(o.agenda.recolhaPrevista)) + '</span>' : '') +
+    (o.agenda && o.agenda.entregaPrevista && o.status === "entrega_agendada"
+      ? '<span class="pill cold">entrega ' + esc(dataCurta(o.agenda.entregaPrevista)) + '</span>' : '') +
+  '</div></div>';
+}
+
+/* ── abrir chamado (cliente) ──────────────────────────────────────── */
+function novoChamado(){
+  editando = {tipo:"novoChamado", chopeira:null, provisoria:false, fotos:[], thumb:null};
+  telaChamados();
+}
+
+function formChamado(){
+  const e = editando;
+  $("tela").innerHTML =
+    '<div class="card">' +
+      '<h2>Preciso de manutenção</h2>' +
+      '<div class="muted">Diga qual chopeira é, mande uma foto e conte o que está acontecendo. ' +
+        'O Giba recebe na hora.</div>' +
+
+      '<h3>Qual chopeira</h3>' +
+      '<label>Número da etiqueta</label>' +
+      '<input id="ch_busca" placeholder="CH-014" value="' + esc(e.chopeira ? e.chopeira.codigo : (e.codigoLivre||"")) +
+        '" oninput="acharChopeira(this.value)">' +
+      '<div id="ch_achou"></div>' +
+
+      '<h3>Foto</h3>' +
+      '<input type="file" accept="image/*" capture="environment" onchange="fotoChamado(this)">' +
+      '<div id="ch_fotos" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"></div>' +
+      '<div class="esc">Até 3 fotos. Ajuda a saber o que levar antes de sair da oficina.</div>' +
+
+      '<h3>O que está acontecendo</h3>' +
+      '<textarea id="ch_problema" placeholder="O chope está saindo quente desde ontem de manhã." ' +
+        'style="min-height:110px"></textarea>' +
+      '<div class="btns" style="margin-top:8px">' +
+        '<button class="btn" id="btDitar" aria-pressed="false" onclick="ditarProblema()">Ditar</button>' +
+      '</div>' +
+      '<div id="ouvindo" class="alert blu" hidden></div>' +
+      '<div class="esc">O ditado usa o reconhecimento do navegador e precisa de internet no momento ' +
+        'da fala. Sem sinal, escreva — ou use o microfone do próprio teclado.</div>' +
+
+      '<div class="btns">' +
+        '<button class="btn pri" id="btEnviar" onclick="enviarChamado()">Enviar chamado</button>' +
+        '<button class="btn" onclick="pararDitado();irPara(\'chamados\')">Cancelar</button>' +
+      '</div>' +
+    '</div>';
+  acharChopeira($("ch_busca").value);
+  desenharFotosChamado();
+}
+
+function acharChopeira(v){
+  const e = editando, alvo = $("ch_achou");
+  const codigo = String(v||"").trim();
+  e.codigoLivre = codigo;
+  if(!codigo){ e.chopeira = null; e.provisoria = false; alvo.innerHTML = ""; return; }
+
+  const achada = CHOPEIRAS.find(c => String(c.codigo||"").toLowerCase() === codigo.toLowerCase());
+  if(achada){
+    e.chopeira = achada; e.provisoria = false;
+    alvo.innerHTML = '<div class="alert grn"><b>' + esc(achada.codigo) + '</b> — ' +
+      esc([achada.marca, achada.modelo].filter(Boolean).join(" ") || "sem marca cadastrada") +
+      (achada.local ? ' · ' + esc(achada.local) : '') + '</div>';
+    return;
+  }
+
+  const parecidas = CHOPEIRAS.filter(c =>
+    String(c.codigo||"").toLowerCase().includes(codigo.toLowerCase())).slice(0,4);
+  e.chopeira = null; e.provisoria = true;
+  alvo.innerHTML =
+    '<div class="alert yel"><b>Não achei esse número no seu cadastro.</b> ' +
+      'Pode enviar assim mesmo — a chopeira entra como <b>provisória</b> e o Giba completa a ficha depois.</div>' +
+    (parecidas.length ? '<div class="esc">Você quis dizer: ' +
+      parecidas.map(c => '<a href="#" onclick="usarChopeira(\'' + c.id +
+        '\');return false;">' + esc(c.codigo) + '</a>').join(" · ") + '</div>' : '');
+}
+function usarChopeira(id){
+  const c = CHOPEIRAS.find(x => x.id === id);
+  if(!c) return;
+  $("ch_busca").value = c.codigo;
+  acharChopeira(c.codigo);
+}
+
+async function fotoChamado(input){
+  const f = input.files && input.files[0];
+  input.value = "";
+  if(!f) return;
+  if(editando.fotos.length >= 3) return toast("Três fotos já dizem bastante.", "err");
+  try{
+    toast("Preparando a foto…");
+    const grande = await reduzirImagem(f, 1280, 0.72);
+    const th = await reduzirImagem(f, 200, 0.6);
+    editando.fotos.push({grande:grande, thumb:th});
+    if(!editando.thumb) editando.thumb = th;
+    desenharFotosChamado();
+    toast("Foto pronta.", "ok");
+  }catch(e){ toast("Não deu para usar essa imagem.", "err"); }
+}
+function desenharFotosChamado(){
+  const alvo = $("ch_fotos");
+  if(!alvo) return;
+  alvo.innerHTML = editando.fotos.map((f,i) =>
+    '<div style="position:relative">' +
+      '<img class="th" style="width:78px;height:78px" src="' + esc(f.thumb) + '" alt="">' +
+      '<button class="btn sm" style="position:absolute;top:-6px;right:-6px;padding:2px 8px;' +
+        'border-radius:20px" onclick="tirarFoto(' + i + ')">×</button>' +
+    '</div>').join("");
+}
+function tirarFoto(i){
+  editando.fotos.splice(i,1);
+  editando.thumb = editando.fotos.length ? editando.fotos[0].thumb : null;
+  desenharFotosChamado();
+}
+
+async function enviarChamado(){
+  pararDitado();
+  const e = editando;
+  const codigo = String($("ch_busca").value || "").trim();
+  const problema = $("ch_problema").value.trim();
+  if(!codigo)   return toast("Falta o número da chopeira.", "err");
+  if(!problema) return toast("Conte o que está acontecendo.", "err");
+
+  $("btEnviar").disabled = true;
+  try{
+    let chopeiraId = e.chopeira ? e.chopeira.id : null;
+
+    /* Chopeira que o cliente não tinha cadastrada entra provisória: o
+       chamado não pode esperar o cadastro ficar perfeito. */
+    if(!chopeiraId){
+      const ref = await db.collection("chopeiras").add({
+        codigo: codigo, clienteId: EU.clienteId, provisorio: true,
+        local:"", marca:"", modelo:"", tipo:"", torneiras:"",
+        compressorMarca:"", compressorModelo:"", compressorHp:"",
+        compressorGas:"", compressorAplicacao:"",
+        observacoes:"Cadastrada pelo cliente ao abrir um chamado.",
+        thumb: e.thumb || null, fotoId: null,
+        criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      chopeiraId = ref.id;
+    }
+
+    const fotoIds = [];
+    for(const f of e.fotos){
+      const r = await db.collection("fotos").add({
+        dataUrl: f.grande, clienteId: EU.clienteId, de:"ordem",
+        criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      fotoIds.push(r.id);
+    }
+
+    const agora = new Date().toISOString();
+    await db.collection("ordens").add({
+      numero: numeroOS(),
+      clienteId: EU.clienteId,
+      chopeiraId: chopeiraId,
+      chopeiraCodigo: codigo,
+      status: "aberto",
+      problemaRelatado: problema,
+      fotos: fotoIds,
+      thumb: e.thumb || null,
+      historico: [{status:"aberto", quando:agora, quem: EU.nome || EU.email, nota:""}],
+      agenda: {recolhaPrevista:"", entregaPrevista:""},
+      abertoPor: {uid: EU.uid, nome: EU.nome || "", email: EU.email},
+      naoLidoAdmin: true,
+      naoLidoCliente: false,
+      abertoEm: firebase.firestore.FieldValue.serverTimestamp(),
+      atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    await recarregar();
+    irPara("chamados");
+    toast("Chamado enviado. O Giba já foi avisado.", "ok");
+  }catch(err){
+    toast("Não deu para enviar: " + (err.message || err), "err");
+    const b = $("btEnviar"); if(b) b.disabled = false;
+  }
+}
+
+/* ── ver e mover ──────────────────────────────────────────────────── */
+async function abrirOrdem(id){
+  const o = ORDENS.find(x => x.id === id);
+  if(!o) return;
+  editando = {tipo:"verOrdem", id:id, dados:o};
+  telaChamados();
+
+  /* Abrir é ler: o aviso do meu lado se apaga. */
+  const campo = EU.admin ? "naoLidoAdmin" : "naoLidoCliente";
+  if(o[campo]){
+    try{
+      await db.collection("ordens").doc(id).update({[campo]: false});
+      o[campo] = false;
+      desenharSino();
+    }catch(e){ /* fica marcado, tenta de novo na próxima */ }
+  }
+  (o.fotos || []).forEach((fid,i) => mostrarFotoOrdem(fid, i));
+}
+
+async function mostrarFotoOrdem(fotoId, i){
+  try{
+    const s = await db.collection("fotos").doc(fotoId).get();
+    const img = $("of_" + i);
+    if(s.exists && img){ img.src = s.data().dataUrl; img.style.display = "block"; }
+  }catch(e){ /* sem a foto, a ficha vive */ }
+}
+
+function verOrdem(){
+  const o = editando.dados, s = status(o.status);
+  const cho = CHOPEIRAS.find(c => c.id === o.chopeiraId);
+
+  const linhaTempo = (o.historico || []).slice().reverse().map((h,i) => {
+    const hs = status(h.status);
+    return '<div class="passo' + (i===0 ? " agora" : "") + '">' +
+      '<div class="bola"><i class="p-' + (hs.pill||"neutro") + '"></i></div>' +
+      '<div class="txt"><div class="pt">' + esc(hs.rot) + '</div>' +
+        '<div class="pd">' + esc(quando(h.quando)) + (h.quem ? ' · ' + esc(h.quem) : '') + '</div>' +
+        (h.nota ? '<div class="pn">' + esc(h.nota) + '</div>' : '') +
+      '</div></div>';
+  }).join("");
+
+  const fotos = (o.fotos || []).map((f,i) =>
+    '<img id="of_' + i + '" class="foto" style="display:none" alt="Foto do chamado">').join("");
+
+  $("tela").innerHTML =
+    '<div class="card">' +
+      '<div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">' +
+        '<div><div class="brand" style="letter-spacing:2px">' + esc(o.numero) + '</div>' +
+        '<h2 class="mono" style="font-size:22px">' + esc(o.chopeiraCodigo) + '</h2>' +
+        '<div class="muted">' + (cho ? esc([cho.marca, cho.modelo].filter(Boolean).join(" ") ||
+          "ficha ainda por completar") : "chopeira não encontrada") +
+          (EU.admin ? ' · ' + esc(nomeCliente(o.clienteId)) : '') + '</div></div>' +
+        '<span class="pill ' + s.pill + '">' + esc(s.rot) + '</span>' +
+      '</div>' +
+
+      (cho && cho.provisorio ? '<div class="alert yel" style="margin-top:12px">' +
+        '<b>Cadastro provisório.</b> Esta chopeira foi lançada pelo cliente ao abrir o chamado. ' +
+        (EU.admin ? 'Complete a ficha na aba Chopeiras.' : 'O Giba completa a ficha na recolha.') +
+        '</div>' : '') +
+
+      '<h3>O que o cliente contou</h3>' +
+      '<div style="white-space:pre-wrap">' + esc(o.problemaRelatado || "—") + '</div>' +
+      (o.abertoPor && o.abertoPor.nome ? '<div class="esc">por ' + esc(o.abertoPor.nome) +
+        ' · ' + esc(quando(o.abertoEm)) + '</div>' : '') +
+      fotos +
+
+      ((o.agenda && (o.agenda.recolhaPrevista || o.agenda.entregaPrevista)) ?
+        '<h3>Agenda</h3><div style="display:flex;gap:6px;flex-wrap:wrap">' +
+          (o.agenda.recolhaPrevista ? '<span class="pill cold">recolha ' +
+            esc(dataCurta(o.agenda.recolhaPrevista)) + '</span>' : '') +
+          (o.agenda.entregaPrevista ? '<span class="pill cold">entrega ' +
+            esc(dataCurta(o.agenda.entregaPrevista)) + '</span>' : '') +
+        '</div>' : '') +
+
+      blocoOrcamento(o) +
+
+      '<h3>Andamento</h3><div class="linha">' + linhaTempo + '</div>' +
+
+      (EU.admin ? (editando.modo === "orcamento" ? editorOrcamento() : painelAdmin(o)) : '') +
+
+      '<div class="btns"><button class="btn" onclick="irPara(\'chamados\')">Voltar</button></div>' +
+    '</div>';
+}
+
+function painelAdmin(o){
+  const seguintes = STATUS.filter(s => s.id !== o.status);
+  return '<h3>Orçamento</h3>' +
+    '<div class="btns" style="margin-top:0">' +
+      '<button class="btn" onclick="montarOrcamento()">' +
+        (o.orcamento ? "Rever o orçamento" : "Montar o orçamento") + '</button>' +
+      (o.orcamento ? '<span class="muted" style="align-self:center">' +
+        esc(reais(o.orcamento.total)) + '</span>' : '') +
+    '</div>' +
+
+    '<h3>Mover o chamado</h3>' +
+    '<label>Novo status</label>' +
+    '<select id="os_status">' + seguintes.map(s =>
+      '<option value="' + s.id + '">' + esc(s.rot) + '</option>').join("") + '</select>' +
+    '<label>Recado para o cliente (opcional)</label>' +
+    '<input id="os_nota" placeholder="Compressor testado, o problema é o pressostato">' +
+    '<div class="lin">' +
+      '<div><label>Recolha prevista</label><input type="date" id="os_recolha" value="' +
+        esc((o.agenda&&o.agenda.recolhaPrevista)||"") + '"></div>' +
+      '<div><label>Entrega prevista</label><input type="date" id="os_entrega" value="' +
+        esc((o.agenda&&o.agenda.entregaPrevista)||"") + '"></div>' +
+    '</div>' +
+    '<div class="btns">' +
+      '<button class="btn pri" id="btMover" onclick="moverOrdem()">Registrar mudança</button>' +
+      botaoWhats(o) +
+    '</div>' +
+    '<div class="esc">Registrar acende o aviso no aplicativo do cliente. O WhatsApp é o empurrão ' +
+      'para ele ver hoje.</div>';
+}
+
+function botaoWhats(o){
+  const c = CLIENTES.find(x => x.id === o.clienteId);
+  const numero = c ? soWhats(c.whatsapp || c.telefone) : "";
+  if(!numero) return '<button class="btn" disabled title="Sem WhatsApp no cadastro">Sem WhatsApp</button>';
+  return '<button class="btn" onclick="avisarWhats(\'' + o.id + '\')">Avisar no WhatsApp</button>';
+}
+
+function avisarWhats(id){
+  const o = ORDENS.find(x => x.id === id) || editando.dados;
+  const c = CLIENTES.find(x => x.id === o.clienteId);
+  const numero = c ? soWhats(c.whatsapp || c.telefone) : "";
+  if(!numero) return toast("Esta empresa não tem WhatsApp no cadastro.", "err");
+  const s = status(o.status);
+  const ultima = (o.historico || [])[o.historico.length - 1] || {};
+  const valor = (o.status === "orcamento_enviado" && o.orcamento)
+    ? "\nTotal: " + reais(o.orcamento.total) +
+      " (peças " + reais(o.orcamento.totalPecas) + " + serviço " + reais(o.orcamento.totalServico) + ")"
+    : "";
+  const texto =
+    (c.contato ? "Oi, " + c.contato + "! " : "Oi! ") +
+    "Novidade na " + o.numero + " — chopeira " + o.chopeiraCodigo + ".\n" +
+    s.rot + ". " + s.cli + valor +
+    (ultima.nota ? "\n" + ultima.nota : "") +
+    "\n\nDá para acompanhar pelo aplicativo.";
+  window.open("https://wa.me/" + numero + "?text=" + encodeURIComponent(texto), "_blank");
+}
+
+async function moverOrdem(){
+  const o = editando.dados;
+  const novo = $("os_status").value;
+  const nota = $("os_nota").value.trim();
+  if(novo === "orcamento_enviado" && !(o.orcamento && (o.orcamento.itens||[]).length)){
+    return toast("Monte o orçamento antes de mandar para o cliente.", "err");
+  }
+  const agenda = {
+    recolhaPrevista: $("os_recolha").value || "",
+    entregaPrevista: $("os_entrega").value || ""
+  };
+  if(!novo) return;
+
+  $("btMover").disabled = true;
+  try{
+    const registro = {status:novo, quando:new Date().toISOString(),
+                      quem: EU.nome || "Giba", nota:nota};
+    await db.collection("ordens").doc(o.id).update({
+      status: novo,
+      agenda: agenda,
+      historico: firebase.firestore.FieldValue.arrayUnion(registro),
+      naoLidoCliente: true,
+      atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    o.status = novo;
+    o.agenda = agenda;
+    o.historico = (o.historico || []).concat([registro]);
+    o.naoLidoCliente = true;
+    verOrdem();
+    desenharSino();
+    toast("Status registrado. Avise no WhatsApp para ele ver hoje.", "ok");
+  }catch(e){
+    toast("Não deu para registrar: " + (e.message || e), "err");
+    const b = $("btMover"); if(b) b.disabled = false;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   DITADO
+
+   Reaproveitado do app de Laudo, com as duas armadilhas já resolvidas
+   lá: no celular a escuta termina sozinha depois de um silêncio (por
+   isso religa), e o Android reentrega a MESMA fala cada vez maior
+   ("está saindo" → "está saindo quente") — somar escrevia a frase
+   quatro vezes. A frase nova que começa pela anterior substitui.
+   ═══════════════════════════════════════════════════════════════════ */
+let dit = {rec:null, ligado:false, alvo:null, fixo:"", aberta:"", lidos:0};
+
+function soLetras(s){
+  return (s||"").toLowerCase().replace(/[^0-9a-záàâãéêíóôõúüçñ]/gi, "");
+}
+function arrumarFrase(t){
+  t = (t||"").trim();
+  if(!t) return "";
+  t = t.charAt(0).toUpperCase() + t.slice(1);
+  return /[.!?]$/.test(t) ? t : t + ".";
+}
+
+function ditarProblema(){
+  if(dit.ligado){ pararDitado(); return; }
+  const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!Rec){
+    return toast("Este navegador não faz ditado. Use o microfone do teclado.", "err");
+  }
+  const alvo = $("ch_problema"), painel = $("ouvindo"), botao = $("btDitar");
+  const rec = new Rec();
+  rec.lang = "pt-BR"; rec.continuous = true; rec.interimResults = true;
+
+  dit = {rec:rec, ligado:true, alvo:alvo, fixo:alvo.value || "", aberta:"", lidos:0};
+  botao.setAttribute("aria-pressed","true");
+  botao.textContent = "Parar";
+  painel.hidden = false;
+  painel.innerHTML = "<b>Ouvindo…</b> fale normalmente; toque em Parar quando acabar.";
+
+  rec.onstart = () => { dit.lidos = 0; };
+  rec.onresult = ev => {
+    let parcial = "";
+    for(let i = 0; i < ev.results.length; i++){
+      const r = ev.results[i];
+      if(!r.isFinal){ parcial += r[0].transcript; continue; }
+      if(i >= dit.lidos){ receberFrase(r[0].transcript); dit.lidos = i + 1; }
+      else if(i === dit.lidos - 1){ receberFrase(r[0].transcript); }
+    }
+    painel.innerHTML = parcial
+      ? "<b>… </b>" + esc(parcial)
+      : "<b>Ouvindo… </b>toque em Parar quando acabar.";
+  };
+  rec.onerror = ev => {
+    if(ev.error === "no-speech" || ev.error === "aborted") return;
+    toast(ev.error === "not-allowed" || ev.error === "service-not-allowed"
+      ? "O navegador bloqueou o microfone. Libere nas permissões do site."
+      : (ev.error === "network"
+          ? "O ditado precisa de internet. Sem sinal, escreva no teclado."
+          : "Ditado interrompido: " + ev.error), "err");
+    pararDitado();
+  };
+  rec.onend = () => {
+    if(dit.ligado && dit.rec === rec){
+      dit.lidos = 0;
+      try{ rec.start(); }catch(e){ pararDitado(); }
+    }
+  };
+  try{ rec.start(); }
+  catch(e){ toast("Não deu para ligar o microfone.", "err"); pararDitado(); }
+}
+
+function receberFrase(bruta){
+  const nova = (bruta||"").trim();
+  if(!nova) return;
+  const anterior = soLetras(dit.aberta), chegou = soLetras(nova);
+  if(anterior && chegou.indexOf(anterior) === 0){
+    dit.aberta = nova;                        // a mesma fala, mais apurada
+  }else{
+    const fechada = arrumarFrase(dit.aberta);
+    if(fechada) dit.fixo = dit.fixo ? (dit.fixo.replace(/\s+$/,"") + " " + fechada) : fechada;
+    dit.aberta = nova;
+  }
+  escreverDitado();
+}
+
+function escreverDitado(){
+  if(!dit.alvo) return;
+  const partes = [];
+  if(dit.fixo) partes.push(dit.fixo.replace(/\s+$/,""));
+  const ultima = arrumarFrase(dit.aberta);
+  if(ultima) partes.push(ultima);
+  const novo = partes.join(" ");
+  if(dit.alvo.value === novo) return;
+  dit.alvo.value = novo;
+  dit.alvo.scrollTop = dit.alvo.scrollHeight;
+}
+
+function pararDitado(){
+  if(!dit.rec){ dit.ligado = false; return; }
+  const rec = dit.rec;
+  dit.ligado = false; dit.rec = null;
+  try{ rec.onend = null; rec.stop(); }catch(e){}
+  const b = $("btDitar"), p = $("ouvindo");
+  if(b){ b.setAttribute("aria-pressed","false"); b.textContent = "Ditar"; }
+  if(p) p.hidden = true;
+  dit.alvo = null; dit.fixo = ""; dit.aberta = ""; dit.lidos = 0;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   PEÇAS E ORÇAMENTO
+
+   O orçamento é do Giba; a resposta é do cliente. Peças e serviço vão
+   em linhas separadas porque é assim que o cliente decide: ele aceita
+   pagar a peça, discute a mão de obra, ou o contrário.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Nomes tirados da tabela de peças de chopeira do app de compressores.
+   Servem de sugestão ao cadastrar — ninguém é obrigado a usá-los. */
+const PECAS_SUGERIDAS = [
+  "Pressostato de baixa (KP1 Danfoss)",
+  "Pressostato de alta (cartucho)",
+  "Pressostato RCP Robert Shaw",
+  "Relé de partida magnético",
+  "Relé de partida voltimétrico",
+  "Capacitor de partida (eletrolítico)",
+  "Capacitor permanente (de marcha)",
+  "Protetor térmico",
+  "Válvula solenoide (linha de líquido)",
+  "Micromotor do ventilador do condensador",
+  "Resistência de degelo",
+  "Compressor",
+  "Filtro secador",
+  "Torneira",
+  "Guarnição de torneira",
+  "Bomba de água",
+  "Serpentina",
+  "Gás refrigerante (carga)"
+];
+
+const SERVICOS_SUGERIDOS = [
+  "Mão de obra — manutenção corretiva",
+  "Mão de obra — troca de componente",
+  "Limpeza e higienização",
+  "Carga de gás e teste de estanqueidade",
+  "Recolha e entrega"
+];
+
+function reais(v){
+  return (Number(v) || 0).toLocaleString("pt-BR", {style:"currency", currency:"BRL"});
+}
+
+/* O cliente digita "45,90"; o teclado numérico do celular às vezes dá
+   "45.90". Os dois têm de virar o mesmo número. */
+function paraNumero(v){
+  const s = String(v == null ? "" : v).trim().replace(/[^\d.,-]/g, "");
+  if(!s) return 0;
+  if(s.includes(",")) return Number(s.replace(/\./g, "").replace(",", ".")) || 0;
+  return Number(s) || 0;
+}
+
+function somarOrcamento(itens){
+  const soma = t => (itens || []).filter(i => i.tipo === t)
+    .reduce((n, i) => n + (Number(i.qtd)||0) * (Number(i.valorUnit)||0), 0);
+  const pecas = soma("peca"), servico = soma("servico");
+  return {totalPecas: pecas, totalServico: servico, total: pecas + servico};
+}
+
+/* ═══════════════ CADASTRO DE PEÇAS (admin) ═══════════════ */
+function telaPecas(){
+  if(editando && editando.tipo === "peca") return formPeca();
+
+  const busca = (window.__buscaPec || "").toLowerCase();
+  const lista = PECAS.filter(p => !busca ||
+    [p.codigo, p.descricao, p.aplicacao].map(x => x || "").join(" ").toLowerCase().includes(busca));
+
+  $("tela").innerHTML =
+    '<div class="btns" style="margin:0 0 12px">' +
+      '<button class="btn pri" onclick="novaPeca()">+ Nova peça</button>' +
+      '<button class="btn" onclick="atualizar()">Atualizar</button>' +
+    '</div>' +
+    '<div class="busca"><input placeholder="Buscar por código ou descrição" value="' +
+      esc(window.__buscaPec||"") + '" oninput="window.__buscaPec=this.value;telaPecas()"></div>' +
+    (lista.length ? lista.map(cartaoPeca).join("") :
+      '<div class="vazio">' + (PECAS.length ? "Nada encontrado." :
+        "Nenhuma peça cadastrada. Lance as que você mais troca — elas entram no orçamento com um toque.") +
+      '</div>');
+}
+
+function cartaoPeca(p){
+  return '<div class="reg"><div class="top"><div style="min-width:0">' +
+    '<div class="nm">' + esc(p.descricao) + '</div>' +
+    (p.codigo ? '<div class="dt mono">' + esc(p.codigo) + '</div>' : '') +
+    (p.aplicacao ? '<div class="dt">' + esc(p.aplicacao) + '</div>' : '') +
+    '</div>' +
+    '<div style="text-align:right"><div class="nm" style="color:var(--copperhi);white-space:nowrap">' +
+      esc(reais(p.precoVenda)) + '</div>' +
+      '<div class="dt">' + esc(p.unidade || "un") + '</div>' +
+      '<button class="btn sm" style="margin-top:6px" onclick="editarPeca(\'' + p.id + '\')">Abrir</button>' +
+    '</div></div></div>';
+}
+
+function novaPeca(){
+  editando = {tipo:"peca", id:null, dados:{codigo:"", descricao:"", unidade:"un",
+    precoVenda:0, aplicacao:"", observacoes:""}};
+  telaPecas();
+}
+function editarPeca(id){
+  const p = PECAS.find(x => x.id === id);
+  if(!p) return;
+  editando = {tipo:"peca", id:id, dados:JSON.parse(JSON.stringify(p))};
+  telaPecas();
+}
+
+function formPeca(){
+  const d = editando.dados;
+  $("tela").innerHTML =
+    '<div class="card">' +
+      '<h2>' + (editando.id ? "Editar peça" : "Nova peça") + '</h2>' +
+      '<div class="muted">O preço aqui é o de venda: é ele que entra no orçamento, e dá para ' +
+        'mudar em cada orçamento sem mexer no cadastro.</div>' +
+
+      '<label>Descrição</label>' +
+      '<input id="p_desc" list="sugestoesPeca" value="' + esc(d.descricao) + '">' +
+      '<datalist id="sugestoesPeca">' +
+        PECAS_SUGERIDAS.map(s => '<option value="' + esc(s) + '"></option>').join("") +
+      '</datalist>' +
+      '<div class="esc">A lista sugere as peças de chopeira do seu app de compressores. ' +
+        'Pode escrever qualquer outra.</div>' +
+
+      '<div class="lin">' +
+        '<div><label>Código</label><input id="p_cod" value="' + esc(d.codigo) + '"></div>' +
+        '<div style="flex:0 0 100px"><label>Unidade</label><input id="p_un" value="' +
+          esc(d.unidade || "un") + '"></div>' +
+      '</div>' +
+      '<label>Preço de venda</label>' +
+      '<input id="p_preco" inputmode="decimal" value="' +
+        esc(d.precoVenda ? String(d.precoVenda).replace(".", ",") : "") + '" placeholder="0,00">' +
+      '<label>Serve em</label>' +
+      '<input id="p_aplic" placeholder="Embraco 1/5 HP, chopeira Beertec" value="' + esc(d.aplicacao) + '">' +
+      '<label>Observações</label><textarea id="p_obs">' + esc(d.observacoes || "") + '</textarea>' +
+
+      '<div class="btns">' +
+        '<button class="btn pri" id="btPeca" onclick="salvarPeca()">Salvar</button>' +
+        '<button class="btn" onclick="irPara(\'pecas\')">Cancelar</button>' +
+        (editando.id ? '<button class="btn dg" onclick="apagarPeca()">Apagar</button>' : '') +
+      '</div>' +
+    '</div>';
+}
+
+async function salvarPeca(){
+  const d = {
+    codigo: $("p_cod").value.trim(),
+    descricao: $("p_desc").value.trim(),
+    unidade: $("p_un").value.trim() || "un",
+    precoVenda: paraNumero($("p_preco").value),
+    aplicacao: $("p_aplic").value.trim(),
+    observacoes: $("p_obs").value.trim()
+  };
+  if(!d.descricao) return toast("Falta a descrição da peça.", "err");
+
+  $("btPeca").disabled = true;
+  try{
+    if(editando.id) await db.collection("pecas").doc(editando.id).update(d);
+    else {
+      d.criadoEm = firebase.firestore.FieldValue.serverTimestamp();
+      await db.collection("pecas").add(d);
+    }
+    await recarregar();
+    irPara("pecas");
+    toast("Peça salva.", "ok");
+  }catch(e){
+    toast("Não deu para salvar: " + (e.message || e), "err");
+    const b = $("btPeca"); if(b) b.disabled = false;
+  }
+}
+
+async function apagarPeca(){
+  if(!confirm("Apagar esta peça do cadastro? Os orçamentos já feitos não mudam.")) return;
+  try{
+    await db.collection("pecas").doc(editando.id).delete();
+    await recarregar();
+    irPara("pecas");
+    toast("Peça apagada.", "ok");
+  }catch(e){ toast("Não deu para apagar: " + (e.message || e), "err"); }
+}
+
+/* ═══════════════ ORÇAMENTO ═══════════════ */
+
+/* O que os dois lados veem, depois de o orçamento estar na mesa. */
+function blocoOrcamento(o){
+  const orc = o.orcamento;
+  if(!orc || !(orc.itens || []).length) return "";
+
+  const linhas = tipo => (orc.itens || []).filter(i => i.tipo === tipo).map(i =>
+    '<tr><td style="padding:7px 8px 7px 0">' + esc(i.descricao) +
+      '<div class="dt">' + esc(i.qtd) + ' × ' + esc(reais(i.valorUnit)) + '</div></td>' +
+    '<td style="padding:7px 0;text-align:right;white-space:nowrap;font-weight:700">' +
+      esc(reais((Number(i.qtd)||0) * (Number(i.valorUnit)||0))) + '</td></tr>').join("");
+
+  const pecas = linhas("peca"), servicos = linhas("servico");
+  const d = o.decisaoCliente;
+
+  return '<h3>Orçamento</h3>' +
+    '<table style="width:100%">' +
+      (pecas ? '<tr><td colspan="2" class="muted" style="padding-top:6px;font-size:11px;' +
+        'text-transform:uppercase;letter-spacing:1.2px">Peças</td></tr>' + pecas +
+        '<tr><td class="muted" style="padding:6px 0">Subtotal peças</td>' +
+        '<td style="text-align:right;padding:6px 0">' + esc(reais(orc.totalPecas)) + '</td></tr>' : '') +
+      (servicos ? '<tr><td colspan="2" class="muted" style="padding-top:12px;font-size:11px;' +
+        'text-transform:uppercase;letter-spacing:1.2px">Serviço</td></tr>' + servicos +
+        '<tr><td class="muted" style="padding:6px 0">Subtotal serviço</td>' +
+        '<td style="text-align:right;padding:6px 0">' + esc(reais(orc.totalServico)) + '</td></tr>' : '') +
+      '<tr><td style="padding:11px 0 0;font-weight:800;border-top:1px solid var(--line)">Total</td>' +
+      '<td style="padding:11px 0 0;text-align:right;font-weight:800;font-size:17px;' +
+        'color:var(--copperhi);border-top:1px solid var(--line)">' + esc(reais(orc.total)) + '</td></tr>' +
+    '</table>' +
+    (orc.validadeDias ? '<div class="esc">Válido por ' + esc(orc.validadeDias) + ' dias' +
+      (orc.enviadoEm ? ' a contar de ' + esc(quando(orc.enviadoEm)) : '') + '.</div>' : '') +
+
+    (d ? '<div class="alert ' + (d.valor === "aprovado" ? "grn" : "red") + '" style="margin-top:12px">' +
+      '<b>' + (d.valor === "aprovado" ? "Aprovado" : "Não aprovado") + '</b> por ' + esc(d.por) +
+      ' em ' + esc(quando(d.quando)) + (d.motivo ? '<br>' + esc(d.motivo) : '') + '</div>' : '') +
+
+    (!d && !EU.admin && o.status === "orcamento_enviado" ? botoesDecisao() : '') +
+    (!d && EU.admin && o.status === "orcamento_enviado"
+      ? '<div class="esc">Esperando a resposta do cliente. Se ele responder por telefone, ' +
+        'registre por ele em <b>Mover o chamado</b>.</div>' : '');
+}
+
+function botoesDecisao(){
+  return '<div class="btns">' +
+      '<button class="btn pri" onclick="responderOrcamento(\'aprovado\')">Aprovar o serviço</button>' +
+      '<button class="btn dg" onclick="responderOrcamento(\'reprovado\')">Não aprovar</button>' +
+    '</div>' +
+    '<div class="esc">A sua resposta fica registrada com o seu nome e a data.</div>';
+}
+
+async function responderOrcamento(valor){
+  const o = editando.dados;
+  let motivo = "";
+  if(valor === "reprovado"){
+    motivo = prompt("Se quiser, diga por que não aprovou (ajuda o Giba a rever):") || "";
+  } else if(!confirm("Aprovar o serviço no valor de " + reais(o.orcamento.total) + "?")){
+    return;
+  }
+  const agora = new Date().toISOString();
+  const novo = valor === "aprovado" ? "orcamento_aprovado" : "orcamento_reprovado";
+  const decisao = {valor:valor, motivo:motivo.trim(), quando:agora,
+                   por: EU.nome || EU.email, porUid: EU.uid};
+  const registro = {status:novo, quando:agora, quem: EU.nome || EU.email, nota:motivo.trim()};
+  try{
+    await db.collection("ordens").doc(o.id).update({
+      status: novo,
+      decisaoCliente: decisao,
+      historico: firebase.firestore.FieldValue.arrayUnion(registro),
+      naoLidoAdmin: true,
+      naoLidoCliente: false,
+      atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    o.status = novo; o.decisaoCliente = decisao;
+    o.historico = (o.historico || []).concat([registro]);
+    o.naoLidoAdmin = true;
+    verOrdem();
+    toast(valor === "aprovado" ? "Aprovado. O Giba já foi avisado." : "Resposta registrada.", "ok");
+  }catch(e){
+    toast("Não deu para registrar: " + (e.message || e), "err");
+  }
+}
+
+/* ── o editor, só do lado do Giba ─────────────────────────────────── */
+function montarOrcamento(){
+  const o = editando.dados;
+  const orc = o.orcamento;
+  editando.orc = {
+    itens: orc ? JSON.parse(JSON.stringify(orc.itens || [])) : [],
+    validadeDias: orc ? (orc.validadeDias || 15) : 15
+  };
+  editando.modo = "orcamento";
+  verOrdem();
+}
+
+function editorOrcamento(){
+  const e = editando.orc;
+  const soma = somarOrcamento(e.itens);
+
+  const linha = (i, idx) =>
+    '<div class="itemOrc">' +
+      '<div class="lin" style="gap:8px">' +
+        '<div style="flex:1 1 100%"><input value="' + esc(i.descricao) + '" placeholder="descrição" ' +
+          'oninput="mudarItem(' + idx + ',\'descricao\',this.value)"></div>' +
+      '</div>' +
+      '<div class="lin" style="gap:8px;margin-top:8px;align-items:flex-end">' +
+        '<div style="flex:0 0 66px"><label style="margin:0 0 4px">Qtd</label>' +
+          '<input inputmode="decimal" value="' + esc(i.qtd) + '" ' +
+          'oninput="mudarItem(' + idx + ',\'qtd\',this.value)"></div>' +
+        '<div><label style="margin:0 0 4px">Valor unitário</label>' +
+          '<input inputmode="decimal" value="' + esc(String(i.valorUnit).replace(".", ",")) + '" ' +
+          'oninput="mudarItem(' + idx + ',\'valorUnit\',this.value)"></div>' +
+        '<div style="flex:0 0 auto"><button class="btn dg sm" onclick="tirarItem(' + idx + ')">×</button></div>' +
+      '</div>' +
+      '<div class="esc" style="text-align:right">' +
+        esc(reais((Number(i.qtd)||0) * (Number(i.valorUnit)||0))) + '</div>' +
+    '</div>';
+
+  const grupo = (tipo, titulo) => {
+    const itens = e.itens.map((i, idx) => ({i:i, idx:idx})).filter(x => x.i.tipo === tipo);
+    return '<h3>' + titulo + '</h3>' +
+      (itens.length ? itens.map(x => linha(x.i, x.idx)).join("") :
+        '<div class="esc">Nada ainda.</div>') +
+      '<div class="btns" style="margin-top:8px">' +
+        '<button class="btn sm" onclick="novoItem(\'' + tipo + '\')">+ Acrescentar</button>' +
+        (tipo === "peca" && PECAS.length
+          ? '<select style="width:auto;flex:1 1 160px" onchange="itemDoCatalogo(this)">' +
+              '<option value="">— do cadastro de peças —</option>' +
+              PECAS.map(p => '<option value="' + p.id + '">' + esc(p.descricao) +
+                ' · ' + esc(reais(p.precoVenda)) + '</option>').join("") +
+            '</select>' : '') +
+      '</div>';
+  };
+
+  return '<div style="border-top:1px solid var(--line);margin-top:16px;padding-top:4px">' +
+    grupo("peca", "Peças") +
+    grupo("servico", "Serviço") +
+    '<h3>Totais</h3>' +
+    '<table style="width:100%">' +
+      '<tr><td class="muted">Peças</td><td style="text-align:right">' + esc(reais(soma.totalPecas)) + '</td></tr>' +
+      '<tr><td class="muted">Serviço</td><td style="text-align:right">' + esc(reais(soma.totalServico)) + '</td></tr>' +
+      '<tr><td style="font-weight:800;padding-top:8px;border-top:1px solid var(--line)">Total</td>' +
+      '<td id="somaViva" style="text-align:right;font-weight:800;font-size:17px;' +
+        'color:var(--copperhi);padding-top:8px;border-top:1px solid var(--line)">' +
+        esc(reais(soma.total)) + '</td></tr>' +
+    '</table>' +
+    '<label>Validade (dias)</label>' +
+    '<input id="orc_validade" inputmode="numeric" value="' + esc(e.validadeDias) + '" ' +
+      'oninput="editando.orc.validadeDias=this.value">' +
+    '<div class="btns">' +
+      '<button class="btn pri" id="btEnviarOrc" onclick="salvarOrcamento(true)">Salvar e enviar ao cliente</button>' +
+      '<button class="btn" onclick="salvarOrcamento(false)">Só salvar</button>' +
+      '<button class="btn" onclick="editando.modo=null;verOrdem()">Cancelar</button>' +
+    '</div>' +
+    '<div class="esc">Enviar coloca o chamado em <b>orçamento enviado</b> e abre os botões de ' +
+      'aprovar do lado do cliente. Só salvar deixa guardado para acertar depois.</div>' +
+  '</div>';
+}
+
+function novoItem(tipo){
+  editando.orc.itens.push({tipo:tipo, pecaId:null, descricao:"", qtd:1, valorUnit:0});
+  verOrdem();
+}
+function itemDoCatalogo(sel){
+  const p = PECAS.find(x => x.id === sel.value);
+  sel.value = "";
+  if(!p) return;
+  editando.orc.itens.push({tipo:"peca", pecaId:p.id, descricao:p.descricao,
+                           qtd:1, valorUnit:Number(p.precoVenda)||0});
+  verOrdem();
+}
+function mudarItem(idx, campo, valor){
+  const i = editando.orc.itens[idx];
+  if(!i) return;
+  i[campo] = (campo === "descricao") ? valor : paraNumero(valor);
+  /* Só o total é redesenhado: refazer a tela inteira tiraria o cursor do
+     campo no meio da digitação. */
+  const alvo = $("somaViva");
+  if(alvo) alvo.textContent = reais(somarOrcamento(editando.orc.itens).total);
+}
+function tirarItem(idx){
+  editando.orc.itens.splice(idx, 1);
+  verOrdem();
+}
+
+async function salvarOrcamento(enviar){
+  const e = editando.orc, o = editando.dados;
+  const itens = e.itens
+    .filter(i => i.descricao.trim())
+    .map(i => ({tipo:i.tipo, pecaId:i.pecaId || null, descricao:i.descricao.trim(),
+                qtd:Number(i.qtd)||0, valorUnit:Number(i.valorUnit)||0}));
+  if(!itens.length) return toast("O orçamento está vazio.", "err");
+  if(itens.some(i => !i.qtd)) return toast("Alguma linha está sem quantidade.", "err");
+
+  const soma = somarOrcamento(itens);
+  const orc = {
+    itens: itens,
+    totalPecas: soma.totalPecas, totalServico: soma.totalServico, total: soma.total,
+    validadeDias: Number(paraNumero(e.validadeDias)) || 15,
+    enviadoEm: enviar ? new Date().toISOString() : (o.orcamento ? o.orcamento.enviadoEm : null)
+  };
+
+  const b = $("btEnviarOrc"); if(b) b.disabled = true;
+  try{
+    const mudanca = {orcamento: orc,
+                     atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()};
+    if(enviar){
+      const agora = new Date().toISOString();
+      const registro = {status:"orcamento_enviado", quando:agora, quem: EU.nome || "Giba",
+                        nota:"Orçamento de " + reais(orc.total) + "."};
+      mudanca.status = "orcamento_enviado";
+      mudanca.decisaoCliente = null;
+      mudanca.historico = firebase.firestore.FieldValue.arrayUnion(registro);
+      mudanca.naoLidoCliente = true;
+      o.status = "orcamento_enviado";
+      o.decisaoCliente = null;
+      o.historico = (o.historico || []).concat([registro]);
+      o.naoLidoCliente = true;
+    }
+    await db.collection("ordens").doc(o.id).update(mudanca);
+    o.orcamento = orc;
+    editando.modo = null;
+    verOrdem();
+    desenharSino();
+    toast(enviar ? "Orçamento enviado. Avise no WhatsApp." : "Orçamento guardado.", "ok");
+  }catch(err){
+    toast("Não deu para salvar: " + (err.message || err), "err");
+    if(b) b.disabled = false;
+  }
+}
+
+async function atualizar(){
+  toast("Atualizando…");
+  await recarregar();
+  desenhar();
+  toast("Pronto.", "ok");
+}
+</script>
+
+<script>
+if("serviceWorker" in navigator){
+  window.addEventListener("load", ()=> navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+}
+</script>
+</body>
+</html>

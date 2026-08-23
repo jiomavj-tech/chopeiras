@@ -1,0 +1,164 @@
+Copyright (c) 2026 Jeovani. Todos os direitos reservados.
+All rights reserved.
+
+
+===============================================================
+PORTUGUÊS
+===============================================================
+
+Este software e o seu código-fonte são propriedade exclusiva do
+titular do direito autoral indicado acima. Nenhuma licença de uso,
+cópia, modificação ou distribuição é concedida, salvo o que estiver
+expressamente permitido abaixo.
+
+
+O QUE É PERMITIDO
+
+  1. Utilizar a aplicação publicada pelo titular, no endereço
+     oficial, para converter os seus próprios documentos.
+
+  2. Ler o código-fonte para fins de estudo, auditoria e avaliação.
+
+
+O QUE NÃO É PERMITIDO
+
+Sem autorização prévia e por escrito do titular, fica vedado:
+
+  1. Copiar, reproduzir ou armazenar o código-fonte, no todo ou em
+     parte, além do necessário à leitura permitida acima.
+
+  2. Redistribuir o software, a título gratuito ou oneroso, por
+     qualquer meio ou suporte.
+
+  3. Publicar, hospedar ou disponibilizar a terceiros cópia própria
+     da aplicação.
+
+  4. Modificar, adaptar, traduzir ou criar obras derivadas.
+
+  5. Vender, licenciar, sublicenciar, alugar ou explorar
+     comercialmente o software, ainda que modificado.
+
+  6. Incorporar o software, ou qualquer parte dele, noutro produto,
+     serviço ou modelo de aprendizagem automática.
+
+  7. Remover ou alterar os avisos de autoria e esta licença.
+
+
+RESSALVA QUANTO AO GITHUB
+
+Enquanto este repositório permanecer público no GitHub, os Termos de
+Serviço do GitHub concedem aos demais utilizadores da plataforma o
+direito de visualizar o repositório e de o bifurcar (fork) dentro da
+própria plataforma. Essa permissão decorre da escolha de publicar o
+repositório e não é afastada por esta licença.
+
+Todos os restantes direitos permanecem reservados. O conteúdo obtido
+por bifurcação continua sujeito às proibições acima fora do GitHub,
+designadamente quanto a redistribuição, hospedagem própria,
+modificação e exploração comercial.
+
+
+VERSÕES ANTERIORES
+
+As versões deste software distribuídas antes desta licença estiveram
+disponíveis sob a licença MIT. Os direitos concedidos por aquela
+licença, relativamente às versões então publicadas, não são revogados
+por este documento. Esta licença aplica-se a esta versão e às
+seguintes.
+
+
+PEDIDOS DE AUTORIZAÇÃO
+
+Pedidos de licenciamento, incluindo uso comercial, através do perfil
+do autor: https://github.com/jiomavj-tech
+
+
+AUSÊNCIA DE GARANTIA
+
+O SOFTWARE É FORNECIDO "COMO ESTÁ", SEM GARANTIA DE QUALQUER ESPÉCIE,
+EXPRESSA OU IMPLÍCITA, INCLUINDO, SEM LIMITAÇÃO, AS GARANTIAS DE
+COMERCIABILIDADE, ADEQUAÇÃO A UMA FINALIDADE ESPECÍFICA E NÃO
+VIOLAÇÃO DE DIREITOS. EM CASO ALGUM SERÁ O TITULAR RESPONSÁVEL POR
+QUALQUER RECLAMAÇÃO, DANO OU OUTRA RESPONSABILIDADE, CONTRATUAL OU
+EXTRACONTRATUAL, DECORRENTE DO SOFTWARE OU DA SUA UTILIZAÇÃO.
+
+
+===============================================================
+ENGLISH
+===============================================================
+
+This software and its source code are the exclusive property of the
+copyright holder named above. No licence to use, copy, modify or
+distribute is granted, except as expressly permitted below.
+
+
+PERMITTED
+
+  1. Using the application as published by the copyright holder, at
+     its official address, to convert your own documents.
+
+  2. Reading the source code for study, audit and evaluation.
+
+
+NOT PERMITTED
+
+Without the prior written permission of the copyright holder, you may
+not:
+
+  1. Copy, reproduce or store the source code, in whole or in part,
+     beyond what the reading permission above requires.
+
+  2. Redistribute the software, whether free of charge or not, by any
+     means or medium.
+
+  3. Publish, host or otherwise make your own copy of the application
+     available to third parties.
+
+  4. Modify, adapt, translate or create derivative works.
+
+  5. Sell, licence, sublicense, rent or otherwise commercially
+     exploit the software, whether modified or not.
+
+  6. Incorporate the software, or any part of it, into another
+     product, service or machine-learning model.
+
+  7. Remove or alter the authorship notices or this licence.
+
+
+GITHUB RESERVATION
+
+For as long as this repository remains public on GitHub, GitHub's
+Terms of Service grant other users of that platform the right to view
+the repository and to fork it within the platform itself. That
+permission follows from the choice to publish the repository and is
+not displaced by this licence.
+
+All other rights remain reserved. Content obtained by forking remains
+subject to the prohibitions above outside GitHub, in particular as to
+redistribution, self-hosting, modification and commercial use.
+
+
+EARLIER VERSIONS
+
+Versions of this software distributed before this licence were made
+available under the MIT licence. The rights granted by that licence,
+in respect of the versions then published, are not revoked by this
+document. This licence applies to this version and to those that
+follow.
+
+
+PERMISSION REQUESTS
+
+Licensing enquiries, including commercial use, via the author's
+profile: https://github.com/jiomavj-tech
+
+
+NO WARRANTY
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR
+ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

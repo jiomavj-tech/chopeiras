@@ -1,0 +1,173 @@
+rules_version = '2';
+
+/* ═══════════════════════════════════════════════════════════════════
+   Quem vê o quê, no app de chopeiras.
+
+   Isto não é conferido dentro da página — é conferido no servidor do
+   Google, antes de gravar. Mesmo que alguém abra o console do
+   navegador e tente escrever direto no banco, estas regras recusam.
+
+   A regra de ouro: o cliente lê só o que é da empresa dele, e a única
+   coisa que ele escreve é o próprio chamado. Status e valores são do
+   administrador, e ninguém se autoaprova.
+   ═══════════════════════════════════════════════════════════════════ */
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function autenticado(){
+      return request.auth != null;
+    }
+
+    function meuEmail(){
+      return request.auth.token.email.lower();
+    }
+
+    function ehAdmin(){
+      return autenticado() && meuEmail() == 'gibasolucoes@gmail.com';
+    }
+
+    function eu(){
+      return get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data;
+    }
+
+    /* Liberado = o administrador, ou alguém que ele aprovou. */
+    function liberado(){
+      return ehAdmin() || (autenticado() && eu().ativo == true);
+    }
+
+    function minhaEmpresa(){
+      return eu().clienteId;
+    }
+
+    /* ── Convites ─────────────────────────────────────────────────
+       Um documento por e-mail, criado pelo administrador ao cadastrar
+       a empresa. Só o dono daquele e-mail consegue ler o seu — é o que
+       permite a pessoa entrar já ligada à empresa certa, sem ter de
+       ler a lista de clientes (que ela não pode ver).             */
+    match /convites/{email} {
+      allow read:  if autenticado() && email == meuEmail();
+      allow write: if ehAdmin();
+    }
+
+    /* ── Usuários ───────────────────────────────────────────────── */
+    match /usuarios/{uid} {
+      allow read: if autenticado() && (request.auth.uid == uid || ehAdmin());
+
+      /* No primeiro acesso a pessoa cria o próprio documento. Ele nasce
+         pendente — a não ser que exista convite para aquele e-mail, e
+         então nasce ligado exatamente à empresa que o convite diz.
+         Em nenhum caso ela escolhe a empresa ou o papel por conta. */
+      allow create: if autenticado()
+        && request.auth.uid == uid
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.papel == 'cliente'
+        && (
+          request.resource.data.ativo == false
+          || (
+            exists(/databases/$(database)/documents/convites/$(meuEmail()))
+            && request.resource.data.ativo == true
+            && request.resource.data.clienteId ==
+               get(/databases/$(database)/documents/convites/$(meuEmail())).data.clienteId
+          )
+        );
+
+      /* A pessoa atualiza o próprio "ultimoAcesso" e o nome, e mais nada:
+         acesso, papel e empresa são do administrador. */
+      allow update: if ehAdmin() || (
+        autenticado()
+        && request.auth.uid == uid
+        && !request.resource.data.diff(resource.data).affectedKeys()
+             .hasAny(['ativo', 'papel', 'clienteId', 'email'])
+      );
+
+      allow delete: if ehAdmin();
+    }
+
+    /* ── Empresas clientes ──────────────────────────────────────── */
+    match /clientes/{clienteId} {
+      allow read:  if ehAdmin() || (liberado() && clienteId == minhaEmpresa());
+      allow write: if ehAdmin();
+    }
+
+    /* ── Chopeiras ────────────────────────────────────────────────
+       O cliente pode CRIAR, e só assim: marcada como provisória e com a
+       empresa dele. É o caso de abrir chamado de um equipamento que
+       ainda não estava cadastrado — o chamado não pode esperar o
+       cadastro ficar perfeito. Editar e apagar continuam sendo do
+       administrador, senão a ficha técnica viraria terra de ninguém. */
+    match /chopeiras/{id} {
+      allow read: if ehAdmin() || (liberado() && resource.data.clienteId == minhaEmpresa());
+
+      allow create: if ehAdmin() || (
+        liberado()
+        && request.resource.data.clienteId == minhaEmpresa()
+        && request.resource.data.provisorio == true
+      );
+
+      allow update, delete: if ehAdmin();
+    }
+
+    /* ── Ordens de serviço ────────────────────────────────────────
+       O cliente abre o chamado e nada mais. O status é do
+       administrador: se o cliente pudesse mexer, "entregue" deixaria
+       de querer dizer entregue. A única coisa que ele reescreve é o
+       próprio aviso de não lido, ao abrir a ordem. */
+    match /ordens/{id} {
+      allow read: if ehAdmin() || (liberado() && resource.data.clienteId == minhaEmpresa());
+
+      allow create: if ehAdmin() || (
+        liberado()
+        && request.resource.data.clienteId == minhaEmpresa()
+        && request.resource.data.status == 'aberto'
+        && request.resource.data.abertoPor.uid == request.auth.uid
+        && request.resource.data.naoLidoAdmin == true
+      );
+
+      allow update: if ehAdmin() || (
+        liberado()
+        && resource.data.clienteId == minhaEmpresa()
+        && (
+          /* abrir a ordem apaga o próprio aviso */
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['naoLidoCliente'])
+
+          /* ou responder ao orçamento — e só isso. O hasOnly abaixo é o
+             que impede a resposta de vir junto com um valor alterado: os
+             campos do orçamento não estão na lista, então continuam como
+             o administrador os deixou. E só vale enquanto houver
+             orçamento na mesa: depois de respondido, o status já não é
+             'orcamento_enviado' e a mesma regra fecha a porta. */
+          || (
+            resource.data.status == 'orcamento_enviado'
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(
+                 ['status', 'decisaoCliente', 'historico',
+                  'naoLidoAdmin', 'naoLidoCliente', 'atualizadoEm'])
+            && request.resource.data.status in ['orcamento_aprovado', 'orcamento_reprovado']
+            && request.resource.data.decisaoCliente.porUid == request.auth.uid
+            && request.resource.data.naoLidoAdmin == true
+          )
+        )
+      );
+
+      allow delete: if ehAdmin();
+    }
+
+    /* ── Peças ────────────────────────────────────────────────────
+       A tabela de preços não é do cliente. O que ele vê do orçamento é
+       a cópia dentro da ordem, com a descrição e o valor daquele
+       serviço — não a sua margem em cada peça. */
+    match /pecas/{id} {
+      allow read, write: if ehAdmin();
+    }
+
+    /* ── Fotos ──────────────────────────────────────────────────────
+       Guardadas fora do documento a que pertencem, para a lista abrir
+       sem carregar imagem nenhuma. O cliente pode criar (vai precisar,
+       ao abrir chamado com foto), mas só marcada com a empresa dele. */
+    match /fotos/{id} {
+      allow read:   if ehAdmin() || (liberado() && resource.data.clienteId == minhaEmpresa());
+      allow create: if ehAdmin() || (liberado() && request.resource.data.clienteId == minhaEmpresa());
+      allow update, delete: if ehAdmin();
+    }
+  }
+}

@@ -1,0 +1,4 @@
+# Aplicativo de uso restrito, com dados de cliente atrás de login.
+# Não há nada aqui para indexar.
+User-agent: *
+Disallow: /
