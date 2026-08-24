@@ -71,6 +71,10 @@
   .pill.orc{border-color:#C97B3D66;background:#C97B3D22;color:var(--copperhi)}
   .itemOrc{border:1px solid var(--line);border-radius:10px;padding:11px;margin-bottom:9px;
     background:var(--bg)}
+  #faixaRede{display:none;padding:9px 14px;font-size:12.5px;text-align:center;line-height:1.4;
+    font-weight:800;border-bottom:1px solid}
+  #faixaRede.fora{background:#E0B34122;border-color:#E0B34155;color:var(--warn)}
+  #faixaRede.sinc{background:#4DA8C922;border-color:#4DA8C955;color:var(--cold)}
   #faixaDemo{background:#C97B3D1F;border-bottom:1px solid #C97B3D55;color:var(--text);
     padding:11px 14px;font-size:12.5px;text-align:center;line-height:1.45}
   #faixaDemo b{color:var(--copperhi)}
@@ -117,6 +121,7 @@
 </style>
 </head>
 <body>
+<div id="faixaRede"></div>
 
 <!-- ══════════════ PORTÃO DE ACESSO ══════════════ -->
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
@@ -280,6 +285,77 @@ function agEntrar(){
 }
 function agSair(){ firebase.auth().signOut().then(()=>location.reload()); }
 
+/* ═══════════════════ GRAVAR SEM DEPENDER DA REDE ═══════════════════
+   No Firestore, a promessa de um set/update só resolve quando o
+   servidor confirma. Sem internet ela fica pendurada para sempre — e
+   como o aplicativo esperava por ela, a tela travava com o botão
+   apagado, embora o dado já estivesse gravado no aparelho.
+
+   Este envelope devolve o controlo assim que a gravação entra na fila
+   local. A ida ao servidor continua a acontecer sozinha quando a rede
+   voltar; o que ficou por sincronizar aparece na faixa do topo.        */
+
+let PENDENTES = 0;
+
+function seguirSincronia(promessa){
+  PENDENTES++;
+  pintarRede();
+  promessa.then(
+    () => { PENDENTES = Math.max(0, PENDENTES - 1); pintarRede(); },
+    (e) => {
+      PENDENTES = Math.max(0, PENDENTES - 1); pintarRede();
+      /* Offline não dá erro: fica na fila. Se deu, o servidor recusou. */
+      if(navigator.onLine){
+        try{ toast("O servidor recusou uma gravação: " + (e.message || e), "err"); }catch(_){}
+      }
+    }
+  );
+  return Promise.resolve();
+}
+
+/* Mesma cara do Firestore, mas as escritas não esperam a rede. */
+function semEsperarRede(fs){
+  const doc = d => ({
+    id: d.id,
+    get:    ()  => d.get(),
+    set:    v   => seguirSincronia(d.set(v)),
+    update: v   => seguirSincronia(d.update(v)),
+    delete: ()  => seguirSincronia(d.delete())
+  });
+  return {
+    _fs: fs,
+    collection(nome){
+      const col = fs.collection(nome);
+      return {
+        doc: id => doc(id ? col.doc(id) : col.doc()),
+        add: v => { const d = col.doc(); return seguirSincronia(d.set(v)).then(() => ({id: d.id})); },
+        get: () => col.get(),
+        where: (...a) => col.where(...a),
+        orderBy: (...a) => col.orderBy(...a)
+      };
+    }
+  };
+}
+
+/* Faixa do topo: sem rede, ou com coisa por sincronizar. */
+function pintarRede(){
+  const f = document.getElementById("faixaRede");
+  if(!f) return;
+  const fora = !navigator.onLine;
+  if(!fora && !PENDENTES){ f.style.display = "none"; return; }
+  f.style.display = "";
+  f.className = fora ? "fora" : "sinc";
+  const n = PENDENTES;
+  const alt = n === 1 ? "1 altera\u00e7\u00e3o" : n + " altera\u00e7\u00f5es";
+  f.textContent = fora
+    ? (n ? "Sem internet \u2014 " + alt + " guardada" + (n===1?"":"s") +
+           " no aparelho. Sobe sozinho quando a rede voltar."
+         : "Sem internet \u2014 pode trabalhar normalmente. Tudo sobe quando a rede voltar.")
+    : "Enviando " + alt + "\u2026";
+}
+window.addEventListener("online",  pintarRede);
+window.addEventListener("offline", pintarRede);
+
 const QUER_DEMO = /[?&]demo\b/.test(location.search);
 
 if(!CONFIGURADO || QUER_DEMO){
@@ -294,8 +370,10 @@ if(!CONFIGURADO || QUER_DEMO){
   });
 } else {
   firebase.initializeApp(CFG);
-  db = firebase.firestore();
-  db.enablePersistence({synchronizeTabs:true}).catch(()=>{});
+  const fs = firebase.firestore();
+  fs.enablePersistence({synchronizeTabs:true}).catch(()=>{});
+  db = semEsperarRede(fs);
+  pintarRede();
 
   firebase.auth().onAuthStateChanged(function(user){
     if(!user){ agMostrar("agLogin"); return; }
@@ -948,6 +1026,7 @@ const APLICACOES = ["LBP", "MBP", "HBP", "não sei"];
 function telaChopeiras(){
   if(editando && editando.tipo === "chopeira") return formChopeira();
   if(editando && editando.tipo === "verChopeira") return verChopeira();
+  if(editando && editando.tipo === "componentes") return formComponentes();
 
   if(!EU.admin && !EU.clienteId){
     $("tela").innerHTML = '<div class="alert yel"><b>Seu acesso ainda não está ligado a uma empresa.</b> ' +
@@ -1013,6 +1092,261 @@ async function carregarFoto(fotoId){
   }catch(e){ /* sem foto, a tela vive sem ela */ }
 }
 
+/* ═══════════════════ FICHA TÉCNICA DA CHOPEIRA ═══════════════════
+   O que a máquina tem, peça por peça, com número de série.
+
+   São três coisas diferentes, e é de propósito:
+     · componentes    — o que ela tem HOJE
+     · fichaOriginal  — como ela chegou da primeira vez, congelada
+     · trocas         — o que mudou, quando e em que chamado
+
+   Assim, quando a máquina volta, dá para dizer o que era original e o
+   que já foi substituído — sem depender da memória de ninguém.        */
+
+const TIPOS_COMPONENTE = [
+  "Compressor",
+  "Pressostato de baixa (KP1)",
+  "Pressostato de alta (cartucho)",
+  "Micromotor / ventilador",
+  "Válvula solenoide",
+  "Relé de partida",
+  "Capacitor de partida",
+  "Capacitor permanente",
+  "Protetor térmico",
+  "Bomba de recirculação",
+  "Filtro secador",
+  "Serpentina / banho",
+  "Torneira",
+  "Painel / controlador",
+  "Gás refrigerante",
+  "Outro"
+];
+
+const CAMPOS_COMPONENTE = [
+  ["tipo",  "Componente"],
+  ["marca", "Marca"],
+  ["modelo","Modelo"],
+  ["serie", "Número de série"],
+  ["spec",  "Especificação"],
+  ["obs",   "Observação"]
+];
+
+function componenteVazio(){
+  return {tipo:"", marca:"", modelo:"", serie:"", spec:"", obs:""};
+}
+
+/* Só o que a pessoa preencheu conta como componente. */
+function componentePreenchido(x){
+  return !!(x && (x.tipo || x.marca || x.modelo || x.serie || x.spec || x.obs));
+}
+
+function resumoComponente(x){
+  return [x.marca, x.modelo, x.serie ? "série " + x.serie : "", x.spec]
+    .map(v => (v || "").trim()).filter(Boolean).join(" · ") || "—";
+}
+
+/* Duas fichas são a mesma peça se o tipo bate. */
+function acharPorTipo(lista, tipo){
+  return (lista || []).find(x => (x.tipo || "") === tipo);
+}
+
+function editarComponentes(id){
+  const c = CHOPEIRAS.find(x => x.id === id);
+  if(!c) return;
+  const itens = (c.componentes || []).map(x => Object.assign(componenteVazio(), x));
+  if(!itens.length) itens.push(componenteVazio());
+  editando = {tipo:"componentes", id:id, dados:JSON.parse(JSON.stringify(c)), itens:itens};
+  telaChopeiras();
+}
+
+function formComponentes(){
+  const c = editando.dados;
+  const jaTemFicha = !!(c.fichaOriginal && (c.fichaOriginal.itens || []).length);
+
+  $("tela").innerHTML =
+    '<div class="card">' +
+      '<div class="brand" style="letter-spacing:2px">Ficha técnica</div>' +
+      '<h2 class="mono" style="font-size:20px">' + esc(c.codigo || "sem número") + '</h2>' +
+      '<div class="muted">' +
+        (jaTemFicha
+          ? 'A ficha original já está congelada. O que você mudar aqui entra como ' +
+            '<b>troca</b>, com data — a original continua guardada para comparação.'
+          : 'Esta é a primeira ficha desta máquina. Ao salvar, ela fica guardada como ' +
+            '<b>ficha original</b>: é o retrato de como a chopeira chegou.') +
+      '</div>' +
+      '<div id="listaComp"></div>' +
+      '<div class="btns">' +
+        '<button class="btn" onclick="addComponente()">+ Componente</button>' +
+      '</div>' +
+      '<h3>Chamado (opcional)</h3>' +
+      '<label>Ligar estas trocas a um chamado</label>' +
+      '<select id="comp_ordem">' +
+        '<option value="">— nenhum —</option>' +
+        ORDENS.filter(o => o.chopeiraId === c.id).map(o =>
+          '<option value="' + esc(o.id) + '">' + esc((o.numero || o.id.slice(0,5)) + " · " +
+            (status(o.status) || {}).rot) + '</option>').join("") +
+      '</select>' +
+      '<div class="btns">' +
+        '<button class="btn pri" id="btComp" onclick="salvarComponentes()">Salvar ficha</button>' +
+        '<button class="btn" onclick="verChopeiraId(\'' + esc(c.id) + '\')">Cancelar</button>' +
+      '</div>' +
+    '</div>';
+  desenharComponentes();
+}
+
+function desenharComponentes(){
+  $("listaComp").innerHTML = editando.itens.map((x, i) =>
+    '<div class="itemOrc">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px">' +
+        '<b style="font-size:12px;color:var(--copperhi)">' + (i+1) + '</b>' +
+        '<button class="btn sm dg" onclick="tirarComponente(' + i + ')">Tirar</button>' +
+      '</div>' +
+      '<label>Componente</label>' +
+      '<select onchange="mudarComponente(' + i + ',\'tipo\',this.value)">' +
+        '<option value="">— escolha —</option>' +
+        TIPOS_COMPONENTE.map(t => '<option value="' + esc(t) + '"' +
+          (x.tipo === t ? " selected" : "") + '>' + esc(t) + '</option>').join("") +
+      '</select>' +
+      '<div class="lin">' +
+        '<div><label>Marca</label><input value="' + esc(x.marca) +
+          '" oninput="mudarComponente(' + i + ',\'marca\',this.value)"></div>' +
+        '<div><label>Modelo</label><input value="' + esc(x.modelo) +
+          '" oninput="mudarComponente(' + i + ',\'modelo\',this.value)"></div>' +
+      '</div>' +
+      '<div class="lin">' +
+        '<div><label>Número de série</label><input value="' + esc(x.serie) +
+          '" oninput="mudarComponente(' + i + ',\'serie\',this.value)"></div>' +
+        '<div><label>Especificação</label><input placeholder="1/3 HP, R290, 220 V…" value="' +
+          esc(x.spec) + '" oninput="mudarComponente(' + i + ',\'spec\',this.value)"></div>' +
+      '</div>' +
+      '<label>Observação</label>' +
+      '<input value="' + esc(x.obs) + '" oninput="mudarComponente(' + i + ',\'obs\',this.value)">' +
+    '</div>').join("");
+}
+
+function addComponente(){
+  editando.itens.push(componenteVazio());
+  desenharComponentes();
+  window.scrollTo(0, document.body.scrollHeight);
+}
+function mudarComponente(i, campo, v){
+  if(editando.itens[i]) editando.itens[i][campo] = v;
+}
+function tirarComponente(i){
+  editando.itens.splice(i, 1);
+  if(!editando.itens.length) editando.itens.push(componenteVazio());
+  desenharComponentes();
+}
+
+async function salvarComponentes(){
+  const c = editando.dados;
+  const novos = editando.itens.filter(componentePreenchido)
+    .map(x => ({tipo:(x.tipo||"").trim(), marca:(x.marca||"").trim(),
+                modelo:(x.modelo||"").trim(), serie:(x.serie||"").trim(),
+                spec:(x.spec||"").trim(), obs:(x.obs||"").trim()}));
+
+  const semTipo = novos.find(x => !x.tipo);
+  if(semTipo) return toast("Escolha o componente em cada linha preenchida.", "err");
+
+  const antigos = c.componentes || [];
+  const ordemId = ($("comp_ordem") || {}).value || "";
+  const agora = new Date().toISOString();
+
+  /* O que mudou de uma ficha para a outra vira troca registada. */
+  const trocas = [];
+  novos.forEach(n => {
+    const a = acharPorTipo(antigos, n.tipo);
+    const de = a ? resumoComponente(a) : "";
+    const para = resumoComponente(n);
+    if(de !== para){
+      trocas.push({quando:agora, quem:EU.nome || EU.email || "Giba", ordemId:ordemId,
+                   tipo:n.tipo, antes:de || "(não constava)", depois:para});
+    }
+  });
+  antigos.forEach(a => {
+    if(!acharPorTipo(novos, a.tipo)){
+      trocas.push({quando:agora, quem:EU.nome || EU.email || "Giba", ordemId:ordemId,
+                   tipo:a.tipo, antes:resumoComponente(a), depois:"(retirado)"});
+    }
+  });
+
+  const mudanca = {componentes: novos};
+
+  /* A ficha original congela na primeira vez, e só nela. */
+  if(!(c.fichaOriginal && (c.fichaOriginal.itens || []).length) && novos.length){
+    mudanca.fichaOriginal = {quando:agora, quem:EU.nome || EU.email || "Giba", itens:novos};
+  } else if(trocas.length){
+    mudanca.trocas = (c.trocas || []).concat(trocas);
+  }
+
+  $("btComp").disabled = true;
+  try{
+    await db.collection("chopeiras").doc(editando.id).update(mudanca);
+    Object.assign(c, mudanca);
+    const naLista = CHOPEIRAS.find(x => x.id === editando.id);
+    if(naLista) Object.assign(naLista, mudanca);
+    verChopeiraId(editando.id);
+    toast(mudanca.fichaOriginal ? "Ficha original guardada."
+          : (trocas.length ? trocas.length + " troca" + (trocas.length===1?"":"s") + " registada" +
+             (trocas.length===1?"":"s") + "." : "Ficha salva."), "ok");
+  }catch(e){
+    toast("Não deu para salvar: " + (e.message || e), "err");
+    const b = $("btComp"); if(b) b.disabled = false;
+  }
+}
+
+/* O bloco que aparece na ficha da chopeira. */
+function blocoFicha(c){
+  const atuais = c.componentes || [];
+  const orig = (c.fichaOriginal && c.fichaOriginal.itens) || [];
+  const trocas = c.trocas || [];
+
+  if(!atuais.length && !orig.length){
+    return '<h3>Ficha técnica</h3>' +
+      '<div class="muted">Ainda sem componentes registados. É aqui que entra o que a ' +
+        'máquina tem — compressor, pressostato, capacitores, número de série.</div>' +
+      (EU.admin ? '<div class="btns"><button class="btn" onclick="editarComponentes(\'' +
+        esc(c.id) + '\')">Registrar componentes</button></div>' : '');
+  }
+
+  const linhas = atuais.map(x => {
+    const o = acharPorTipo(orig, x.tipo);
+    const mudou = o && resumoComponente(o) !== resumoComponente(x);
+    return '<div class="itemOrc">' +
+      '<div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline">' +
+        '<b>' + esc(x.tipo) + '</b>' +
+        (mudou ? '<span class="pill pend">trocado</span>'
+               : (o ? '<span class="pill ok">original</span>' : '<span class="pill">acrescentado</span>')) +
+      '</div>' +
+      '<div style="margin-top:3px">' + esc(resumoComponente(x)) + '</div>' +
+      (mudou ? '<div class="esc">era: ' + esc(resumoComponente(o)) + '</div>' : '') +
+      (x.obs ? '<div class="esc">' + esc(x.obs) + '</div>' : '') +
+    '</div>';
+  }).join("");
+
+  const sumiram = orig.filter(o => !acharPorTipo(atuais, o.tipo)).map(o =>
+    '<div class="itemOrc">' +
+      '<div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline">' +
+        '<b>' + esc(o.tipo) + '</b><span class="pill dg">retirado</span></div>' +
+      '<div class="esc">era: ' + esc(resumoComponente(o)) + '</div>' +
+    '</div>').join("");
+
+  return '<h3>Ficha técnica</h3>' +
+    (c.fichaOriginal ? '<div class="esc">Ficha original de ' +
+      esc(dataCurta(String(c.fichaOriginal.quando).slice(0,10))) + '.</div>' : '') +
+    linhas + sumiram +
+    (EU.admin ? '<div class="btns"><button class="btn" onclick="editarComponentes(\'' +
+      esc(c.id) + '\')">Editar ficha</button></div>' : '') +
+    (trocas.length ?
+      '<h3>Trocas</h3>' + trocas.slice().reverse().map(t =>
+        '<div class="itemOrc">' +
+          '<div class="esc">' + esc(dataCurta(String(t.quando).slice(0,10))) + ' · ' + esc(t.quem) + '</div>' +
+          '<b>' + esc(t.tipo) + '</b>' +
+          '<div style="font-size:13px">' + esc(t.antes) + ' → <b>' + esc(t.depois) + '</b></div>' +
+        '</div>').join("")
+      : "");
+}
+
 function verChopeira(){
   const c = editando.dados;
   const linha = (r, v) => v ? '<tr><td class="muted" style="padding:6px 10px 6px 0;white-space:nowrap">'+
@@ -1037,6 +1371,7 @@ function verChopeira(){
           linha("Potência", c.compressorHp) + linha("Gás", c.compressorGas) +
           linha("Aplicação", c.compressorAplicacao) +
         '</table>' : '') +
+      blocoFicha(c) +
       (c.observacoes ? '<h3>Observações</h3><div class="muted" style="white-space:pre-wrap">'+
         esc(c.observacoes)+'</div>' : '') +
       '<div class="btns"><button class="btn" onclick="irPara(\'chopeiras\')">Voltar</button></div>' +
@@ -2329,7 +2664,7 @@ async function importarPecasCompressores(){
   const bt = $("btImportar");
   if(bt) bt.disabled = true;
   try{
-    const r = await fetch("./pecas-compressores.json", {cache:"no-store"});
+    const r = await fetch("./pecas-compressores.json");
     if(!r.ok) throw new Error("não achei o catálogo");
     const dados = await r.json();
     const vindas = (dados && dados.pecas) || [];

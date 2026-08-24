@@ -17,18 +17,27 @@
    Ao mudar a aplicação, incrementar VERSAO — as caches antigas são
    apagadas no activate — e atualizar o número em #versaoApp no index.html.
 */
-const VERSAO = 'chopeiras-v5';
+const VERSAO = 'chopeiras-v6';
 const ESSENCIAIS = [
   './',
   './index.html',
   './manifest.webmanifest',
+  './pecas-compressores.json',
   './icone-192.png',
   './icone-512.png',
   './icone-mascara.png'
 ];
 
+/* Um a um, e não com addAll: o addAll é tudo-ou-nada — basta um
+   ficheiro falhar para a instalação inteira ser recusada, e aí o
+   aplicativo nunca passa a abrir sem rede. Num aplicativo de campo,
+   isso é o defeito que só aparece longe do escritório. */
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(VERSAO).then(c => c.addAll(ESSENCIAIS)).then(() => self.skipWaiting()));
+  e.waitUntil(
+    caches.open(VERSAO)
+      .then(c => Promise.all(ESSENCIAIS.map(u => c.add(u).catch(() => null))))
+      .then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener('activate', e => {
