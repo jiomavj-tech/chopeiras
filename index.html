@@ -3554,6 +3554,28 @@ function montarLaudo(dados, imagens){
     }
   }
 
+  /* ── ficha técnica: o que a máquina tem, peça por peça ──
+     Vai depois do serviço de propósito: primeiro o que foi feito,
+     depois como a máquina ficou. */
+  if(((dados.ficha || {}).itens || []).length){
+    titulo("Ficha técnica do equipamento");
+    if(dados.ficha.desde){
+      paragrafo("Ficha original de " + dados.ficha.desde + ".", PAG.ml, LU, 9, false, COR.fraca, 12);
+      y -= 4;
+    }
+    dados.ficha.itens.forEach(it => {
+      garantir(24);
+      escrever(PAG.ml, y - 9, it.tipo, 10, true, COR.tinta);
+      const marca = paraWinAnsi(it.estado);
+      escrever(PAG.w - PAG.mr - largura(marca, 8, true), y - 9, it.estado, 8, true,
+               it.estado === "original" ? COR.fraca : COR.marca);
+      y -= 13;
+      if(it.resumo) paragrafo(it.resumo, PAG.ml + 12, LU - 12, 9.5, false, COR.tinta, 12.5);
+      if(it.era)    paragrafo("era: " + it.era, PAG.ml + 12, LU - 12, 8.5, false, COR.fraca, 11.5);
+      y -= 5;
+    });
+  }
+
   if(dados.recomendacoes){
     titulo("Recomendações");
     paragrafo(dados.recomendacoes, PAG.ml, LU, 10.5, false, COR.tinta, 14);
@@ -3991,6 +4013,24 @@ async function baixarLaudo(){
       problemaConstatado: l.problemaConstatado,
       componentes: l.componentes,
       servicoExecutado: l.servicoExecutado,
+      ficha: (function(){
+        const atuais = cho.componentes || [];
+        const orig = (cho.fichaOriginal && cho.fichaOriginal.itens) || [];
+        const itens = atuais.map(x => {
+          const antes = acharPorTipo(orig, x.tipo);
+          const mudou = antes && resumoComponente(antes) !== resumoComponente(x);
+          return {tipo: x.tipo, resumo: resumoComponente(x),
+                  estado: mudou ? "trocado" : (antes ? "original" : "acrescentado"),
+                  era: mudou ? resumoComponente(antes) : ""};
+        });
+        /* O que saiu e não foi reposto também conta como história. */
+        orig.filter(a => !acharPorTipo(atuais, a.tipo)).forEach(a => {
+          itens.push({tipo: a.tipo, resumo: "", estado: "retirado", era: resumoComponente(a)});
+        });
+        return {desde: cho.fichaOriginal
+                  ? dataCurta(String(cho.fichaOriginal.quando).slice(0,10)) : "",
+                itens: itens};
+      })(),
       servicos: (o.servicos || []).map(x => ({
         quando: dataCurta(String(x.quando).slice(0,10)),
         tipo: x.tipo,
