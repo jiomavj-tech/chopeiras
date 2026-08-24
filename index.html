@@ -1802,6 +1802,109 @@ function desenharSino(){
 }
 
 /* ── lista ────────────────────────────────────────────────────────── */
+/* ═══════════════════ PRAZOS E RECADOS ═══════════════════
+   Duas coisas que o aplicativo tinha pela metade: o cliente nunca via a
+   data do que estava combinado, e a validade do orçamento era uma frase
+   sem consequência — dava para aprovar preço de três meses atrás.
+
+   Aqui ficam as contas de prazo e o texto que o cliente lê. Um sítio só,
+   para a tela e o WhatsApp dizerem a mesma coisa.                     */
+
+function somaDias(iso, dias){
+  if(!iso) return "";
+  const d = new Date(iso);
+  if(isNaN(d)) return "";
+  d.setDate(d.getDate() + (Number(dias) || 0));
+  return d.toISOString().slice(0,10);
+}
+
+/* Até quando o orçamento vale. "" se não há orçamento enviado. */
+function validoAte(o){
+  const orc = o && o.orcamento;
+  if(!orc || !orc.enviadoEm) return "";
+  return somaDias(orc.enviadoEm, orc.validadeDias || 15);
+}
+
+function orcamentoVencido(o){
+  const ate = validoAte(o);
+  if(!ate) return false;
+  if(o.decisaoCliente) return false;          /* já respondido, não vence */
+  const d = diasAte(ate);
+  return d !== null && d < 0;
+}
+
+/* Há quantos dias o orçamento está à espera de resposta. */
+function diasEsperandoResposta(o){
+  const orc = o && o.orcamento;
+  if(!orc || !orc.enviadoEm || o.status !== "orcamento_enviado") return null;
+  const d = diasAte(String(orc.enviadoEm).slice(0,10));
+  return d === null ? null : -d;
+}
+
+/* Desde quando está no estado atual — serve para ver o que empacou. */
+function diasNoStatus(o){
+  const h = (o.historico || []).filter(x => x.status === o.status);
+  const ult = h[h.length - 1];
+  const iso = ult && ult.quando ? String(ult.quando).slice(0,10) : "";
+  if(!iso) return null;
+  const d = diasAte(iso);
+  return d === null ? null : -d;
+}
+
+/* Data por extenso curta, do jeito que se fala: "26/08". */
+function dataFalada(iso){
+  const t = dataCurta(iso);
+  return t ? t.slice(0,5) : "";
+}
+
+/* O recado que o cliente lê — o texto do status, mais a data e o valor
+   quando existem. É isto que responde "quando" e "quanto". */
+function recadoCliente(o){
+  const s = status(o.status) || {};
+  let t = s.cli || "";
+
+  const recolha = o.agenda && o.agenda.recolhaPrevista;
+  const entrega = o.agenda && o.agenda.entregaPrevista;
+
+  if(o.status === "recolha_agendada" && recolha){
+    t = "Passamos para buscar dia " + dataFalada(recolha) + ".";
+  }
+  if(o.status === "entrega_agendada" && entrega){
+    t = "Levamos de volta dia " + dataFalada(entrega) + ".";
+  }
+  if(o.status === "aberto" && recolha){
+    t = "Recebemos o seu pedido. Passamos para buscar dia " + dataFalada(recolha) + ".";
+  }
+  if(o.status === "orcamento_enviado" && o.orcamento){
+    const ate = validoAte(o);
+    t = "O orçamento ficou em " + reais(o.orcamento.total) + ".";
+    if(o.orcamento.prazoDias){
+      t += " Fica pronto em " + o.orcamento.prazoDias + " dia" +
+           (Number(o.orcamento.prazoDias) === 1 ? "" : "s") + " depois que você aprovar.";
+    }
+    if(ate) t += " Responda até " + dataFalada(ate) + ".";
+  }
+  if(o.status === "orcamento_aprovado" && o.orcamento && o.orcamento.prazoDias){
+    t = "Aprovado. Fica pronto em até " + o.orcamento.prazoDias + " dia" +
+        (Number(o.orcamento.prazoDias) === 1 ? "" : "s") + ".";
+  }
+  if(o.status === "concluido"){
+    t = entrega ? "Está pronta. Levamos de volta dia " + dataFalada(entrega) + "."
+                : "Está pronta. Já combinamos a entrega.";
+  }
+  return t;
+}
+
+/* O que o cliente precisa fazer agora, se precisar de alguma coisa. */
+function proximoPassoCliente(o){
+  if(o.status === "orcamento_enviado" && !o.decisaoCliente){
+    return orcamentoVencido(o)
+      ? "Este orçamento venceu. Peça um novo para seguir."
+      : "Você precisa aprovar ou recusar para eu seguir.";
+  }
+  return "";
+}
+
 function telaChamados(){
   if(editando && editando.tipo === "novoChamado") return formChamado();
   if(editando && editando.tipo === "verOrdem")    return verOrdem();
@@ -1840,8 +1943,8 @@ function cartaoOrdem(o){
       (o.thumb ? '<img class="th" src="' + esc(o.thumb) + '" alt="">' : '') +
       '<div style="min-width:0">' +
         '<div class="nm mono">' + esc(o.chopeiraCodigo || "sem número") + '</div>' +
-        '<div class="dt">' + esc(o.numero) + '</div>' +
-        (EU.admin ? '<div class="dt">' + esc(nomeCliente(o.clienteId)) + '</div>' : '') +
+        (EU.admin ? '<div class="dt">' + esc(o.numero) + '</div>' +
+                    '<div class="dt">' + esc(nomeCliente(o.clienteId)) + '</div>' : '') +
         '<div class="dt">' + esc(quando(o.abertoEm)) + '</div>' +
       '</div>' +
     '</div>' +
@@ -1850,10 +1953,12 @@ function cartaoOrdem(o){
   '<div style="margin-top:9px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">' +
     '<span class="pill ' + s.pill + '">' + esc(s.rot) + '</span>' +
     (novo ? '<span class="pill pend">novidade</span>' : '') +
-    (o.agenda && o.agenda.recolhaPrevista && o.status === "recolha_agendada"
-      ? '<span class="pill cold">recolha ' + esc(dataCurta(o.agenda.recolhaPrevista)) + '</span>' : '') +
-    (o.agenda && o.agenda.entregaPrevista && o.status === "entrega_agendada"
-      ? '<span class="pill cold">entrega ' + esc(dataCurta(o.agenda.entregaPrevista)) + '</span>' : '') +
+    (o.agenda && o.agenda.recolhaPrevista && ["aberto","recolha_agendada"].includes(o.status)
+      ? '<span class="pill cold">buscar ' + esc(dataCurta(o.agenda.recolhaPrevista)) + '</span>' : '') +
+    (o.agenda && o.agenda.entregaPrevista &&
+     ["concluido","entrega_agendada","saiu_pra_entrega"].includes(o.status)
+      ? '<span class="pill cold">entregar ' + esc(dataCurta(o.agenda.entregaPrevista)) + '</span>' : '') +
+    (orcamentoVencido(o) ? '<span class="pill dg">orçamento vencido</span>' : '') +
   '</div></div>';
 }
 
@@ -2025,7 +2130,7 @@ async function enviarChamado(){
     /* notificar o admin */
     setTimeout(() => {
       const c = CLIENTES.find(x => x.id === EU.clienteId);
-      notificarAdminNovosChamados(c, problema);
+      confirmarChamadoAberto();
     }, 500);
 
     toast("Chamado enviado. O Giba já foi avisado.", "ok");
@@ -2039,19 +2144,15 @@ async function enviarChamado(){
    NOTIFICAÇÕES E INTEGRAÇÃO
    ═══════════════════════════════════════════════════════════════════ */
 
-function notificarAdminNovosChamados(cliente, problema){
-  const c = cliente || {};
-  const whats = soWhats(c.whatsapp || c.telefone);
-  if(!whats) return;
-  const msg = encodeURIComponent(
-    "🔔 NOVO CHAMADO CHOPEIRA\n\n" +
-    "Cliente: " + (c.nome || "?") + "\n" +
-    "Problema: " + (problema || "?") + "\n\n" +
-    "Abra o app para detalhes"
-  );
-  /* gerar link mas não abrir automaticamente */
-  const link = "https://wa.me/" + whats + "?text=" + msg;
-  console.log("Link WhatsApp pronto para aviso de chamado:", link);
+/* O que existia aqui montava um aviso interno — "NOVO CHAMADO, cliente
+   X, problema Y" — e mandava-o para o WhatsApp do próprio cliente, além
+   de nunca chegar a abrir. Estava errado no destinatário e no conteúdo.
+
+   Quem tem de saber do chamado novo é o administrador, e ele já sabe: a
+   ordem nasce com naoLidoAdmin e o sino acende. O cliente, esse, precisa
+   é de confirmação de que o pedido entrou. */
+function confirmarChamadoAberto(){
+  toast("Pedido enviado. O Giba já foi avisado e entra em contacto.", "ok");
 }
 
 /* ═══════════════════ AGENDA DO GOOGLE ═══════════════════
@@ -2291,19 +2392,17 @@ function cartaoAgenda(){
 }
 
 /* Notificar quando muda o status */
-function notificarClienteStatus(ordem, cliente){
+/* Isto antes montava o link e fazia console.log — ou seja, o cliente
+   nunca recebia nada, embora parecesse que sim. Agora pergunta e abre
+   o WhatsApp, que é a única forma de a mensagem sair mesmo. Perguntar
+   em vez de abrir sozinho é de propósito: abrir sozinho é intrusivo e
+   o navegador do telemóvel costuma bloquear. */
+function ofereceAvisarCliente(ordem, cliente){
   if(!cliente) return;
-  const whats = soWhats(cliente.whatsapp || cliente.telefone);
-  if(!whats) return;
-  const s = status(ordem.status);
-  const msg = encodeURIComponent(
-    "📲 ATUALIZAÇÃO DO CHAMADO\n\n" +
-    "Status: " + s.rot + "\n" +
-    "Mensagem: " + (s.cli || "Veja no app") + "\n\n" +
-    "Abra o app para mais informações"
-  );
-  const link = "https://wa.me/" + whats + "?text=" + msg;
-  console.log("Link WhatsApp para atualização:", link);
+  if(!soWhats(cliente.whatsapp || cliente.telefone)) return;
+  if(confirm("Avisar o cliente no WhatsApp agora?\n\n" + recadoCliente(ordem))){
+    avisarWhats(ordem.id);
+  }
 }
 
 /* ── ver e mover ──────────────────────────────────────────────────── */
@@ -2550,6 +2649,9 @@ function verOrdem(){
             esc(dataCurta(o.agenda.entregaPrevista)) + '</span>' : '') +
         '</div>' : '') +
 
+      (recadoCliente(o) ? '<div class="alert blu"><b>' + esc(recadoCliente(o)) + '</b>' +
+        (proximoPassoCliente(o) ? '<br>' + esc(proximoPassoCliente(o)) : '') + '</div>' : '') +
+
       blocoOrcamento(o) +
       blocoServicos(o) +
       blocoLaudo(o) +
@@ -2651,18 +2753,19 @@ function avisarWhats(id){
   const c = CLIENTES.find(x => x.id === o.clienteId);
   const numero = c ? soWhats(c.whatsapp || c.telefone) : "";
   if(!numero) return toast("Esta empresa não tem WhatsApp no cadastro.", "err");
-  const s = status(o.status);
-  const ultima = (o.historico || [])[o.historico.length - 1] || {};
-  const valor = (o.status === "orcamento_enviado" && o.orcamento)
-    ? "\nTotal: " + reais(o.orcamento.total) +
-      " (peças " + reais(o.orcamento.totalPecas) + " + serviço " + reais(o.orcamento.totalServico) + ")"
-    : "";
+
+  /* Nada de número de OS nem de subtotais: o cliente não sabe o que é
+     OS, e a decomposição peças/serviço só convida a negociar item a
+     item. Ele precisa de saber o quê, quando, quanto e o que decidir. */
+  const ultima = (o.historico || [])[(o.historico || []).length - 1] || {};
+  const passo = proximoPassoCliente(o);
   const texto =
     (c.contato ? "Oi, " + c.contato + "! " : "Oi! ") +
-    "Novidade na " + o.numero + " — chopeira " + o.chopeiraCodigo + ".\n" +
-    s.rot + ". " + s.cli + valor +
+    "Sobre a sua chopeira " + (o.chopeiraCodigo || "") + ":\n\n" +
+    recadoCliente(o) +
     (ultima.nota ? "\n" + ultima.nota : "") +
-    "\n\nDá para acompanhar pelo aplicativo.";
+    (passo ? "\n\n" + passo : "") +
+    "\n\nQualquer dúvida é só chamar.";
   window.open("https://wa.me/" + numero + "?text=" + encodeURIComponent(texto), "_blank");
 }
 
@@ -2724,7 +2827,7 @@ async function moverOrdem(){
     sincronizarAgenda(o);
 
     /* notificar cliente */
-    notificarClienteStatus(o, cliente);
+    ofereceAvisarCliente(o, cliente);
 
     verOrdem();
     desenharSino();
@@ -3096,14 +3199,26 @@ function blocoOrcamento(o){
       '<td style="padding:11px 0 0;text-align:right;font-weight:800;font-size:17px;' +
         'color:var(--copperhi);border-top:1px solid var(--line)">' + esc(reais(orc.total)) + '</td></tr>' +
     '</table>' +
-    (orc.validadeDias ? '<div class="esc">Válido por ' + esc(orc.validadeDias) + ' dias' +
-      (orc.enviadoEm ? ' a contar de ' + esc(quando(orc.enviadoEm)) : '') + '.</div>' : '') +
+    (orc.prazoDias ? '<div class="alert blu" style="margin-top:10px">' +
+      '<b>Fica pronto em ' + esc(orc.prazoDias) + ' dia' +
+      (Number(orc.prazoDias) === 1 ? "" : "s") + '</b> depois da aprovação.</div>' : '') +
+
+    (validoAte(o)
+      ? (orcamentoVencido(o)
+          ? '<div class="alert red" style="margin-top:10px"><b>Este orçamento venceu</b> em ' +
+            esc(dataCurta(validoAte(o))) + '. Os preços podem ter mudado — ' +
+            (EU.admin ? 'monte um novo para o cliente poder responder.'
+                      : 'peça um novo ao Giba.') + '</div>'
+          : '<div class="esc">Responda até <b>' + esc(dataCurta(validoAte(o))) + '</b>.' +
+            (diasAte(validoAte(o)) <= 3 ? ' Falta pouco.' : '') + '</div>')
+      : '') +
 
     (d ? '<div class="alert ' + (d.valor === "aprovado" ? "grn" : "red") + '" style="margin-top:12px">' +
       '<b>' + (d.valor === "aprovado" ? "Aprovado" : "Não aprovado") + '</b> por ' + esc(d.por) +
       ' em ' + esc(quando(d.quando)) + (d.motivo ? '<br>' + esc(d.motivo) : '') + '</div>' : '') +
 
-    (!d && !EU.admin && o.status === "orcamento_enviado" ? botoesDecisao() : '') +
+    (!d && !EU.admin && o.status === "orcamento_enviado" && !orcamentoVencido(o)
+      ? botoesDecisao() : '') +
     (!d && EU.admin && o.status === "orcamento_enviado"
       ? '<div class="esc">Esperando a resposta do cliente. Se ele responder por telefone, ' +
         'registre por ele em <b>Mover o chamado</b>.</div>' : '');
@@ -3155,7 +3270,8 @@ function montarOrcamento(){
   const orc = o.orcamento;
   editando.orc = {
     itens: orc ? JSON.parse(JSON.stringify(orc.itens || [])) : [],
-    validadeDias: orc ? (orc.validadeDias || 15) : 15
+    validadeDias: orc ? (orc.validadeDias || 15) : 15,
+    prazoDias: orc ? (orc.prazoDias || "") : ""
   };
   editando.modo = "orcamento";
   verOrdem();
@@ -3212,9 +3328,16 @@ function editorOrcamento(){
         'color:var(--copperhi);padding-top:8px;border-top:1px solid var(--line)">' +
         esc(reais(soma.total)) + '</td></tr>' +
     '</table>' +
-    '<label>Validade (dias)</label>' +
-    '<input id="orc_validade" inputmode="numeric" value="' + esc(e.validadeDias) + '" ' +
-      'oninput="editando.orc.validadeDias=this.value">' +
+    '<div class="lin">' +
+      '<div><label>Validade (dias)</label>' +
+        '<input id="orc_validade" inputmode="numeric" value="' + esc(e.validadeDias) + '" ' +
+          'oninput="editando.orc.validadeDias=this.value"></div>' +
+      '<div><label>Fica pronto em (dias)</label>' +
+        '<input id="orc_prazo" inputmode="numeric" placeholder="5" value="' + esc(e.prazoDias) + '" ' +
+          'oninput="editando.orc.prazoDias=this.value"></div>' +
+    '</div>' +
+    '<div class="esc">O prazo é o que o cliente mais pergunta depois do preço. ' +
+      'Conta a partir da aprovação.</div>' +
     '<div class="btns">' +
       '<button class="btn pri" id="btEnviarOrc" onclick="salvarOrcamento(true)">Salvar e enviar ao cliente</button>' +
       '<button class="btn" onclick="salvarOrcamento(false)">Só salvar</button>' +
@@ -3265,6 +3388,7 @@ async function salvarOrcamento(enviar){
     itens: itens,
     totalPecas: soma.totalPecas, totalServico: soma.totalServico, total: soma.total,
     validadeDias: Number(paraNumero(e.validadeDias)) || 15,
+    prazoDias: Number(paraNumero(e.prazoDias)) || 0,
     enviadoEm: enviar ? new Date().toISOString() : (o.orcamento ? o.orcamento.enviadoEm : null)
   };
 
@@ -4402,6 +4526,12 @@ function telaSemana(){
   const abertas = ORDENS.filter(ehAberto);
   const parados = abertas.filter(o => o.status === "aguardando_peca").length;
   const esperando = abertas.filter(o => o.status === "orcamento_enviado").length;
+  const vencidos = abertas.filter(orcamentoVencido).length;
+  const atrasados = abertas.filter(o => {
+    const iso = (o.agenda || {}).recolhaPrevista || (o.agenda || {}).entregaPrevista;
+    const d = iso ? diasAte(iso) : null;
+    return d !== null && d < 0;
+  }).length;
 
   const grupo = g => {
     const itens = abertas.filter(o => g.status.includes(o.status))
@@ -4423,6 +4553,9 @@ function telaSemana(){
     '<div class="card" style="padding:13px">' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
         '<span class="pill cold">' + abertas.length + ' em aberto</span>' +
+        (atrasados ? '<span class="pill dg">' + atrasados + ' com data atrasada</span>' : '') +
+        (vencidos ? '<span class="pill dg">' + vencidos + ' orçamento' +
+          (vencidos===1?"":"s") + ' vencido' + (vencidos===1?"":"s") + '</span>' : '') +
         (parados ? '<span class="pill pend">' + parados + ' esperando peça</span>' : '') +
         (esperando ? '<span class="pill orc">' + esperando + ' esperando resposta</span>' : '') +
       '</div>' +
@@ -4444,7 +4577,26 @@ function cartaoSemana(o, g){
     selo = '<span class="pill">sem data</span>';
   }
 
-  return '<div class="reg' + (d !== null && d <= 0 ? " pend" : "") + '"><div class="top">' +
+  /* O que empacou dentro da oficina não tem data de agenda, e por isso
+     não aparecia em lado nenhum — um chamado podia ficar três semanas
+     parado sem nada a assinalá-lo. Estes selos são essa cobrança. */
+  const espera = diasEsperandoResposta(o);
+  if(espera !== null && espera > 0){
+    selo += '<span class="pill ' + (espera > 7 ? "dg" : "orc") + '">sem resposta há ' +
+            espera + ' dia' + (espera === 1 ? "" : "s") + '</span>';
+  }
+  if(orcamentoVencido(o)){
+    selo += '<span class="pill dg">orçamento vencido</span>';
+  }
+  if(o.status === "aguardando_peca"){
+    const parado = diasNoStatus(o);
+    selo += '<span class="pill pend">esperando peça' +
+            (parado ? " há " + parado + " dia" + (parado === 1 ? "" : "s") : "") + '</span>';
+  }
+
+  const urgente = (d !== null && d <= 0) || orcamentoVencido(o) ||
+                  (diasEsperandoResposta(o) || 0) > 7;
+  return '<div class="reg' + (urgente ? " pend" : "") + '"><div class="top">' +
     '<div style="min-width:0">' +
       '<div class="nm mono">' + esc(o.chopeiraCodigo) + '</div>' +
       '<div class="dt">' + esc(nomeCliente(o.clienteId)) + '</div>' +
