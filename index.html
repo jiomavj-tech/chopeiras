@@ -2278,6 +2278,176 @@ async function mostrarFotoOrdem(fotoId, i){
   }catch(e){ /* sem a foto, a ficha vive */ }
 }
 
+/* ═══════════════════ SERVIÇOS EXECUTADOS ═══════════════════
+   O que foi feito na máquina neste chamado. Nem todo serviço é troca de
+   peça: limpeza, ajuste do pressostato, carga de gás e regulagem são a
+   maior parte do trabalho e também precisam ficar registados.
+
+   Quando o serviço É uma troca, ele atualiza a ficha da chopeira de
+   uma vez — a peça nova entra como atual e a antiga vai para o
+   histórico de trocas. Assim não há duas listas a divergir.          */
+
+const SERVICOS_TIPOS = [
+  "Limpeza",
+  "Higienização",
+  "Ajuste do pressostato",
+  "Regulagem de temperatura / pressão",
+  "Carga de gás",
+  "Troca de peça",
+  "Solda / reparo",
+  "Teste / diagnóstico",
+  "Lubrificação",
+  "Outro"
+];
+
+function montarServico(){
+  editando.modo = "servico";
+  editando.servico = {tipo:"", detalhe:"", comp: componenteVazio()};
+  verOrdem();
+}
+
+function mudarTipoServico(v){
+  editando.servico.tipo = v;
+  verOrdem();
+}
+function mudarServico(campo, v){ editando.servico[campo] = v; }
+function mudarCompServico(campo, v){ editando.servico.comp[campo] = v; }
+
+function formServico(){
+  const s = editando.servico;
+  const ehTroca = s.tipo === "Troca de peça";
+  const c = CHOPEIRAS.find(x => x.id === editando.dados.chopeiraId);
+  const atual = ehTroca && s.comp.tipo ? acharPorTipo(c && c.componentes, s.comp.tipo) : null;
+
+  return '<h3>Registrar serviço</h3>' +
+    '<label>O que foi feito</label>' +
+    '<select onchange="mudarTipoServico(this.value)">' +
+      '<option value="">— escolha —</option>' +
+      SERVICOS_TIPOS.map(t => '<option value="' + esc(t) + '"' +
+        (s.tipo === t ? " selected" : "") + '>' + esc(t) + '</option>').join("") +
+    '</select>' +
+
+    (ehTroca ?
+      '<label>Qual componente</label>' +
+      '<select onchange="mudarCompServico(\'tipo\',this.value);verOrdem()">' +
+        '<option value="">— escolha —</option>' +
+        TIPOS_COMPONENTE.map(t => '<option value="' + esc(t) + '"' +
+          (s.comp.tipo === t ? " selected" : "") + '>' + esc(t) + '</option>').join("") +
+      '</select>' +
+      (atual ? '<div class="esc">Estava: ' + esc(resumoComponente(atual)) + '</div>' : '') +
+      '<div class="lin">' +
+        '<div><label>Marca (peça nova)</label><input value="' + esc(s.comp.marca) +
+          '" oninput="mudarCompServico(\'marca\',this.value)"></div>' +
+        '<div><label>Modelo</label><input value="' + esc(s.comp.modelo) +
+          '" oninput="mudarCompServico(\'modelo\',this.value)"></div>' +
+      '</div>' +
+      '<div class="lin">' +
+        '<div><label>Número de série</label><input value="' + esc(s.comp.serie) +
+          '" oninput="mudarCompServico(\'serie\',this.value)"></div>' +
+        '<div><label>Especificação</label><input value="' + esc(s.comp.spec) +
+          '" oninput="mudarCompServico(\'spec\',this.value)"></div>' +
+      '</div>'
+    : '') +
+
+    '<label>Detalhe' + (ehTroca ? " (opcional)" : "") + '</label>' +
+    '<textarea oninput="mudarServico(\'detalhe\',this.value)" placeholder="' +
+      esc(ehTroca ? "Motivo da troca, o que a peça velha apresentava…"
+                  : "Pressostato ajustado para cortar a 0,9 bar…") + '">' +
+      esc(s.detalhe) + '</textarea>' +
+
+    '<div class="btns">' +
+      '<button class="btn pri" id="btServico" onclick="salvarServico()">Registrar</button>' +
+      '<button class="btn" onclick="editando.modo=null;verOrdem()">Cancelar</button>' +
+    '</div>' +
+    '<div class="esc">' +
+      (ehTroca ? 'A troca também entra na ficha da chopeira: a peça nova passa a ser a ' +
+                 'atual e a antiga vai para o histórico.'
+               : 'Fica no chamado e o cliente vê o que foi feito.') +
+    '</div>';
+}
+
+async function salvarServico(){
+  const o = editando.dados;
+  const s = editando.servico;
+
+  if(!s.tipo) return toast("Escolha o que foi feito.", "err");
+  const ehTroca = s.tipo === "Troca de peça";
+  if(ehTroca && !s.comp.tipo) return toast("Escolha qual componente foi trocado.", "err");
+  if(ehTroca && !componentePreenchido(s.comp)){
+    return toast("Diga ao menos marca ou modelo da peça nova.", "err");
+  }
+  if(!ehTroca && !s.detalhe.trim()) return toast("Escreva o que foi feito.", "err");
+
+  const agora = new Date().toISOString();
+  const registo = {
+    quando: agora,
+    quem: EU.nome || EU.email || "Giba",
+    tipo: s.tipo,
+    detalhe: s.detalhe.trim(),
+    componente: ehTroca ? Object.assign({}, s.comp) : null
+  };
+
+  $("btServico").disabled = true;
+  try{
+    await db.collection("ordens").doc(o.id).update({
+      servicos: (o.servicos || []).concat([registo]),
+      atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    o.servicos = (o.servicos || []).concat([registo]);
+
+    /* A troca reflete-se na ficha da chopeira, para não haver duas
+       listas a dizer coisas diferentes sobre a mesma máquina. */
+    if(ehTroca && o.chopeiraId){
+      const c = CHOPEIRAS.find(x => x.id === o.chopeiraId);
+      if(c){
+        const antes = acharPorTipo(c.componentes, s.comp.tipo);
+        const nova = Object.assign(componenteVazio(), s.comp);
+        const componentes = (c.componentes || []).filter(x => x.tipo !== s.comp.tipo).concat([nova]);
+        const mudanca = {
+          componentes: componentes,
+          trocas: (c.trocas || []).concat([{
+            quando: agora, quem: registo.quem, ordemId: o.id, tipo: s.comp.tipo,
+            antes: antes ? resumoComponente(antes) : "(não constava)",
+            depois: resumoComponente(nova)
+          }])
+        };
+        /* Sem ficha original ainda: esta passa a ser o ponto de partida. */
+        if(!(c.fichaOriginal && (c.fichaOriginal.itens || []).length)){
+          mudanca.fichaOriginal = {quando: agora, quem: registo.quem, itens: componentes};
+        }
+        await db.collection("chopeiras").doc(c.id).update(mudanca);
+        Object.assign(c, mudanca);
+      }
+    }
+
+    editando.modo = null;
+    verOrdem();
+    toast(ehTroca ? "Troca registada, e a ficha da chopeira foi atualizada."
+                  : "Serviço registado.", "ok");
+  }catch(e){
+    toast("Não deu para registar: " + (e.message || e), "err");
+    const b = $("btServico"); if(b) b.disabled = false;
+  }
+}
+
+/* O que já foi feito neste chamado — o cliente também vê. */
+function blocoServicos(o){
+  const lista = o.servicos || [];
+  if(!lista.length) return "";
+  return '<h3>Serviços executados</h3>' +
+    lista.slice().reverse().map(s =>
+      '<div class="itemOrc">' +
+        '<div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline">' +
+          '<b>' + esc(s.tipo) + '</b>' +
+          '<span class="esc">' + esc(dataCurta(String(s.quando).slice(0,10))) + '</span>' +
+        '</div>' +
+        (s.componente ? '<div style="margin-top:2px">' + esc(s.componente.tipo) + ': <b>' +
+          esc(resumoComponente(s.componente)) + '</b></div>' : '') +
+        (s.detalhe ? '<div style="font-size:13px;margin-top:2px;white-space:pre-wrap">' +
+          esc(s.detalhe) + '</div>' : '') +
+      '</div>').join("");
+}
+
 function verOrdem(){
   const o = editando.dados, s = status(o.status);
   const cho = CHOPEIRAS.find(c => c.id === o.chopeiraId);
@@ -2326,6 +2496,7 @@ function verOrdem(){
         '</div>' : '') +
 
       blocoOrcamento(o) +
+      blocoServicos(o) +
       blocoLaudo(o) +
 
       '<h3>Andamento</h3><div class="linha">' + linhaTempo + '</div>' +
@@ -2333,6 +2504,7 @@ function verOrdem(){
       (EU.admin
         ? (editando.modo === "orcamento" ? editorOrcamento()
           : editando.modo === "laudo"    ? formLaudo()
+          : editando.modo === "servico"  ? formServico()
           : painelAdmin(o))
         : '') +
 
@@ -2345,7 +2517,17 @@ function painelAdmin(o){
   const proximoSugerido = proximoStatusSugerido(o.status);
   const temOrca = o.orcamento && Object.keys(o.orcamento).length > 1;
 
-  return '<h3>Orçamento</h3>' +
+  return '<h3>Serviço executado</h3>' +
+    '<div class="btns" style="margin-top:0">' +
+      '<button class="btn" onclick="montarServico()">+ Registrar serviço</button>' +
+      ((o.servicos && o.servicos.length)
+        ? '<span class="muted" style="align-self:center">' + o.servicos.length +
+          ' registado' + (o.servicos.length===1?"":"s") + '</span>'
+        : '') +
+    '</div>' +
+    '<div class="esc">Limpeza, ajuste, carga de gás, troca de peça — o que foi feito na máquina.</div>' +
+
+    '<h3>Orçamento</h3>' +
     '<div class="btns" style="margin-top:0">' +
       '<button class="btn" onclick="montarOrcamento()">' +
         (temOrca ? "Editar orçamento" : "Montar o orçamento") + '</button>' +
@@ -2462,6 +2644,15 @@ async function moverOrdem(){
   }
 
   if(!novo) return;
+
+  /* Concluir sem dizer o que foi feito é o registo que faz falta seis
+     meses depois. Avisa, mas não impede: às vezes só se olhou. */
+  if(["concluido","entregue"].includes(novo) && !((o.servicos || []).length)){
+    if(!confirm("Nenhum serviço registado neste chamado.\n\n" +
+        "Limpeza, ajuste, carga de gás, troca de peça — nada foi anotado. " +
+        "Sem isso, daqui a seis meses ninguém sabe o que foi feito nesta máquina.\n\n" +
+        "Seguir assim mesmo?")) return;
+  }
 
   $("btMover").disabled = true;
   try{
