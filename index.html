@@ -3510,9 +3510,25 @@ function montarLaudo(dados, imagens){
     });
   }
 
-  if(dados.servicoExecutado){
+  if(dados.servicoExecutado || (dados.servicos || []).length){
     titulo("Serviço executado");
-    paragrafo(dados.servicoExecutado, PAG.ml, LU, 10.5, false, COR.tinta, 14);
+    if(dados.servicoExecutado){
+      paragrafo(dados.servicoExecutado, PAG.ml, LU, 10.5, false, COR.tinta, 14);
+      if((dados.servicos || []).length) y -= 8;
+    }
+    /* O que foi registado na máquina, item a item, com data. É isto que
+       responde "o que foi feito" quando o laudo é lido meses depois. */
+    (dados.servicos || []).forEach(sv => {
+      garantir(20);
+      escrever(PAG.ml, y - 9, "•", 10, false, COR.fraca);
+      escrever(PAG.ml + 12, y - 9, sv.tipo, 10, true, COR.tinta);
+      escrever(PAG.w - PAG.mr - largura(paraWinAnsi(sv.quando), 8.5, false), y - 9,
+               sv.quando, 8.5, false, COR.fraca);
+      y -= 14;
+      if(sv.peca)    paragrafo(sv.peca,    PAG.ml + 12, LU - 12, 9.5, false, COR.tinta, 12.5);
+      if(sv.detalhe) paragrafo(sv.detalhe, PAG.ml + 12, LU - 12, 9.5, false, COR.fraca, 12.5);
+      y -= 5;
+    });
   }
 
   if((dados.pecas || []).length){
@@ -3975,6 +3991,12 @@ async function baixarLaudo(){
       problemaConstatado: l.problemaConstatado,
       componentes: l.componentes,
       servicoExecutado: l.servicoExecutado,
+      servicos: (o.servicos || []).map(x => ({
+        quando: dataCurta(String(x.quando).slice(0,10)),
+        tipo: x.tipo,
+        detalhe: x.detalhe || "",
+        peca: x.componente ? x.componente.tipo + ": " + resumoComponente(x.componente) : ""
+      })),
       recomendacoes: l.recomendacoes,
       pecas: (l.pecas || []).map(p => ({
         descricao: p.descricao, qtd: p.qtd,
