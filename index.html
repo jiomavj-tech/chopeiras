@@ -746,6 +746,85 @@ function desenhar(){
 }
 
 /* ═══════════════════ CLIENTES (admin) ═══════════════════ */
+/* ═══════════════════ CONVIDAR O CLIENTE ═══════════════════
+   O aplicativo não tinha como ser passado adiante: o Giba tinha de
+   copiar o endereço à mão e explicar tudo de cabeça, toda vez.
+
+   O texto pede as duas coisas sem as quais o acesso não pode ser
+   liberado — o documento e o e-mail com que a pessoa vai entrar — e
+   diz porquê, para não parecer burocracia.                          */
+
+function enderecoDoApp(){
+  return location.origin + location.pathname.replace(/index\.html$/, "");
+}
+
+function textoConvite(c){
+  const nome = c ? (c.contato || "") : "";
+  return (nome ? "Oi, " + nome + "! " : "Oi! ") +
+    "Aqui é o Giba, das chopeiras.\n\n" +
+    "Fiz um aplicativo para você acompanhar o serviço da sua chopeira: " +
+    "pedir para buscar, ver o orçamento, aprovar e acompanhar até a entrega. " +
+    "Não precisa instalar nada.\n\n" +
+    enderecoDoApp() + "\n\n" +
+    "Para liberar o seu acesso, me manda:\n" +
+    "1) CNPJ da empresa (ou CPF, se for em seu nome)\n" +
+    "2) o e-mail que você vai usar para entrar\n\n" +
+    "Precisa ser um e-mail do Google (gmail), porque é por ele que o " +
+    "aplicativo reconhece você. Assim que mandar, eu libero e já dá para usar.";
+}
+
+/* Partilhar abre o menu do telemóvel (WhatsApp, mensagem, e-mail).
+   Onde não houver, copia — e onde nem isso houver, mostra o texto para
+   copiar à mão, que é sempre melhor do que um botão que não faz nada. */
+async function convidarCliente(clienteId){
+  const c = clienteId ? CLIENTES.find(x => x.id === clienteId) : null;
+  const texto = textoConvite(c);
+
+  /* Com o WhatsApp do cliente no cadastro, vai direto para a conversa
+     dele — é um toque a menos e não erra o contacto. */
+  const numero = c ? soWhats(c.whatsapp || c.telefone) : "";
+  if(numero){
+    window.open("https://wa.me/" + numero + "?text=" + encodeURIComponent(texto), "_blank");
+    return;
+  }
+
+  if(navigator.share){
+    try{ await navigator.share({title:"Chopeiras — Giba Soluções", text:texto}); return; }
+    catch(e){ if(e && e.name === "AbortError") return; }
+  }
+  try{
+    await navigator.clipboard.writeText(texto);
+    toast("Convite copiado. É só colar no WhatsApp.", "ok");
+    return;
+  }catch(e){ /* sem área de transferência: mostra para copiar à mão */ }
+
+  mostrarConvite(texto);
+}
+
+function mostrarConvite(texto){
+  $("tela").innerHTML =
+    '<div class="card">' +
+      '<h2>Convite para o cliente</h2>' +
+      '<div class="muted">Copie este texto e mande para ele.</div>' +
+      '<textarea id="txtConvite" style="min-height:230px">' + esc(texto) + '</textarea>' +
+      '<div class="btns">' +
+        '<button class="btn pri" onclick="copiarConvite()">Copiar</button>' +
+        '<button class="btn" onclick="irPara(\'clientes\')">Voltar</button>' +
+      '</div>' +
+    '</div>';
+}
+
+function copiarConvite(){
+  const t = $("txtConvite");
+  t.select(); t.setSelectionRange(0, 99999);
+  try{
+    document.execCommand("copy");
+    toast("Copiado.", "ok");
+  }catch(e){
+    toast("Selecione o texto e copie à mão.", "err");
+  }
+}
+
 function telaClientes(){
   if(editando && editando.tipo === "cliente") return formCliente();
   const busca = (window.__buscaCli || "").toLowerCase();
@@ -758,6 +837,7 @@ function telaClientes(){
   $("tela").innerHTML =
     '<div class="btns" style="margin:0 0 12px">' +
       '<button class="btn pri" onclick="novoCliente()">+ Nova empresa</button>' +
+      '<button class="btn" onclick="convidarCliente()">Convidar cliente</button>' +
       '<button class="btn" onclick="atualizar()">Atualizar</button>' +
     '</div>' +
     '<div class="busca"><input placeholder="Buscar por nome, CNPJ, CPF ou cidade" value="'+esc(window.__buscaCli||"")+
@@ -777,7 +857,10 @@ function cartaoCliente(c){
       '<div class="dt mono">'+esc(cnpjFormatado(c.cnpj))+'</div>' +
       '<div class="dt">'+esc([c.cidade, c.uf].filter(Boolean).join(" · "))+'</div>' +
     '</div>' +
-    '<button class="btn sm" onclick="editarCliente(\''+c.id+'\')">Abrir</button></div>' +
+    '<div style="display:flex;flex-direction:column;gap:6px;flex:0 0 auto">' +
+      '<button class="btn sm" onclick="editarCliente(\''+c.id+'\')">Abrir</button>' +
+      '<button class="btn sm" onclick="convidarCliente(\''+c.id+'\')">Convidar</button>' +
+    '</div></div>' +
     '<div style="margin-top:9px;display:flex;gap:6px;flex-wrap:wrap">' +
       '<span class="pill cold">'+n+' chopeira'+(n===1?"":"s")+'</span>' +
       '<span class="pill">'+convidados+' e-mail'+(convidados===1?"":"s")+' liberado'+(convidados===1?"":"s")+'</span>' +
