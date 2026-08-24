@@ -356,6 +356,45 @@ function pintarRede(){
 window.addEventListener("online",  pintarRede);
 window.addEventListener("offline", pintarRede);
 
+/* ═══════════════════ VERSÃO E ATUALIZAÇÃO ═══════════════════
+   O número no rodapé é lido da cache do service worker, e não escrito à
+   mão: escrito à mão ele diverge — e foi o que aconteceu, com a página
+   a dizer 5 enquanto o service worker já ia no 6. Quem olha o rodapé
+   precisa de saber qual versão o aparelho tem de facto.              */
+
+async function mostrarVersao(){
+  const el = document.getElementById("versaoApp");
+  if(!el || !window.caches) return;
+  try{
+    const ks = await caches.keys();
+    const n = ks.map(k => (k.match(/^chopeiras-v(\d+)$/) || [])[1])
+                .filter(Boolean).map(Number).sort((a,b) => b - a)[0];
+    if(n) el.textContent = "versão " + n;
+  }catch(e){ /* fica o que está escrito */ }
+}
+
+/* Um aparelho pode ficar com a versão antiga guardada — e aí um botão
+   novo simplesmente não existe, sem erro nenhum a explicar porquê.
+   Isto vai buscar a versão nova e recarrega. */
+async function procurarAtualizacao(){
+  /* Sem rede não há o que procurar — e o pedido seria respondido pela
+     própria cache, dando a impressão falsa de que atualizou. */
+  if(!navigator.onLine){
+    return toast("Sem internet agora \u2014 o aplicativo continua a funcionar.", "err");
+  }
+  if(!("serviceWorker" in navigator)){ location.reload(); return; }
+  toast("Procurando atualiza\u00e7\u00e3o\u2026", "");
+  try{
+    const regs = await navigator.serviceWorker.getRegistrations();
+    await Promise.all(regs.map(r => r.update()));
+    await fetch("./index.html", {cache:"no-store"});   /* confirma que h\u00e1 rede */
+    toast("Recarregando com a vers\u00e3o mais nova\u2026", "ok");
+    setTimeout(() => location.reload(), 800);
+  }catch(e){
+    toast("Sem internet agora \u2014 o aplicativo continua a funcionar.", "err");
+  }
+}
+
 const QUER_DEMO = /[?&]demo\b/.test(location.search);
 
 if(!CONFIGURADO || QUER_DEMO){
@@ -468,7 +507,8 @@ async function portao(user){
 <main class="wrap" id="tela"></main>
 
 <div class="foot">
-  <span id="versaoApp">versão 5</span> ·
+  <span id="versaoApp">versão 6</span> ·
+  <a href="#" onclick="procurarAtualizacao();return false;">procurar atualização</a> ·
   <a href="#" onclick="sair();return false;">sair</a> ·
   <a href="#" onclick="verConfiguracao();return false;">como ligar ao Firebase</a>
   <span id="avisoColada"></span>
@@ -4690,7 +4730,8 @@ async function atualizar(){
 
 <script>
 if("serviceWorker" in navigator){
-  window.addEventListener("load", ()=> navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+  window.addEventListener("load", ()=> navigator.serviceWorker.register("./sw.js")
+    .then(mostrarVersao).catch(()=>{}));
 }
 </script>
 </body>
