@@ -1374,7 +1374,12 @@ function verChopeira(){
       blocoFicha(c) +
       (c.observacoes ? '<h3>Observações</h3><div class="muted" style="white-space:pre-wrap">'+
         esc(c.observacoes)+'</div>' : '') +
-      '<div class="btns"><button class="btn" onclick="irPara(\'chopeiras\')">Voltar</button></div>' +
+      '<div class="btns">' +
+        (ordensDaChopeira(c.id).length
+          ? '<button class="btn pri" onclick="baixarRelatorio(\'' + esc(c.id) +
+            '\')">Relatório de manutenção</button>' : '') +
+        '<button class="btn" onclick="irPara(\'chopeiras\')">Voltar</button>' +
+      '</div>' +
     '</div>';
 }
 
@@ -1712,6 +1717,16 @@ const FLUXO_PADRAO = {
 
 function proximoStatusSugerido(statusAtual){
   return FLUXO_PADRAO[statusAtual] || null;
+}
+
+/* Numeração no mesmo esquema da OS: data mais sufixo. É de propósito
+   não ser um contador sequencial — um contador precisaria de ir ao
+   servidor buscar o último número, e sem rede daria dois laudos com o
+   mesmo. Aqui cada aparelho gera sozinho, sem colidir. */
+function numeroLaudo(){
+  const d = new Date(), p = n => String(n).padStart(2,"0");
+  const sufixo = Math.random().toString(36).slice(2,6).toUpperCase();
+  return "LAU-" + String(d.getFullYear()).slice(2) + p(d.getMonth()+1) + p(d.getDate()) + "-" + sufixo;
 }
 
 function numeroOS(){
@@ -3415,7 +3430,8 @@ function montarLaudo(dados, imagens){
     ops = []; paginas.push(ops);
     y = PAG.h - PAG.mt;
     if(paginas.length > 1){
-      escrever(PAG.ml, y - 7, "Laudo técnico · " + dados.numero + " · chopeira " +
+      escrever(PAG.ml, y - 7, "Laudo técnico · " +
+               (dados.numeroLaudo || dados.numero) + " · chopeira " +
                dados.chopeiraCodigo, 8, false, COR.fraca);
       risco(PAG.ml, y - 13, PAG.w - PAG.mr, y - 13, COR.linha, 0.7);
       y -= 26;
@@ -3453,8 +3469,10 @@ function montarLaudo(dados, imagens){
   y -= 24;
   escrever(PAG.ml, y - 20, "Laudo técnico de manutenção", 21, true, COR.tinta);
   y -= 30;
-  escrever(PAG.ml, y - 10, dados.numero + "  ·  chopeira " + dados.chopeiraCodigo +
-           "  ·  " + dados.dataLaudo, 10, false, COR.fraca);
+  escrever(PAG.ml, y - 10,
+           (dados.numeroLaudo ? dados.numeroLaudo + "  ·  " : "") + dados.numero +
+           "  ·  chopeira " + dados.chopeiraCodigo + "  ·  " + dados.dataLaudo,
+           10, false, COR.fraca);
   y -= 20;
   risco(PAG.ml, y, PAG.w - PAG.mr, y, COR.linha, 1);
   y -= 20;
@@ -3667,7 +3685,8 @@ function escreverPDF(paginas, imagens, dados){
   const carimbo = "D:" + agora.getFullYear() + dois(agora.getMonth()+1) + dois(agora.getDate()) +
                   dois(agora.getHours()) + dois(agora.getMinutes()) + dois(agora.getSeconds());
   objeto(nInfo,
-    "<< /Title (" + escPDF(paraWinAnsi("Laudo técnico " + dados.numero)) + ")" +
+    "<< /Title (" + escPDF(paraWinAnsi(dados.tituloPDF ||
+      ("Laudo técnico " + (dados.numeroLaudo || dados.numero)))) + ")" +
     " /Author (" + escPDF(paraWinAnsi(dados.tecnico || "Giba Soluções")) + ")" +
     " /Creator (Chopeiras) /Producer (Chopeiras) /CreationDate (" + carimbo + ") >>");
 
@@ -3938,7 +3957,9 @@ async function salvarLaudo(){
     recomendacoes: $("l_recomenda").value.trim(),
     pecas: e.pecas,
     tecnico: $("l_tecnico").value.trim() || "Giba Soluções",
-    emitidoEm: new Date().toISOString()
+    emitidoEm: new Date().toISOString(),
+    /* reeditar não renumera: o laudo que já saiu tem de continuar o mesmo */
+    numero: (o.laudo && o.laudo.numero) || numeroLaudo()
   };
   if(!laudo.problemaConstatado && !laudo.servicoExecutado){
     return toast("Um laudo sem problema constatado nem serviço executado não diz nada.", "err");
@@ -4012,6 +4033,7 @@ async function baixarLaudo(){
       problemaRelatado: o.problemaRelatado || "",
       problemaConstatado: l.problemaConstatado,
       componentes: l.componentes,
+      numeroLaudo: l.numero || "",
       servicoExecutado: l.servicoExecutado,
       ficha: (function(){
         const atuais = cho.componentes || [];
@@ -4095,6 +4117,228 @@ const GRUPOS = [
    data:"entregaPrevista",
    vazio:"Nada pronto para entregar."}
 ];
+
+/* ═══════════════════ RELATÓRIO DE MANUTENÇÃO ═══════════════════
+   O histórico da máquina numa folha só: cada vez que ela veio, a data,
+   o número do laudo e o que foi feito — com destaque para o que foi
+   trocado. Não é o laudo; é o resumo de todos eles.
+
+   Serve para o cliente responder sozinho "o que já fizeram nesta
+   chopeira?" sem abrir laudo por laudo.                              */
+
+function diaDaOrdem(o){
+  const v = o.abertoEm;
+  if(v && v.toDate) return v.toDate().toISOString().slice(0,10);
+  if(typeof v === "string") return v.slice(0,10);
+  return "";
+}
+
+function ordensDaChopeira(id){
+  return ORDENS.filter(o => o.chopeiraId === id)
+    .slice()
+    .sort((a,b) => String(diaDaOrdem(a)).localeCompare(String(diaDaOrdem(b))));
+}
+
+/* As folhas do relatório usam os mesmos primitivos do laudo, mas em
+   caixa própria: o laudo é documento assinado e não se mexe nele. */
+function folhaPDF(rodapeTexto){
+  const LU = PAG.w - PAG.ml - PAG.mr;
+  const paginas = [];
+  let ops = null, y = 0;
+  const cor = (c, traco) => n2(c[0]) + " " + n2(c[1]) + " " + n2(c[2]) + (traco ? " RG" : " rg");
+
+  const f = {
+    get LU(){ return LU; },
+    get y(){ return y; },
+    set y(v){ y = v; },
+    paginas: paginas,
+    escrever(x, base, txt, tam, negrito, c){
+      txt = paraWinAnsi(txt);
+      if(!txt) return;
+      ops.push("BT " + cor(c || COR.tinta) + " /" + (negrito ? "F2" : "F1") + " " + n2(tam) +
+               " Tf 1 0 0 1 " + n2(x) + " " + n2(base) + " Tm (" + escPDF(txt) + ") Tj ET");
+    },
+    caixa(x, yy, w, h, c){
+      ops.push(cor(c) + " " + n2(x) + " " + n2(yy) + " " + n2(w) + " " + n2(h) + " re f");
+    },
+    risco(x1, y1, x2, y2, c, esp){
+      ops.push(cor(c || COR.linha, true) + " " + n2(esp || 0.7) + " w " +
+               n2(x1) + " " + n2(y1) + " m " + n2(x2) + " " + n2(y2) + " l S");
+    },
+    novaPagina(){
+      ops = []; paginas.push(ops);
+      y = PAG.h - PAG.mt;
+      if(paginas.length > 1){
+        f.escrever(PAG.ml, y - 7, rodapeTexto, 8, false, COR.fraca);
+        f.risco(PAG.ml, y - 13, PAG.w - PAG.mr, y - 13, COR.linha, 0.7);
+        y -= 26;
+      }
+    },
+    garantir(h){ if(y - h < PAG.mb) f.novaPagina(); },
+    paragrafo(txt, x, larg, tam, negrito, c, entre){
+      entre = entre || tam * 1.38;
+      quebrar(txt, larg, tam, negrito).forEach(l => {
+        if(l === ""){ y -= entre * 0.5; return; }
+        f.garantir(entre);
+        f.escrever(x, y - tam * 0.86, l, tam, negrito, c);
+        y -= entre;
+      });
+    },
+    titulo(txt){
+      f.garantir(46);
+      y -= 6;
+      f.escrever(PAG.ml, y - 13, txt, 13, true, COR.tinta);
+      f.caixa(PAG.ml, y - 19, largura(paraWinAnsi(txt), 13, true), 3.5, COR.marca);
+      y -= 30;
+    },
+    rodape(dataEmissao){
+      paginas.forEach((pg, i) => {
+        const guarda = ops;
+        ops = pg;
+        f.risco(PAG.ml, PAG.mb - 14, PAG.w - PAG.mr, PAG.mb - 14, COR.linha, 0.7);
+        f.escrever(PAG.ml, PAG.mb - 26,
+          "Giba Soluções · relatório emitido em " + dataEmissao, 8, false, COR.fraca);
+        const t = "Página " + (i + 1) + " de " + paginas.length;
+        f.escrever(PAG.w - PAG.mr - largura(paraWinAnsi(t), 8, false), PAG.mb - 26,
+          t, 8, false, COR.fraca);
+        ops = guarda;
+      });
+    }
+  };
+  return f;
+}
+
+function montarRelatorio(dados){
+  const f = folhaPDF("Relatório de manutenção · chopeira " + dados.chopeiraCodigo);
+  f.novaPagina();
+
+  f.escrever(PAG.ml, f.y - 8, "GIBA SOLUÇÕES", 9, true, COR.marca);
+  f.y -= 24;
+  f.escrever(PAG.ml, f.y - 20, "Relatório de manutenção", 21, true, COR.tinta);
+  f.y -= 30;
+  f.escrever(PAG.ml, f.y - 10, "Chopeira " + dados.chopeiraCodigo +
+    (dados.equipamento ? "  ·  " + dados.equipamento : "") +
+    "  ·  " + dados.cliente, 10, false, COR.fraca);
+  f.y -= 20;
+  f.risco(PAG.ml, f.y, PAG.w - PAG.mr, f.y, COR.linha, 1);
+  f.y -= 22;
+
+  /* o cabeçalho que responde à pergunta de uma olhada */
+  f.escrever(PAG.ml, f.y - 10, dados.resumo, 11, true, COR.tinta);
+  f.y -= 26;
+
+  if(!dados.visitas.length){
+    f.paragrafo("Esta chopeira ainda não tem manutenção registada.",
+      PAG.ml, f.LU, 10.5, false, COR.fraca, 14);
+  }
+
+  dados.visitas.forEach((v, i) => {
+    f.garantir(60);
+    if(i) f.y -= 6;
+    f.risco(PAG.ml, f.y + 6, PAG.w - PAG.mr, f.y + 6, COR.linha, 0.7);
+    f.y -= 6;
+
+    /* data à esquerda, números à direita */
+    f.escrever(PAG.ml, f.y - 10, v.data, 12, true, COR.marca);
+    const ref = [v.numeroLaudo, v.numeroOS].filter(Boolean).join("  ·  ");
+    if(ref) f.escrever(PAG.w - PAG.mr - largura(paraWinAnsi(ref), 8.5, false),
+                       f.y - 10, ref, 8.5, false, COR.fraca);
+    f.y -= 20;
+
+    if(v.problema){
+      f.paragrafo(v.problema, PAG.ml, f.LU, 9.5, false, COR.fraca, 12.5);
+      f.y -= 3;
+    }
+
+    /* primeiro o que foi trocado — é o que ele quer ver de relance */
+    v.trocas.forEach(t => {
+      f.garantir(16);
+      f.caixa(PAG.ml + 1, f.y - 7.5, 4, 4, COR.marca);
+      f.paragrafo(t, PAG.ml + 12, f.LU - 12, 10, true, COR.tinta, 13);
+    });
+    v.outros.forEach(t => {
+      f.garantir(15);
+      f.escrever(PAG.ml, f.y - 9, "•", 10, false, COR.fraca);
+      f.paragrafo(t, PAG.ml + 12, f.LU - 12, 9.5, false, COR.tinta, 12.5);
+    });
+    if(!v.trocas.length && !v.outros.length){
+      f.paragrafo(v.situacao || "Sem serviço registado.",
+        PAG.ml + 12, f.LU - 12, 9.5, false, COR.fraca, 12.5);
+    }
+    f.y -= 8;
+  });
+
+  f.rodape(dados.dataEmissao);
+  return f.paginas;
+}
+
+async function baixarRelatorio(chopeiraId){
+  const cho = CHOPEIRAS.find(x => x.id === chopeiraId);
+  if(!cho) return toast("Chopeira não encontrada.", "err");
+
+  const ordens = ordensDaChopeira(chopeiraId);
+  let trocasTotal = 0;
+
+  const visitas = ordens.map(o => {
+    const servicos = o.servicos || [];
+    const trocas = servicos.filter(s => s.componente).map(s => {
+      trocasTotal++;
+      return s.componente.tipo + " — " + resumoComponente(s.componente);
+    });
+    const outros = servicos.filter(s => !s.componente)
+      .map(s => s.tipo + (s.detalhe ? ": " + s.detalhe : ""));
+    return {
+      data: dataCurta(diaDaOrdem(o)) || "—",
+      numeroOS: o.numero || "",
+      numeroLaudo: (o.laudo && o.laudo.numero) || "",
+      problema: (o.problemaRelatado || "").trim(),
+      trocas: trocas,
+      outros: outros,
+      situacao: "Em andamento — " + ((status(o.status) || {}).rot || o.status)
+    };
+  });
+
+  const periodo = visitas.length
+    ? (visitas[0].data === visitas[visitas.length-1].data
+        ? visitas[0].data
+        : visitas[0].data + " a " + visitas[visitas.length-1].data)
+    : "";
+  const resumo = visitas.length
+    ? visitas.length + (visitas.length === 1 ? " manutenção" : " manutenções") +
+      (periodo ? " · " + periodo : "") +
+      (trocasTotal ? " · " + trocasTotal + (trocasTotal === 1 ? " peça trocada" : " peças trocadas")
+                   : " · nenhuma peça trocada")
+    : "Sem manutenção registada";
+
+  const dados = {
+    chopeiraCodigo: cho.codigo || "sem número",
+    equipamento: [cho.marca, cho.modelo].filter(Boolean).join(" "),
+    cliente: nomeCliente(cho.clienteId),
+    dataEmissao: new Date().toLocaleDateString("pt-BR"),
+    tecnico: EU.nome || "Giba Soluções",
+    numero: "REL-" + (cho.codigo || ""),
+    tituloPDF: "Relatório de manutenção · chopeira " + (cho.codigo || ""),
+    resumo: resumo,
+    visitas: visitas
+  };
+
+  try{
+    const blob = escreverPDF(montarRelatorio(dados), [], dados);
+    const nome = "relatorio-" +
+      String(cho.codigo || "chopeira").toLowerCase().replace(/[^a-z0-9]+/g, "-") + ".pdf";
+    const arquivo = new File([blob], nome, {type:"application/pdf"});
+    if(navigator.canShare && navigator.canShare({files:[arquivo]})){
+      try{ await navigator.share({files:[arquivo], title:"Relatório " + dados.chopeiraCodigo}); return; }
+      catch(e){ /* cancelou: cai no download */ }
+    }
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = nome; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+  }catch(e){
+    toast("Não deu para gerar: " + (e.message || e), "err");
+  }
+}
 
 function hojeISO(){
   const d = new Date(), p = n => String(n).padStart(2,"0");
