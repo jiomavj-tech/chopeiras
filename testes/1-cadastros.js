@@ -55,7 +55,17 @@ function falha(t){ passos.push('  FALHA ' + t); erros.push(t); }
   await pg.fill('#f_cidade', 'Florianópolis');
   await pg.fill('#f_uf', 'sc');
   await pg.fill('#f_whats', '48 99999-1234');
-  await pg.fill('#f_emails', 'ze@bardoze.com.br\nGERENTE@bardoze.com.br');
+  /* Os e-mails deixaram de ser uma caixa de texto solta: agora cada um
+     entra pelo botão Liberar e aparece na lista, com o duplicado barrado. */
+  for(const e of ['ze@bardoze.com.br', 'GERENTE@bardoze.com.br']){
+    await pg.fill('#f_email_novo', e);
+    await pg.click('button:has-text("Liberar")');
+    await pg.waitForTimeout(120);
+  }
+  const naLista = await pg.$$eval('#f_emails_lista div', ns =>
+    ns.map(n => n.textContent).filter(t => t.includes('@')).length);
+  naLista >= 2 ? ok('dois e-mails liberados na lista')
+               : falha('e-mails na lista: ' + naLista);
   await pg.click('#btSalvar');
   await pg.waitForSelector('.reg .nm', { timeout: 5000 });
 

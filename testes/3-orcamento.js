@@ -15,6 +15,16 @@ const falha = t => { passos.push('  FALHA ' + t); erros.push(t); };
 (async () => {
   const b = await chromium.launch({ executablePath: process.env.CHROMIUM || undefined });
   const pg = await b.newPage({ viewport: { width: 412, height: 900 } });
+
+  /* Um ouvinte só para os diálogos: o Playwright chama todos os que
+     estiverem registados para a mesma caixa, e o segundo a responder
+     rebenta com "already handled". Quem decide é a mensagem. */
+  let respostaDoPrompt = '';
+  pg.on('dialog', d => {
+    if(/WhatsApp/.test(d.message())) return d.dismiss();   /* abriria janela para fora */
+    if(d.type() === 'prompt') return d.accept(respostaDoPrompt);
+    return d.accept();
+  });
   const ruido = /gstatic|ERR_TUNNEL|sw\.js|service worker|A bad HTTP response code/i;
   pg.on('console', m => { if (m.type() === 'error' && !ruido.test(m.text())) erros.push('console: ' + m.text()); });
   pg.on('pageerror', e => erros.push('pageerror: ' + e.message));
@@ -143,8 +153,14 @@ const falha = t => { passos.push('  FALHA ' + t); erros.push(t); };
     return capturado;
   });
   const texto = link ? decodeURIComponent(link) : '';
-  (texto.includes('469,90') && texto.includes('peças') && texto.includes('180,00'))
-    ? ok('WhatsApp leva total e os subtotais') : falha('mensagem: ' + texto.slice(0,150));
+  /* Os subtotais saíram da mensagem de propósito: a decomposição
+     peças/serviço convida a negociar item a item, e o que o cliente
+     precisa é do total, do prazo e do que tem de decidir. */
+  (texto.includes('469,90')
+    && !/pe\u00e7as R\$|servi\u00e7o R\$/.test(texto)
+    && /aprovar ou recusar/.test(texto))
+    ? ok('WhatsApp leva o total e o próximo passo, sem subtotais nem OS')
+    : falha('mensagem: ' + texto.slice(0,150));
 
   // ── 9. o cliente vê o orçamento com os grupos separados
   await pg.evaluate(() => window.__trocarUsuario({uid:'u2', email:'ze@bardoze.com.br',
@@ -167,7 +183,6 @@ const falha = t => { passos.push('  FALHA ' + t); erros.push(t); };
   !editor ? ok('cliente não recebe o editor de orçamento') : falha('cliente viu o editor');
 
   // ── 11. aprovar grava a decisão com nome, data e aviso ao Giba
-  pg.once('dialog', d => d.accept());
   await pg.click('button:has-text("Aprovar o serviço")');
   await pg.waitForTimeout(600);
   const decidida = await pg.evaluate(() => window.__LOJA.ordens.o1);
@@ -204,7 +219,7 @@ const falha = t => { passos.push('  FALHA ' + t); erros.push(t); };
   await pg.waitForSelector('#nav button');
   await pg.locator('.reg').first().locator('button:has-text("Abrir")').click();
   await pg.waitForSelector('button:has-text("Não aprovar")');
-  pg.once('dialog', d => d.accept('Muito caro, vou pesquisar.'));
+  respostaDoPrompt = 'Muito caro, vou pesquisar.';
   await pg.click('button:has-text("Não aprovar")');
   await pg.waitForTimeout(600);
   const rep = await pg.evaluate(() => window.__LOJA.ordens.o2);

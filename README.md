@@ -5,7 +5,9 @@
 Cadastro das chopeiras de cada cliente, com acesso controlado: o cliente entra com a conta Google
 dele e vê apenas os equipamentos da própria empresa. O Giba vê e mantém tudo.
 
-**As cinco entregas planeadas estão feitas.** O que continua de fora, e porquê, está no fim.
+**As cinco entregas planeadas estão feitas**, e desde então o aplicativo ganhou ficha técnica dos
+equipamentos, registo de serviços, relatório de manutenção, agenda do Google e funcionamento sem
+internet. O que continua de fora, e porquê, está no fim.
 
 ## Experimentar sem configurar nada
 
@@ -45,13 +47,64 @@ se achar, mostra a ficha para confirmar; se não achar, deixa enviar assim mesmo
 como **provisória**, para o Giba completar depois — um chamado não pode esperar o cadastro ficar
 perfeito. Até três fotos, e o problema escrito ou **ditado**.
 
-**Status e linha do tempo.** Dez estados, de *chamado aberto* a *entregue*. Cada mudança guarda
+**Pessoa física, além de empresa.** O cadastro aceita CNPJ ou CPF, com máscara e conferência dos
+dígitos em ambos, e recusa documento repetido. Quem trabalha em nome próprio não tem de inventar
+uma empresa para ser atendido.
+
+**Ficha técnica da chopeira.** Os componentes da máquina, um a um — compressor, pressostato KP1,
+capacitores, solenoide, relé, bomba — com marca, modelo, **número de série** e especificação. São
+três coisas separadas, de propósito: o que ela tem **hoje**, a **ficha original** congelada na
+primeira vez, e o **histórico de trocas**. Cada peça aparece marcada como original, trocada,
+acrescentada ou retirada, com o que era antes ao lado. É o que responde "o que esta máquina tinha
+e o que já foi substituído" sem depender da memória de ninguém.
+
+**Serviços executados.** Nem todo serviço é troca de peça: limpeza, ajuste do pressostato, carga
+de gás e regulagem são a maior parte do trabalho. Cada chamado regista o que foi feito, e o
+cliente vê. A troca é um dos tipos, e o único que mexe na ficha da chopeira — uma lista só, para
+não haver duas a divergir sobre a mesma máquina. Concluir sem nada registado dá aviso antes.
+
+**Relatório de manutenção.** Na ficha da chopeira, para o Giba e para o cliente: o histórico da
+máquina numa folha, cada passagem com data, número do laudo, o problema em uma linha e o que foi
+feito — as trocas primeiro e em destaque. É a resposta a "o que já fizeram nesta chopeira?" sem
+abrir laudo por laudo.
+
+**Prazos que aparecem.** Os recados ao cliente trazem a data: *"Passamos para buscar dia 26/08"*,
+*"Levamos de volta dia 02/09"*. O orçamento diz o valor, em quantos dias fica pronto e até quando
+responder. E vence de facto: passada a validade, os botões de aprovar desaparecem e ambos os lados
+leem o que fazer — aprovar preço de três meses atrás é fechar por um valor que já não existe.
+
+**Semana que cobra.** Além das datas de recolha e entrega, assinala o que empacou dentro da
+oficina: orçamento sem resposta há N dias (vermelho acima de sete), orçamento vencido, e há quanto
+tempo está à espera de peça. Antes, um chamado podia ficar três semanas parado sem nada a
+assinalá-lo, porque o grupo "na oficina" não tinha data nenhuma.
+
+**Convidar o cliente.** Botão na aba Clientes, e um por cliente já cadastrado — esse vai direto
+para a conversa de WhatsApp dele. O texto pede as duas coisas sem as quais o acesso não pode ser
+liberado, documento e e-mail, e explica porque tem de ser um e-mail do Google.
+
+**Catálogo de peças do app de compressores.** Botão que traz 43 peças — os componentes do circuito
+da chopeira, 22 micromotores e 11 motoventiladores axiais, com as fichas técnicas. Traz só o que
+ainda não existe, e sempre com preço zerado: o valor é do Giba, não do catálogo.
+
+**Agenda do Google.** Marcar recolha ou entrega cria o compromisso sozinho, e **remarcar muda a
+data no mesmo compromisso** em vez de duplicar — o id do evento fica guardado na ordem. Apagar a
+data apaga o compromisso. Precisa de um Client ID, explicado em
+[`MANUAL-AGENDA-GOOGLE.md`](MANUAL-AGENDA-GOOGLE.md); sem ele, cada chamado mostra um link que abre
+a agenda já preenchida.
+
+**Trabalha sem internet.** As gravações não esperam a rede: entram na fila do aparelho e sobem
+sozinhas quando o sinal voltar, com uma faixa no topo a dizer o que falta. Dá para montar o
+orçamento inteiro dentro da carrinha e enviar depois. O catálogo de peças também fica no aparelho.
+
+**Status e linha do tempo.** Catorze estados, de *chamado aberto* a *entregue*. Cada mudança guarda
 quem mudou, quando, e o recado escrito para o cliente — e os dois lados veem a mesma linha do
 tempo. Os encerrados saem da lista de abertos sem sumir: ficam atrás de um botão.
 
 **Aviso de duas vias.** Toda mudança acende um **sino** no cabeçalho do outro lado, que se apaga
-ao abrir o chamado. E o Giba tem o botão **Avisar no WhatsApp**, que abre a conversa com a
-mensagem já escrita — status, recado, número da OS e, quando é orçamento, o total.
+ao abrir o chamado. E ao mover o status o aplicativo pergunta se quer avisar pelo WhatsApp, com a
+mensagem já escrita — o que foi combinado, **a data**, o valor quando é orçamento, e o que o
+cliente tem de decidir. Sem número de OS e sem subtotais: ele não sabe o que é uma OS, e a
+decomposição peças/serviço só convida a negociar item a item.
 
 **Cadastro de peças.** Código, descrição, unidade, preço de venda e onde serve. A descrição sugere
 as peças de chopeira do app de compressores — pressostato KP1, relé voltimétrico, capacitor de
@@ -76,8 +129,11 @@ aviso de que os testes são opostos, porque trocar um pelo outro condena peça b
 ruim.
 
 **PDF com as fotos, sem biblioteca nenhuma.** Capa com cliente e equipamento, reclamação,
-problema constatado, ensaios com a conclusão de cada um, serviço executado, peças substituídas
-com valores, recomendações, as fotos do chamado e as duas linhas de assinatura. No celular, o
+problema constatado, ensaios com a conclusão de cada um, o serviço executado item a item com data,
+peças substituídas com valores, a **ficha técnica** com cada componente marcado como original ou
+trocado, recomendações, as fotos do chamado e as duas linhas de assinatura. Cada laudo tem número
+próprio (`LAU-AAMMDD-XXXX`), e reeditar não renumera. Não é contador sequencial de propósito: um
+contador teria de ir ao servidor buscar o último número, e sem rede dois laudos sairiam iguais. No celular, o
 botão abre a folha de partilha e vai direto para o WhatsApp.
 
 **Aprovação do cliente, por escrito.** Quando o orçamento é enviado, aparecem no aplicativo dele os
@@ -103,6 +159,9 @@ equipamentos dele com a ficha completa de cada um.
 | Valores do orçamento | vê os da ordem dele; não altera | é quem lança |
 | Aprovar ou não aprovar | responde uma vez, só com orçamento na mesa | pode registrar por ele |
 | Laudo | lê e baixa o PDF | emite e refaz |
+| Ficha técnica da chopeira | lê | regista e edita |
+| Serviços executados | lê o que foi feito | regista |
+| Relatório de manutenção | gera e baixa o dele | gera de qualquer uma |
 | Semana | não vê | é a tela de abertura |
 | Fotos | lê só as da empresa dele; pode criar | tudo |
 | O próprio acesso | não se aprova | aprova e bloqueia |
@@ -156,10 +215,15 @@ Publicando assim, as regras do Firestore continuam a ter de ser enviadas à part
 | `manifest.webmanifest` | Nome, cores e ícones para instalar no celular |
 | `sw.js` | Faz o app abrir sem rede depois de instalado |
 | `testes/` | As quatro suítes e o Firestore de mentira |
+| `pecas-compressores.json` | Catálogo trazido do app de compressores, gerado por script |
+| `MANUAL-CLIENTE.md` | Guia de uma página para mandar ao cliente |
+| `MANUAL-AGENDA-GOOGLE.md` | Como ligar a agenda do Google, uma vez só |
 | `robots.txt` | Pede aos buscadores que não indexem: é app de uso restrito |
 
-Ao publicar uma alteração, incrementar `VERSAO` no `sw.js` e o número em `#versaoApp` no
-`index.html`. O `sw.js` busca o HTML **pela rede primeiro** e só recorre à cache se não houver
+Ao publicar uma alteração, incrementar `VERSAO` no `sw.js` — só isso. O número no rodapé é lido
+da cache do service worker, e não escrito à mão: escrito à mão diverge, e uma página a dizer
+"versão 5" quando o aparelho já tem a 6 é pior do que não dizer nada. O rodapé tem ainda
+**procurar atualização**, para quando um aparelho ficou com a versão antiga guardada. O `sw.js` busca o HTML **pela rede primeiro** e só recorre à cache se não houver
 ligação: um service worker que serve a cache primeiro faz a versão antiga continuar a aparecer
 depois de publicada uma correção, e o sintoma é indistinguível de um erro no código.
 
@@ -170,7 +234,7 @@ node testes/rodar.js
 ```
 
 Abre o aplicativo num Chromium de verdade, com um Firestore de mentira no lugar do Google, e
-percorre os fluxos inteiros — **75 verificações**, incluindo gerar o PDF e conferir que o arquivo
+percorre os fluxos inteiros — **82 verificações**, incluindo gerar o PDF e conferir que o arquivo
 é mesmo um PDF, com a foto embutida. Detalhe do que cobre e do que **não** cobre
 em [`testes/LEIAME.md`](testes/LEIAME.md).
 
@@ -186,9 +250,10 @@ Desconto, por ora, é uma linha de serviço com valor negativo.
 
 ## Limitações conhecidas
 
-- **Notificação push ainda não existe.** O aviso sai pelo sino dentro do app e pelo WhatsApp, com
-  a mensagem já escrita, mas é o Giba quem aperta o botão. Push automático exige servidor — e, no
-  iPhone, exige ainda que o cliente tenha o app na tela inicial. Fica para a entrega 5.
+- **Notificação push ainda não existe.** O aviso sai pelo sino dentro do app e pelo WhatsApp: ao
+  mover o status o aplicativo pergunta e abre a conversa com a mensagem pronta, mas é o Giba quem
+  confirma. Abrir sozinho não é opção — o navegador do telemóvel bloqueia. Push automático exige
+  servidor e, no iPhone, exige ainda que o cliente tenha o app na tela inicial.
 - **O ditado precisa de internet no momento da fala.** O reconhecimento é do navegador, não do
   app: no meio do salão sem sinal, não vai. O campo continua editável no teclado, e no iPhone o
   microfone do próprio teclado faz o mesmo serviço.

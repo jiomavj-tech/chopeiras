@@ -15,6 +15,14 @@ const falha = t => { passos.push('  FALHA ' + t); erros.push(t); };
 (async () => {
   const b = await chromium.launch({ executablePath: process.env.CHROMIUM || undefined });
   const pg = await b.newPage({ viewport: { width: 412, height: 900 } });
+
+  /* O aplicativo passou a perguntar duas coisas ao mover o status: se
+     falta registar serviço, e se quer avisar o cliente pelo WhatsApp.
+     Sem responder, o Playwright recusa por omissão e a mudança é
+     cancelada — o teste falharia por um diálogo, não por um defeito.
+     Segue-se em frente no primeiro e recusa-se o segundo, que abriria
+     uma janela para fora. */
+  pg.on('dialog', d => /WhatsApp/.test(d.message()) ? d.dismiss() : d.accept());
   const ruido = /gstatic|ERR_TUNNEL|sw\.js|service worker|A bad HTTP response code/i;
   pg.on('console', m => { if (m.type() === 'error' && !ruido.test(m.text())) erros.push('console: ' + m.text()); });
   pg.on('pageerror', e => erros.push('pageerror: ' + e.message));
@@ -158,11 +166,16 @@ const falha = t => { passos.push('  FALHA ' + t); erros.push(t); };
     window.open = original;
     return capturado;
   });
+  /* A mensagem foi reescrita para a língua do cliente: diz a data do que
+     foi combinado e o recado, e deixou de citar o número da OS e a
+     decomposição peças/serviço, que são coisas de dentro da oficina. */
+  const texto = link ? decodeURIComponent(link) : '';
   (link && link.startsWith('https://wa.me/5548999991234?text=')
-    && decodeURIComponent(link).includes('Recolha agendada')
-    && decodeURIComponent(link).includes('quinta'))
-    ? ok('WhatsApp: número com 55, status e recado na mensagem')
-    : falha('link: ' + String(link).slice(0,120));
+    && /Passamos para buscar dia \d{2}\/\d{2}/.test(texto)
+    && texto.includes('quinta')
+    && !/OS-\d/.test(texto))
+    ? ok('WhatsApp: número com 55, data combinada e recado, sem número de OS')
+    : falha('link: ' + texto.slice(0,160));
 
   // ── 14. o cliente vê a mudança e o aviso
   await pg.evaluate(() => window.__trocarUsuario({uid:'u2', email:'ze@bardoze.com.br',
@@ -172,8 +185,8 @@ const falha = t => { passos.push('  FALHA ' + t); erros.push(t); };
   await pg.waitForTimeout(400);
   sino = await pg.textContent('#sino');
   const listaCli = await pg.textContent('#tela');
-  (sino.includes('1 novidade') && listaCli.includes('Recolha agendada') && listaCli.includes('recolha 27/08/26'))
-    ? ok('cliente vê o aviso, o novo status e a data da recolha')
+  (sino.includes('1 novidade') && listaCli.includes('Recolha agendada') && listaCli.includes('buscar 27/08/26'))
+    ? ok('cliente vê o aviso, o novo status e a data de buscar')
     : falha('lado do cliente: ' + sino + ' | ' + listaCli.slice(0,150));
 
   // ── 15. o cliente não tem como mexer no status
