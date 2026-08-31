@@ -2092,7 +2092,13 @@ function formChamado(){
       : '') +
 
       '<h3>Qual chopeira</h3>' +
-      '<label>Número da etiqueta</label>' +
+
+      /* Escolher da lista é melhor do que decorar a etiqueta: quem abre
+         o chamado costuma estar à frente da máquina, não do cadastro. */
+      listaChopeirasDoChamado() +
+
+      '<label>' + (listaChopeirasDoChamado() ? "Ou digite o número da etiqueta"
+                                             : "Número da etiqueta") + '</label>' +
       '<input id="ch_busca" placeholder="CH-014" value="' + esc(e.chopeira ? e.chopeira.codigo : (e.codigoLivre||"")) +
         '" oninput="acharChopeira(this.value)">' +
       '<div id="ch_achou"></div>' +
@@ -2151,11 +2157,35 @@ function acharChopeira(v){
       parecidas.map(c => '<a href="#" onclick="usarChopeira(\'' + c.id +
         '\');return false;">' + esc(c.codigo) + '</a>').join(" · ") + '</div>' : '');
 }
+/* As chopeiras já cadastradas da empresa, para tocar em vez de digitar.
+   Fica vazio enquanto não houver empresa escolhida — mostrar as de todas
+   as empresas convidaria a abrir o chamado na errada. */
+function listaChopeirasDoChamado(){
+  const empresa = empresaDoChamado();
+  if(!empresa) return "";
+  const chs = CHOPEIRAS.filter(c => c.clienteId === empresa)
+    .sort((a,b) => String(a.codigo||"").localeCompare(String(b.codigo||""), "pt-BR"));
+  if(!chs.length) return "";
+
+  const escolhida = editando.chopeira ? editando.chopeira.id : "";
+  return '<div class="esc" style="margin-bottom:6px">' +
+      (chs.length === 1 ? "A chopeira desta empresa:" : "As chopeiras desta empresa:") + '</div>' +
+    '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">' +
+      chs.map(c => '<button class="btn sm' + (c.id === escolhida ? " pri" : "") + '" ' +
+        'onclick="usarChopeira(\'' + esc(c.id) + '\')">' +
+        esc(c.codigo || "sem número") +
+        (c.local ? ' <span style="font-weight:400;opacity:.75">· ' + esc(c.local) + '</span>' : '') +
+        '</button>').join("") +
+    '</div>';
+}
+
 function usarChopeira(id){
   const c = CHOPEIRAS.find(x => x.id === id);
   if(!c) return;
-  $("ch_busca").value = c.codigo;
-  acharChopeira(c.codigo);
+  editando.chopeira = c;
+  editando.provisoria = false;
+  editando.codigoLivre = c.codigo;
+  formChamado();          /* repinta para marcar qual ficou escolhida */
 }
 
 async function fotoChamado(input){
