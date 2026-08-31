@@ -647,6 +647,7 @@ const ABAS_ADMIN = [
   {id:"chopeiras", rot:"Chopeiras"},
   {id:"clientes",  rot:"Clientes"},
   {id:"pecas",     rot:"Peças"},
+  {id:"avulsos",   rot:"Avulsos"},
   {id:"acessos",   rot:"Acessos"}
 ];
 const ABAS_CLIENTE = [
@@ -740,6 +741,7 @@ function desenhar(){
   if(VISTA === "chamados")  return telaChamados();
   if(VISTA === "clientes")  return telaClientes();
   if(VISTA === "pecas")     return telaPecas();
+  if(VISTA === "avulsos")   return telaDocumentos();
   if(VISTA === "chopeiras") return telaChopeiras();
   if(VISTA === "acessos")   return telaAcessos();
   if(VISTA === "empresa")   return telaEmpresa();
@@ -2004,7 +2006,9 @@ function telaChamados(){
 
   $("tela").innerHTML =
     '<div class="btns" style="margin:0 0 12px">' +
-      (EU.admin ? '' : '<button class="btn pri" onclick="novoChamado()">Preciso de manutenção</button>') +
+      (EU.admin
+        ? '<button class="btn pri" onclick="novoChamado()">+ Abrir chamado</button>'
+        : '<button class="btn pri" onclick="novoChamado()">Preciso de manutenção</button>') +
       '<button class="btn" onclick="atualizar()">Atualizar</button>' +
       (fechados ? '<button class="btn sm" onclick="window.__soAbertos=' + (soAbertos?'false':'true') +
         ';telaChamados()">' + (soAbertos ? "Ver encerrados ("+fechados+")" : "Ver só os abertos") +
@@ -2047,17 +2051,45 @@ function cartaoOrdem(o){
 
 /* ── abrir chamado (cliente) ──────────────────────────────────────── */
 function novoChamado(){
-  editando = {tipo:"novoChamado", chopeira:null, provisoria:false, fotos:[], thumb:null};
+  editando = {tipo:"novoChamado", chopeira:null, provisoria:false, fotos:[], thumb:null,
+    /* O cliente só pode abrir para a empresa dele; o administrador
+       escolhe, porque o chamado costuma chegar por telefone. */
+    clienteId: EU.admin ? (CLIENTES.length === 1 ? CLIENTES[0].id : "") : EU.clienteId};
   telaChamados();
+}
+
+/* De quem é este chamado — a empresa escolhida, ou a de quem está a abrir. */
+function empresaDoChamado(){
+  return EU.admin ? (editando.clienteId || "") : EU.clienteId;
+}
+
+function trocarEmpresaChamado(v){
+  editando.clienteId = v;
+  editando.chopeira = null;
+  editando.provisoria = false;
+  formChamado();
 }
 
 function formChamado(){
   const e = editando;
   $("tela").innerHTML =
     '<div class="card">' +
-      '<h2>Preciso de manutenção</h2>' +
-      '<div class="muted">Diga qual chopeira é, mande uma foto e conte o que está acontecendo. ' +
-        'O Giba recebe na hora.</div>' +
+      '<h2>' + (EU.admin ? "Abrir chamado" : "Preciso de manutenção") + '</h2>' +
+      '<div class="muted">' + (EU.admin
+        ? "Chamado que chegou por telefone ou na rua. Escolha a empresa e a chopeira."
+        : "Diga qual chopeira é, mande uma foto e conte o que está acontecendo. " +
+          "O Giba recebe na hora.") + '</div>' +
+
+      (EU.admin ?
+        '<h3>De quem é</h3>' +
+        '<label>Empresa</label>' +
+        '<select onchange="trocarEmpresaChamado(this.value)">' +
+          '<option value="">— escolha —</option>' +
+          CLIENTES.map(c => '<option value="' + esc(c.id) + '"' +
+            (e.clienteId === c.id ? " selected" : "") + '>' +
+            esc(c.nomeFantasia || c.razaoSocial || "sem nome") + '</option>').join("") +
+        '</select>'
+      : '') +
 
       '<h3>Qual chopeira</h3>' +
       '<label>Número da etiqueta</label>' +
@@ -2095,7 +2127,12 @@ function acharChopeira(v){
   e.codigoLivre = codigo;
   if(!codigo){ e.chopeira = null; e.provisoria = false; alvo.innerHTML = ""; return; }
 
-  const achada = CHOPEIRAS.find(c => String(c.codigo||"").toLowerCase() === codigo.toLowerCase());
+  /* O administrador vê todas as chopeiras, mas o chamado é de uma
+     empresa só: procurar fora dela daria um chamado ligado à errada. */
+  const daEmpresa = CHOPEIRAS.filter(c =>
+    !empresaDoChamado() || c.clienteId === empresaDoChamado());
+
+  const achada = daEmpresa.find(c => String(c.codigo||"").toLowerCase() === codigo.toLowerCase());
   if(achada){
     e.chopeira = achada; e.provisoria = false;
     alvo.innerHTML = '<div class="alert grn"><b>' + esc(achada.codigo) + '</b> — ' +
@@ -2104,7 +2141,7 @@ function acharChopeira(v){
     return;
   }
 
-  const parecidas = CHOPEIRAS.filter(c =>
+  const parecidas = daEmpresa.filter(c =>
     String(c.codigo||"").toLowerCase().includes(codigo.toLowerCase())).slice(0,4);
   e.chopeira = null; e.provisoria = true;
   alvo.innerHTML =
@@ -2157,6 +2194,8 @@ async function enviarChamado(){
   const e = editando;
   const codigo = String($("ch_busca").value || "").trim();
   const problema = $("ch_problema").value.trim();
+  const clienteId = empresaDoChamado();
+  if(!clienteId) return toast("Escolha de qual empresa é o chamado.", "err");
   if(!codigo)   return toast("Falta o número da chopeira.", "err");
   if(!problema) return toast("Conte o que está acontecendo.", "err");
 
@@ -2168,11 +2207,12 @@ async function enviarChamado(){
        chamado não pode esperar o cadastro ficar perfeito. */
     if(!chopeiraId){
       const ref = await db.collection("chopeiras").add({
-        codigo: codigo, clienteId: EU.clienteId, provisorio: true,
+        codigo: codigo, clienteId: clienteId, provisorio: true,
         local:"", marca:"", modelo:"", tipo:"", torneiras:"",
         compressorMarca:"", compressorModelo:"", compressorHp:"",
         compressorGas:"", compressorAplicacao:"",
-        observacoes:"Cadastrada pelo cliente ao abrir um chamado.",
+        observacoes: EU.admin ? "Cadastrada ao abrir um chamado."
+                             : "Cadastrada pelo cliente ao abrir um chamado.",
         thumb: e.thumb || null, fotoId: null,
         criadoEm: firebase.firestore.FieldValue.serverTimestamp()
       });
@@ -2182,7 +2222,7 @@ async function enviarChamado(){
     const fotoIds = [];
     for(const f of e.fotos){
       const r = await db.collection("fotos").add({
-        dataUrl: f.grande, clienteId: EU.clienteId, de:"ordem",
+        dataUrl: f.grande, clienteId: clienteId, de:"ordem",
         criadoEm: firebase.firestore.FieldValue.serverTimestamp()
       });
       fotoIds.push(r.id);
@@ -2191,7 +2231,7 @@ async function enviarChamado(){
     const agora = new Date().toISOString();
     await db.collection("ordens").add({
       numero: numeroOS(),
-      clienteId: EU.clienteId,
+      clienteId: clienteId,
       chopeiraId: chopeiraId,
       chopeiraCodigo: codigo,
       status: "aberto",
@@ -2201,8 +2241,8 @@ async function enviarChamado(){
       historico: [{status:"aberto", quando:agora, quem: EU.nome || EU.email, nota:""}],
       agenda: {recolhaPrevista:"", entregaPrevista:""},
       abertoPor: {uid: EU.uid, nome: EU.nome || "", email: EU.email},
-      naoLidoAdmin: true,
-      naoLidoCliente: false,
+      naoLidoAdmin: !EU.admin,
+      naoLidoCliente: EU.admin,
       abertoEm: firebase.firestore.FieldValue.serverTimestamp(),
       atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
     });
@@ -2210,13 +2250,11 @@ async function enviarChamado(){
     await recarregar();
     irPara("chamados");
 
-    /* notificar o admin */
-    setTimeout(() => {
-      const c = CLIENTES.find(x => x.id === EU.clienteId);
+    if(EU.admin){
+      toast("Chamado aberto para " + nomeCliente(clienteId) + ".", "ok");
+    } else {
       confirmarChamadoAberto();
-    }, 500);
-
-    toast("Chamado enviado. O Giba já foi avisado.", "ok");
+    }
   }catch(err){
     toast("Não deu para enviar: " + (err.message || err), "err");
     const b = $("btEnviar"); if(b) b.disabled = false;
@@ -4438,13 +4476,14 @@ function folhaPDF(rodapeTexto){
       f.caixa(PAG.ml, y - 19, largura(paraWinAnsi(txt), 13, true), 3.5, COR.marca);
       y -= 30;
     },
-    rodape(dataEmissao){
+    rodape(dataEmissao, oQue){
       paginas.forEach((pg, i) => {
         const guarda = ops;
         ops = pg;
         f.risco(PAG.ml, PAG.mb - 14, PAG.w - PAG.mr, PAG.mb - 14, COR.linha, 0.7);
         f.escrever(PAG.ml, PAG.mb - 26,
-          "Giba Soluções · relatório emitido em " + dataEmissao, 8, false, COR.fraca);
+          "Giba Soluções · " + (oQue || "relatório") + " emitido em " + dataEmissao,
+          8, false, COR.fraca);
         const t = "Página " + (i + 1) + " de " + paginas.length;
         f.escrever(PAG.w - PAG.mr - largura(paraWinAnsi(t), 8, false), PAG.mb - 26,
           t, 8, false, COR.fraca);
@@ -4585,6 +4624,425 @@ async function baixarRelatorio(chopeiraId){
   }catch(e){
     toast("Não deu para gerar: " + (e.message || e), "err");
   }
+}
+
+/* ═══════════════════ DOCUMENTOS AVULSOS ═══════════════════
+   Nem todo trabalho começa num chamado. Uma instalação, uma visita de
+   avaliação, um contrato de manutenção — coisas que precisam de um
+   papel na hora, para um cliente que às vezes ainda nem está
+   cadastrado.
+
+   Estes dois não ficam guardados: viram PDF e vão embora. Guardar
+   exigiria uma coleção nova e regras novas no Firestore, e um orçamento
+   de prospecto que nunca vai entrar no aplicativo não ganha nada com
+   isso. O que vira serviço nasce como chamado, e aí sim fica gravado.  */
+
+function telaDocumentos(){
+  if(editando && editando.tipo === "orcAvulso")  return formOrcAvulso();
+  if(editando && editando.tipo === "visita")     return formVisita();
+
+  $("tela").innerHTML =
+    '<div class="card">' +
+      '<h2>Orçamento avulso</h2>' +
+      '<div class="muted">Instalação, visita, contrato — qualquer trabalho que ainda não é um ' +
+        'chamado. Sai em PDF e vai para o WhatsApp.</div>' +
+      '<div class="btns"><button class="btn pri" onclick="novoOrcAvulso()">Montar orçamento</button></div>' +
+    '</div>' +
+    '<div class="card">' +
+      '<h2>Relatório de visita</h2>' +
+      '<div class="muted">O que você viu em cada equipamento numa ida ao cliente, com as duas ' +
+        'linhas de assinatura.</div>' +
+      '<div class="btns"><button class="btn pri" onclick="novaVisita()">Montar relatório</button></div>' +
+    '</div>';
+}
+
+/* ── quem é o cliente, escolhido ou escrito ── */
+function blocoQuemE(d){
+  return '<h3>Para quem</h3>' +
+    '<label>Empresa cadastrada</label>' +
+    '<select onchange="escolherClienteAvulso(this.value)">' +
+      '<option value="">— não cadastrado / escrever à mão —</option>' +
+      CLIENTES.map(c => '<option value="' + esc(c.id) + '"' +
+        (d.clienteId === c.id ? " selected" : "") + '>' +
+        esc(c.nomeFantasia || c.razaoSocial || "sem nome") + '</option>').join("") +
+    '</select>' +
+    '<div class="lin">' +
+      '<div><label>Nome</label><input id="av_nome" value="' + esc(d.nome) +
+        '" oninput="editando.dados.nome=this.value"></div>' +
+      '<div><label>Telefone</label><input id="av_tel" value="' + esc(d.telefone) +
+        '" oninput="editando.dados.telefone=this.value"></div>' +
+    '</div>' +
+    '<label>Local</label><input id="av_local" value="' + esc(d.local) +
+      '" oninput="editando.dados.local=this.value">';
+}
+
+function escolherClienteAvulso(id){
+  const d = editando.dados;
+  d.clienteId = id;
+  const c = CLIENTES.find(x => x.id === id);
+  if(c){
+    d.nome = c.nomeFantasia || c.razaoSocial || "";
+    d.telefone = c.whatsapp || c.telefone || "";
+    d.local = [c.endereco, c.cidade].filter(Boolean).join(" · ");
+  }
+  editando.tipo === "visita" ? formVisita() : formOrcAvulso();
+}
+
+/* ═══════ orçamento avulso ═══════ */
+
+function novoOrcAvulso(){
+  editando = {tipo:"orcAvulso", dados:{
+    clienteId:"", nome:"", telefone:"", local:"",
+    titulo:"", itens:[{descricao:"", qtd:"1", valorUnit:""}],
+    validadeDias:"15", prazoDias:"", observacoes:""
+  }};
+  telaDocumentos();
+}
+
+function mudarItemAvulso(i, campo, v){
+  editando.dados.itens[i][campo] = v;
+  if(campo !== "descricao") somaAvulsoViva();
+}
+function novoItemAvulso(){
+  editando.dados.itens.push({descricao:"", qtd:"1", valorUnit:""});
+  formOrcAvulso();
+}
+function tirarItemAvulso(i){
+  editando.dados.itens.splice(i, 1);
+  if(!editando.dados.itens.length) editando.dados.itens.push({descricao:"", qtd:"1", valorUnit:""});
+  formOrcAvulso();
+}
+function somaAvulso(){
+  return (editando.dados.itens || []).reduce((t, i) =>
+    t + (paraNumero(i.qtd) || 0) * (paraNumero(i.valorUnit) || 0), 0);
+}
+function somaAvulsoViva(){
+  const el = $("somaAvulso");
+  if(el) el.textContent = reais(somaAvulso());
+}
+
+function formOrcAvulso(){
+  const d = editando.dados;
+  $("tela").innerHTML =
+    '<div class="card">' +
+      '<h2>Orçamento avulso</h2>' +
+      blocoQuemE(d) +
+
+      '<h3>O trabalho</h3>' +
+      '<label>Do que se trata</label>' +
+      '<input id="av_titulo" placeholder="Instalação de chopeira de 2 torneiras" value="' +
+        esc(d.titulo) + '" oninput="editando.dados.titulo=this.value">' +
+
+      '<h3>Itens</h3>' +
+      d.itens.map((i, n) =>
+        '<div class="itemOrc">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px">' +
+            '<b style="font-size:12px;color:var(--copperhi)">' + (n+1) + '</b>' +
+            '<button class="btn sm dg" onclick="tirarItemAvulso(' + n + ')">Tirar</button>' +
+          '</div>' +
+          '<label>Descrição</label>' +
+          '<input value="' + esc(i.descricao) +
+            '" oninput="mudarItemAvulso(' + n + ',\'descricao\',this.value)">' +
+          '<div class="lin">' +
+            '<div style="flex:0 0 90px"><label>Qtd</label>' +
+              '<input inputmode="decimal" value="' + esc(i.qtd) +
+              '" oninput="mudarItemAvulso(' + n + ',\'qtd\',this.value)"></div>' +
+            '<div><label>Valor unitário</label>' +
+              '<input inputmode="decimal" value="' + esc(i.valorUnit) +
+              '" oninput="mudarItemAvulso(' + n + ',\'valorUnit\',this.value)"></div>' +
+          '</div>' +
+        '</div>').join("") +
+      '<div class="btns"><button class="btn" onclick="novoItemAvulso()">+ Item</button></div>' +
+
+      '<table style="width:100%;margin-top:12px">' +
+        '<tr><td style="font-weight:800;padding-top:8px;border-top:1px solid var(--line)">Total</td>' +
+        '<td id="somaAvulso" style="text-align:right;font-weight:800;font-size:17px;' +
+          'color:var(--copperhi);padding-top:8px;border-top:1px solid var(--line)">' +
+          esc(reais(somaAvulso())) + '</td></tr>' +
+      '</table>' +
+
+      '<div class="lin">' +
+        '<div><label>Validade (dias)</label><input inputmode="numeric" value="' +
+          esc(d.validadeDias) + '" oninput="editando.dados.validadeDias=this.value"></div>' +
+        '<div><label>Fica pronto em (dias)</label><input inputmode="numeric" placeholder="5" value="' +
+          esc(d.prazoDias) + '" oninput="editando.dados.prazoDias=this.value"></div>' +
+      '</div>' +
+
+      '<label>Observações</label>' +
+      '<textarea oninput="editando.dados.observacoes=this.value">' + esc(d.observacoes) + '</textarea>' +
+
+      '<div class="btns">' +
+        '<button class="btn pri" onclick="baixarOrcAvulso()">Gerar PDF</button>' +
+        '<button class="btn" onclick="whatsOrcAvulso()">Mandar no WhatsApp</button>' +
+        '<button class="btn" onclick="irPara(\'avulsos\')">Voltar</button>' +
+      '</div>' +
+      '<div class="esc">Este orçamento não fica guardado no aplicativo. O que virar serviço, ' +
+        'abra como chamado — aí sim entra no histórico da máquina.</div>' +
+    '</div>';
+}
+
+function validarAvulso(){
+  const d = editando.dados;
+  if(!d.nome.trim()){ toast("Falta o nome de quem recebe.", "err"); return null; }
+  const itens = d.itens.filter(i => i.descricao.trim());
+  if(!itens.length){ toast("O orçamento está vazio.", "err"); return null; }
+  return itens;
+}
+
+function whatsOrcAvulso(){
+  const d = editando.dados;
+  const itens = validarAvulso();
+  if(!itens) return;
+  const numero = soWhats(d.telefone);
+  if(!numero) return toast("Sem telefone para mandar. Gere o PDF.", "err");
+
+  const texto = "Oi! Aqui é o Giba, das chopeiras.\n\n" +
+    (d.titulo ? d.titulo + "\n\n" : "") +
+    "Ficou em " + reais(somaAvulso()) + "." +
+    (paraNumero(d.prazoDias) ? " Fica pronto em " + d.prazoDias + " dia" +
+      (Number(d.prazoDias) === 1 ? "" : "s") + " depois de aprovado." : "") +
+    (paraNumero(d.validadeDias) ? " O valor vale por " + d.validadeDias + " dias." : "") +
+    "\n\nÉ só me dizer se pode fazer.";
+  window.open("https://wa.me/" + numero + "?text=" + encodeURIComponent(texto), "_blank");
+}
+
+async function baixarOrcAvulso(){
+  const d = editando.dados;
+  const itens = validarAvulso();
+  if(!itens) return;
+  try{
+    const paginas = montarAvulso({
+      titulo: "Orçamento",
+      subtitulo: d.titulo,
+      cliente: d, itens: itens, total: somaAvulso(),
+      validadeDias: d.validadeDias, prazoDias: d.prazoDias,
+      observacoes: d.observacoes,
+      dataEmissao: new Date().toLocaleDateString("pt-BR"),
+      tecnico: EU.nome || "Giba Soluções"
+    });
+    baixarPDF(paginas, {
+      tituloPDF: "Orçamento — " + d.nome,
+      tecnico: EU.nome || "Giba Soluções",
+      dataEmissao: new Date().toLocaleDateString("pt-BR")
+    }, "orcamento-" + limparNome(d.nome) + ".pdf");
+  }catch(e){ toast("Não deu para gerar: " + (e.message || e), "err"); }
+}
+
+/* ═══════ relatório de visita ═══════ */
+
+function novaVisita(){
+  editando = {tipo:"visita", dados:{
+    clienteId:"", nome:"", telefone:"", local:"",
+    data: hojeISO(),
+    itens:[{equipamento:"", detalhe:""}],
+    observacoes:""
+  }};
+  telaDocumentos();
+}
+
+function mudarItemVisita(i, campo, v){ editando.dados.itens[i][campo] = v; }
+function novoItemVisita(){
+  editando.dados.itens.push({equipamento:"", detalhe:""});
+  formVisita();
+}
+function tirarItemVisita(i){
+  editando.dados.itens.splice(i, 1);
+  if(!editando.dados.itens.length) editando.dados.itens.push({equipamento:"", detalhe:""});
+  formVisita();
+}
+
+/* As chopeiras da empresa entram com um toque: escrever à mão o que já
+   está cadastrado é erro à espera de acontecer. */
+function trazerChopeirasDaVisita(){
+  const d = editando.dados;
+  if(!d.clienteId) return toast("Escolha a empresa primeiro.", "err");
+  const chs = CHOPEIRAS.filter(c => c.clienteId === d.clienteId);
+  if(!chs.length) return toast("Esta empresa não tem chopeira cadastrada.", "err");
+  const jaTem = e => d.itens.some(i => i.equipamento === e);
+  let n = 0;
+  chs.forEach(c => {
+    const rot = (c.codigo || "sem número") +
+      ([c.marca, c.modelo].filter(Boolean).length ? " — " + [c.marca, c.modelo].filter(Boolean).join(" ") : "");
+    if(!jaTem(rot)){ d.itens.push({equipamento: rot, detalhe:""}); n++; }
+  });
+  d.itens = d.itens.filter(i => i.equipamento || i.detalhe);
+  if(!d.itens.length) d.itens.push({equipamento:"", detalhe:""});
+  formVisita();
+  toast(n ? n + " equipamento" + (n===1?"":"s") + " trazido" + (n===1?"":"s") + "."
+          : "Já estavam todos na lista.", "ok");
+}
+
+function formVisita(){
+  const d = editando.dados;
+  $("tela").innerHTML =
+    '<div class="card">' +
+      '<h2>Relatório de visita</h2>' +
+      blocoQuemE(d) +
+      '<label>Data da visita</label>' +
+      '<input type="date" value="' + esc(d.data) + '" oninput="editando.dados.data=this.value">' +
+
+      '<h3>O que foi visto</h3>' +
+      (d.clienteId ? '<div class="btns" style="margin-top:0">' +
+        '<button class="btn" onclick="trazerChopeirasDaVisita()">Trazer as chopeiras desta empresa</button>' +
+      '</div>' : '') +
+      d.itens.map((i, n) =>
+        '<div class="itemOrc">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px">' +
+            '<b style="font-size:12px;color:var(--copperhi)">' + (n+1) + '</b>' +
+            '<button class="btn sm dg" onclick="tirarItemVisita(' + n + ')">Tirar</button>' +
+          '</div>' +
+          '<label>Equipamento</label>' +
+          '<input value="' + esc(i.equipamento) + '" placeholder="CH-014 — Beertec 2 torneiras" ' +
+            'oninput="mudarItemVisita(' + n + ',\'equipamento\',this.value)">' +
+          '<label>O que foi visto</label>' +
+          '<textarea oninput="mudarItemVisita(' + n + ',\'detalhe\',this.value)">' +
+            esc(i.detalhe) + '</textarea>' +
+        '</div>').join("") +
+      '<div class="btns"><button class="btn" onclick="novoItemVisita()">+ Equipamento</button></div>' +
+
+      '<label>Observações gerais</label>' +
+      '<textarea oninput="editando.dados.observacoes=this.value">' + esc(d.observacoes) + '</textarea>' +
+
+      '<div class="btns">' +
+        '<button class="btn pri" onclick="baixarVisita()">Gerar PDF</button>' +
+        '<button class="btn" onclick="irPara(\'avulsos\')">Voltar</button>' +
+      '</div>' +
+    '</div>';
+}
+
+async function baixarVisita(){
+  const d = editando.dados;
+  if(!d.nome.trim()) return toast("Falta o nome de quem recebe.", "err");
+  const itens = d.itens.filter(i => i.equipamento.trim() || i.detalhe.trim());
+  if(!itens.length) return toast("Não há nada registado na visita.", "err");
+  try{
+    const paginas = montarAvulso({
+      titulo: "Relatório de visita",
+      subtitulo: "",
+      cliente: d, visita: itens,
+      dataVisita: dataCurta(d.data),
+      observacoes: d.observacoes,
+      assinaturas: true,
+      dataEmissao: new Date().toLocaleDateString("pt-BR"),
+      tecnico: EU.nome || "Giba Soluções"
+    });
+    baixarPDF(paginas, {
+      tituloPDF: "Relatório de visita — " + d.nome,
+      tecnico: EU.nome || "Giba Soluções",
+      dataEmissao: new Date().toLocaleDateString("pt-BR")
+    }, "visita-" + limparNome(d.nome) + ".pdf");
+  }catch(e){ toast("Não deu para gerar: " + (e.message || e), "err"); }
+}
+
+/* ═══════ o papel ═══════ */
+
+function limparNome(s){
+  return String(s || "documento").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
+async function baixarPDF(paginas, dados, nome){
+  const blob = escreverPDF(paginas, [], dados);
+  const arquivo = new File([blob], nome, {type:"application/pdf"});
+  if(navigator.canShare && navigator.canShare({files:[arquivo]})){
+    try{ await navigator.share({files:[arquivo], title: dados.tituloPDF}); return; }
+    catch(e){ /* cancelou: cai no download */ }
+  }
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = nome; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+
+function montarAvulso(d){
+  const f = folhaPDF(d.titulo + " · " + (d.cliente.nome || ""));
+  f.novaPagina();
+
+  f.escrever(PAG.ml, f.y - 8, "GIBA SOLUÇÕES", 9, true, COR.marca);
+  f.y -= 24;
+  f.escrever(PAG.ml, f.y - 20, d.titulo, 21, true, COR.tinta);
+  f.y -= 30;
+  if(d.subtitulo){
+    f.paragrafo(d.subtitulo, PAG.ml, f.LU, 11, false, COR.fraca, 14);
+    f.y -= 2;
+  }
+  f.escrever(PAG.ml, f.y - 10, (d.dataVisita ? "Visita em " + d.dataVisita + "  ·  " : "") +
+    "Emitido em " + d.dataEmissao, 9.5, false, COR.fraca);
+  f.y -= 20;
+  f.risco(PAG.ml, f.y, PAG.w - PAG.mr, f.y, COR.linha, 1);
+  f.y -= 20;
+
+  f.escrever(PAG.ml, f.y - 8, "PARA", 8, true, COR.fraca);
+  f.y -= 16;
+  [d.cliente.nome, d.cliente.telefone, d.cliente.local]
+    .map(v => (v || "").trim()).filter(Boolean)
+    .forEach(l => f.paragrafo(l, PAG.ml, f.LU, 9.5, false, COR.tinta, 12.5));
+  f.y -= 6;
+
+  /* itens com valor — o orçamento */
+  if(d.itens){
+    f.titulo("Itens");
+    d.itens.forEach(i => {
+      f.garantir(18);
+      const qtd = paraNumero(i.qtd) || 0, unit = paraNumero(i.valorUnit) || 0;
+      const val = reais(qtd * unit);
+      const larguraValor = largura(paraWinAnsi(val), 10, true) + 10;
+      f.escrever(PAG.ml, f.y - 9, "•", 10, false, COR.fraca);
+      f.escrever(PAG.w - PAG.mr - largura(paraWinAnsi(val), 10, true), f.y - 9, val, 10, true, COR.tinta);
+      f.paragrafo(i.descricao, PAG.ml + 12, f.LU - 12 - larguraValor, 10, false, COR.tinta, 13);
+      const detalhe = qtd + " × " + reais(unit);
+      f.paragrafo(detalhe, PAG.ml + 12, f.LU - 12, 8.5, false, COR.fraca, 11.5);
+      f.y -= 4;
+    });
+
+    f.garantir(34);
+    f.y -= 6;
+    f.risco(PAG.ml, f.y, PAG.w - PAG.mr, f.y, COR.linha, 0.7);
+    f.y -= 18;
+    const tot = reais(d.total);
+    f.escrever(PAG.ml, f.y, "Total", 13, true, COR.tinta);
+    f.escrever(PAG.w - PAG.mr - largura(paraWinAnsi(tot), 15, true), f.y, tot, 15, true, COR.marca);
+    f.y -= 22;
+
+    const notas = [];
+    if(paraNumero(d.prazoDias)) notas.push("Fica pronto em " + d.prazoDias + " dia" +
+      (Number(d.prazoDias) === 1 ? "" : "s") + " depois de aprovado.");
+    if(paraNumero(d.validadeDias)) notas.push("Este valor vale por " + d.validadeDias + " dias.");
+    notas.forEach(t => f.paragrafo(t, PAG.ml, f.LU, 9.5, false, COR.fraca, 12.5));
+  }
+
+  /* itens sem valor — a visita */
+  if(d.visita){
+    f.titulo("O que foi visto");
+    d.visita.forEach(i => {
+      f.garantir(30);
+      if(i.equipamento) f.escrever(PAG.ml, f.y - 10, i.equipamento, 11, true, COR.tinta);
+      f.y -= 15;
+      if(i.detalhe) f.paragrafo(i.detalhe, PAG.ml, f.LU, 10, false, COR.tinta, 13.5);
+      f.y -= 8;
+    });
+  }
+
+  if(d.observacoes){
+    f.titulo("Observações");
+    f.paragrafo(d.observacoes, PAG.ml, f.LU, 10, false, COR.tinta, 13.5);
+  }
+
+  if(d.assinaturas){
+    f.garantir(90);
+    f.y -= 30;
+    const meia = (f.LU - 30) / 2;
+    f.risco(PAG.ml, f.y, PAG.ml + meia, f.y, COR.tinta, 0.7);
+    f.risco(PAG.ml + meia + 30, f.y, PAG.w - PAG.mr, f.y, COR.tinta, 0.7);
+    f.y -= 12;
+    f.escrever(PAG.ml, f.y, d.tecnico, 9, false, COR.tinta);
+    f.escrever(PAG.ml + meia + 30, f.y, d.cliente.nome || "Cliente", 9, false, COR.tinta);
+    f.y -= 11;
+    f.escrever(PAG.ml, f.y, "Técnico responsável", 8, false, COR.fraca);
+    f.escrever(PAG.ml + meia + 30, f.y, "Recebido por", 8, false, COR.fraca);
+  }
+
+  f.rodape(d.dataEmissao, d.itens ? "orçamento" : "relatório");
+  return f.paginas;
 }
 
 function hojeISO(){

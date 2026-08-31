@@ -34,8 +34,8 @@ function falha(t){ passos.push('  FALHA ' + t); erros.push(t); }
 
   // ── 1. o portão deixou o admin passar e montou a navegação de admin
   const abas = await pg.$$eval('#nav button', bs => bs.map(b => b.textContent));
-  abas.join('|') === 'Semana|Chamados|Chopeiras|Clientes|Peças|Acessos'
-    ? ok('portão liberou o admin e montou as 6 abas') : falha('abas erradas: ' + abas.join('|'));
+  abas.join('|') === 'Semana|Chamados|Chopeiras|Clientes|Peças|Avulsos|Acessos'
+    ? ok('portão liberou o admin e montou as 7 abas') : falha('abas erradas: ' + abas.join('|'));
 
   // ── 2. cadastrar uma empresa, com CNPJ que confere
   await pg.click('#nav_clientes');
