@@ -521,6 +521,38 @@ async function portao(user){
 <div id="toast"></div>
 
 <script>
+/* ╔══════════════════════════════════════════════════════════════════╗
+   ║  MAPA DESTE ARQUIVO                                              ║
+   ╚══════════════════════════════════════════════════════════════════╝
+
+   Procure pelo nome da seção (as barras ═══ marcam cada uma) em vez de
+   rolar. Sem números de linha de propósito: número envelhece a cada
+   alteração e passa a mentir; nome, não.
+
+     ferramentas ............. atalhos, foto, esc
+     estado .................. as listas em memória e a navegação
+     CLIENTES ................ cadastro, e-mails liberados, convite
+     CHOPEIRAS ............... cadastro e ficha técnica dos componentes
+     ACESSOS ................. quem entra, aprovar e bloquear
+     MINHA EMPRESA ........... o que o cliente vê da empresa dele
+     CHAMADOS ................ abrir, mover status, linha do tempo
+     PRAZOS E RECADOS ........ o que vence e o que o cliente lê
+     AGENDA DO GOOGLE ........ criar e remarcar compromisso
+     SERVIÇOS EXECUTADOS ..... o que foi feito, e as trocas de peça
+     DITADO .................. ditar o problema por voz
+     PEÇAS E ORÇAMENTO ....... catálogo, montar e responder orçamento
+     GERADOR DE PDF .......... o motor: fontes, larguras, páginas
+     LAUDO ................... o documento de cada serviço
+     SEMANA .................. o que buscar, o que está parado, o que entregar
+     RELATÓRIO DE MANUTENÇÃO . o histórico de uma chopeira
+     DOCUMENTOS AVULSOS ...... orçamento e relatório de visita
+     MODO DEMONSTRAÇÃO ....... o Firestore de mentira, para experimentar
+
+   As regras que não dependem de tela nem de banco NÃO estão aqui: vivem
+   no nucleo.js, e são conferidas por node testes/unidade.js em 90 ms.
+   Ao acrescentar uma regra dessas, o lugar dela é lá — e o teste vem
+   junto.                                                              */
+
 /* ═══════════════════ ferramentas ═══════════════════ */
 const $ = id => document.getElementById(id);
 
