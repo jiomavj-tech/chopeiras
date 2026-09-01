@@ -1,6 +1,6 @@
 {
- "origem": "Giba Compressores — aba Peças e diagrama elétrico da chopeira",
- "gerado": "2026-08-23",
+ "origem": "Giba Compressores — equivalência, catálogos Elgin e Tecumseh, ventiladores e diagrama elétrico da chopeira",
+ "gerado": "2026-09-01",
  "pecas": [
   {
    "codigo": "KP1",
@@ -81,6 +81,1334 @@
    "precoVenda": 0,
    "aplicacao": "Chopeira",
    "observacoes": "Motor simples; liga com o pré-resfriador ou por chave própria, conforme o modelo."
+  },
+  {
+   "codigo": "EMIS20HHR",
+   "descricao": "Compressor EMIS20HHR — 1/12 HP, R-134a LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "200 kcal/h a 60 Hz · 172 kcal/h a 50 Hz · substitui: EM20HHR, EM20HHP, EM20HSC, EM20HBR · equivalente Tecumseh: THG1340Y, THB1340Y, THG1346Y"
+  },
+  {
+   "codigo": "EMIS30HHR",
+   "descricao": "Compressor EMIS30HHR — 1/10 HP, R-134a LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "340 kcal/h a 60 Hz · 270 kcal/h a 50 Hz · substitui: BP1058Z, EMI28HER, EMIE30HJR, EMU30HSC, EM30HHR, EMI30HER, EMT30HHR, EMUS30HEP, EM30HNP, EMI30HEX, EMT30HSC, PW4,5HA, EM30HNR, EMIE30HER, EMT30HSR, PW4,5HAK, EM35HNR, EMIE30HJP, EMU30HER, PW4,5HK11 · equivalente Tecumseh: THG1330Y, THB1335Y, AEA1338YXA, AZ0374Y, THB3413Y, AZ0368Y, THB4415Y, THG1335Y, THB4413Y, THG1324Y"
+  },
+  {
+   "codigo": "EMI45HER",
+   "descricao": "Compressor EMI45HER — 1/8 HP, R-134a LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "420 kcal/h a 60 Hz · 340 kcal/h a 50 Hz · substitui: BP1072Z, EM45HNR, EMI45HEX, EMU45HEP, BP1084Z, EMH45HER, EMIE40HER, EMU45HER, EM45HHR, EMI40HNP, EMIE40HJP, EMU45HSC · equivalente Tecumseh: THG1340Y, THB1340Y, THG1346Y"
+  },
+  {
+   "codigo": "EMI60HER",
+   "descricao": "Compressor EMI60HER — 1/6 HP, R-134a LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "570 kcal/h a 60 Hz · 470 kcal/h a 50 Hz · substitui: EM2S60HLP, EMI50HNP, EMU60HLC, EMYS60HLP, EM2U50HLP, EMI55HER, EMU60HSC, EMZ60HSC, EM2Y50HLT, EMI60HSC, EMUS60HLP, EMZS60HLC, EM55HNR, EMI60HSR, EMX60HLC, EMZ60HLP, EM55HNX, EMS60HLP, EMY60HER, FF6HBK, EME60HER, EMT60HLC, EMY60HSC, FF6HBKW, EMH60HER, EMT60HSC, EMYS60HEP, FGS60HA, EMI50HER, EMU60HER, FGS60HAW · equivalente Tecumseh: THG1352Y, THB1350Y, AEA1360YXA, TSB1355Y, THB1365Y, THG1358Y"
+  },
+  {
+   "codigo": "EMR70HLR",
+   "descricao": "Compressor EMR70HLR — 1/5 HP, R-134a LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "672 kcal/h a 60 Hz · substitui: EMI70HER, EMIS70HHR, EGAS70HLR, EGAS70HLP, EGZS70HLC, FF8,5HBK, EGD70HLC, EGZS70HLP, EMI70HNR, FF8,5HBKW, EGS70HLP, EGZS70HLPW, FFC60HBK, EGU70HLC, EM2Y60HLP, EMX70HSC, FFI6HAK, EGU70HLCW, EM2Z60HLT, EMY65HLC, FFI6HAKW, EGUS70HLP, EM3D60HLT, EMY70HER, FFV6HAK, EGX70HLC, EM3U60HLP, EMY70HSC, FGS70HA, EGY70HLP, EM3Y60HLP, EMYE70HEP, FGS70HAW, EGY70HLPW, EM3Z60HLT, EMYS70HEP, FGV70HA, EGYS70HLP, EM65HNR, FF7,5HBK, NEK2116Z, EGZ60HLP, EM65HNX, FF7,5HBKW, EMI70HEP, EGZ70HLP · equivalente Tecumseh: THG1365Y, AEZ1370Y, TPA1370YXA, TSB1360Y, AEZ1365Y, TPG1370YXA, TSB1374Y, AEA1360YXA, THB1355Y, TA1365Y"
+  },
+  {
+   "codigo": "EMR80HLR",
+   "descricao": "Compressor EMR80HLR — 1/4+ HP, R-134a LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "757 kcal/h a 60 Hz · substitui: FFUS70HAK, EGAS80HLR, FFUS80HAK, FFI7,5HAK, FF8,5HBK, FFI7,5HAKW, FF8,5HBKW, ECU70HLR, EGY80HLPW, EM3Y70HLP, FFV7,5HAK, EG70HLR, EGY85HLC, EM3Z70HLT, FFV8,5HAK, EG75HLR, EGY80HLP, EM3Z80HLT, FGI75HAK, EG85HLP, EGZ80HLC, EMY75HLC, FGI85HAK, EG85HLR, EGZ80HLP, FF10HAX, FGM80HA, EGAS80HLP, FF10HBK, FGS100HA, EGD80HLC, FF10HBKW, FGS100HAW, EGS80HLP, EGZS80HLPW, FF10HBX, FGS80HA, EGT80HLC, EM2U70HLP, FFC80HBK, FGS80HAS, EGU80HLC, EM2U80HLP, FFI7,5HAK, FGS80HAW, EGU80HLCW, EM2Y80HLP, FGT80HA, EGU85HLP, EM2Z60HLT, FFI8,5HAK, FGU80HAW, EM2Z70HLT, FFU80HAK, EGY80HLC, EM2Z80HLT, FFU80HAKW, EM3D70HLT, FFU80HAX · equivalente Tecumseh: TSB1380Y, TPA1380YXA, THG1374Y, TPH1378 · equivalente Elgin: TCB0008"
+  },
+  {
+   "codigo": "EMR100HLC",
+   "descricao": "Compressor EMR100HLC — 1/3 HP, R-134a LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "971 kcal/h a 60 Hz · substitui: EGAS90HLR, EGAS100HLR, FFUS100HAK, EGS90HLP, EGY90HLC, EGZ90HLPW, FGS90HAW, EGU90HLC, EGY90GLP, EGZS90HLC, FGT90HA, EGU90HLCW, EGY90HLPW, EGZS90HLP, FGU90HAW, EGUS90HLP, EGYS90HLP, EGZS90HLPW, EGW90HA, EGX90HLC, EGZ90HLC, EM2U80HLP, NE2121Z, EGY85HLC, EGZ90HLP, FGS90HA · equivalente Tecumseh: TSB1390Y, AEZ1380Y, TPA1390YXA, TPH1380Y, AEZ2380Y, TPG1390YXA"
+  },
+  {
+   "codigo": "FFI12HBX",
+   "descricao": "Compressor FFI12HBX — 1/3+ HP, R-134a LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "1226 / 1282 kcal/h a 60 Hz · substitui: FF12HBK, FFI12HBK, FFI12HBKW, FFI12HAX, FFI12HBXW, FFUS130HAX, FFU130HAX, FFU130HAXW, NE2130Z · equivalente Tecumseh: TPH1413Y, AE1412Y, AEA2413YXA, TPG1413Y, CAE2412Y, CAE2414Y · equivalente Elgin: TCB0012"
+  },
+  {
+   "codigo": "EMR130HLC",
+   "descricao": "Compressor EMR130HLC — 1/3+ HP, R-134a LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "1226 / 1282 kcal/h a 60 Hz · substitui: FF12HBK, FFI12HBK, FFI12HBKW, FFI12HAX, FFI12HBXW, FFUS130HAX, FFU130HAX, FFU130HAXW, NE2130Z · equivalente Tecumseh: TPH1413Y, AE1412Y, AEA2413YXA, TPG1413Y, CAE2412Y, CAE2414Y · equivalente Elgin: TCB0012"
+  },
+  {
+   "codigo": "FFU160HAX",
+   "descricao": "Compressor FFU160HAX — 1/2 HP, R-134a LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "1533 kcal/h a 60 Hz · 1275 kcal/h a 50 Hz · substitui: FFI12HBX, FFU130HAXW, NE2130Z, FFI12HBXW, NE1130Z · equivalente Tecumseh: TPH1415Y, AJA2419YXA"
+  },
+  {
+   "codigo": "EM55HHR",
+   "descricao": "Compressor EM55HHR — 1/6 HP, R-134a HBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "1911 kcal/h a 60 Hz · 1618 kcal/h a 50 Hz · equivalente Tecumseh: AEA3417Y, THB3419Y, AEA3414YXA, THB4419Y"
+  },
+  {
+   "codigo": "EM65HHR",
+   "descricao": "Compressor EM65HHR — 1/6+ HP, R-134a HBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "2311 kcal/h a 60 Hz · 1956 kcal/h a 50 Hz · equivalente Tecumseh: AZ0411Y, THB4422Y, AEA3417YXA · equivalente Elgin: TCM0013"
+  },
+  {
+   "codigo": "FFI12HBK",
+   "descricao": "Compressor FFI12HBK — 1/3+ HP, R-134a HBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "5300 kcal/h a 60 Hz · 4492 kcal/h a 50 Hz · substitui: FFU130HAX, FF12HBK, NE1130Z, FFI12HAX, FFI12HBXW · equivalente Tecumseh: AE4448Y, CAE4448Y, AEA4430YXA, TPA9417Y · equivalente Elgin: TCM0020"
+  },
+  {
+   "codigo": "NEU6214Z",
+   "descricao": "Compressor NEU6214Z — 1/2 HP, R-134a HBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "6402 kcal/h a 60 Hz · 5582 kcal/h a 50 Hz · equivalente Tecumseh: TPA9423Y, HGA4450Y, EA4440YXA, CAJ4452Y, TAJ4452Y, TYA4452Y, CAE4456Y, AEA4448YXA, HGA4460Y · equivalente Elgin: TCA0042, TCM0030"
+  },
+  {
+   "codigo": "NT6215Z",
+   "descricao": "Compressor NT6215Z — 1/2+ HP, R-134a HBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "6401 kcal/h a 60 Hz · 5484 kcal/h a 50 Hz · substitui: T6215Z · equivalente Tecumseh: CAJ4461Y, TAJ4461Y · equivalente Elgin: TCA0060"
+  },
+  {
+   "codigo": "NT6217Z",
+   "descricao": "Compressor NT6217Z — 3/4 HP, R-134a HBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "7460 kcal/h a 60 Hz · 6358 kcal/h a 50 Hz · substitui: T6217Z · equivalente Tecumseh: TYA4466Y, HGA4476Y, CAJ4476Y · equivalente Elgin: TCM0040"
+  },
+  {
+   "codigo": "NJ6220Z",
+   "descricao": "Compressor NJ6220Z — 1 HP, R-134a HBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "9090 kcal/h a 60 Hz · 8692 kcal/h a 50 Hz · substitui: J6220Z · equivalente Tecumseh: TYA4475Y, AKA4460YXA, AKA4460YXD, TYA4489Y, CAJ4492Y, TAJ4492Y, AKA4476YXD"
+  },
+  {
+   "codigo": "NJ6226Z",
+   "descricao": "Compressor NJ6226Z — 1 1/4 HP, R-134a HBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "11130 kcal/h a 60 Hz · 10156 kcal/h a 50 Hz · substitui: J6226Z · equivalente Tecumseh: CAJD4510Y, TAJD4510Y, AJA4492YXA, CAJ4511Y, TAJ4511Y, CAJ4513Y"
+  },
+  {
+   "codigo": "NJ6226ZX",
+   "descricao": "Compressor NJ6226ZX — 1 1/4 HP, R-134a HBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "11130 kcal/h a 60 Hz · 10156 kcal/h a 50 Hz · substitui: J6226Z · equivalente Tecumseh: CAJD4510Y, TAJD4510Y, AJA4492YXA, CAJ4511Y, TAJ4511Y, CAJ4513Y"
+  },
+  {
+   "codigo": "NEU2140GK",
+   "descricao": "Compressor NEU2140GK — 1/2 HP, R-404A LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "1937 kcal/h a 60 Hz · 1660 kcal/h a 50 Hz · substitui: NEK2140GK · equivalente Tecumseh: AEA2413Z, AE1417Z, CAE2417Z · equivalente Elgin: TCB4018, TCB4020"
+  },
+  {
+   "codigo": "NEU2155GK",
+   "descricao": "Compressor NEU2155GK — 3/4 HP, R-404A LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "2493 kcal/h a 60 Hz · 2102 kcal/h a 50 Hz · substitui: NEK2150GK · equivalente Tecumseh: AEA2415Z, AE1420Z, AJA2419ZXD, CAE2420Z, AJA2419ZXA"
+  },
+  {
+   "codigo": "NEU2168GK",
+   "descricao": "Compressor NEU2168GK — 3/4 HP, R-404A LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "3165 kcal/h a 60 Hz · 2539 kcal/h a 50 Hz · substitui: NEK2168GK · equivalente Tecumseh: CAJ2428Z, TAJ2428Z, CAE2424Z, HGA2426Z, CAJ2432Z · equivalente Elgin: TCB4030"
+  },
+  {
+   "codigo": "NEU2178GK",
+   "descricao": "Compressor NEU2178GK — 1 HP, R-404A LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "3600 kcal/h a 60 Hz · 3120 kcal/h a 50 Hz · substitui: NT2178GK, T2178GK · equivalente Tecumseh: TYA2431Z, HGA2432Z, AJA2425ZXA, HGA2436Z, AJA2425ZXD"
+  },
+  {
+   "codigo": "NT2180GK",
+   "descricao": "Compressor NT2180GK — 1 HP, R-404A LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "3822 kcal/h a 60 Hz · 3350 kcal/h a 50 Hz · substitui: T2180GK · equivalente Tecumseh: TYA2438Z, CAJ2440Z · equivalente Elgin: TCB4040"
+  },
+  {
+   "codigo": "NJ2192GJ",
+   "descricao": "Compressor NJ2192GJ — 1 1/4 HP, R-404A LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "4500 kcal/h a 60 Hz · 3848 kcal/h a 50 Hz · substitui: NJ2192GS, NJ2192GK, NJ2192GKV · equivalente Tecumseh: TYA2446Z, CAJ2446Z, TAJ2446Z, AJB2433ZXD, AWA2440ZXT, HGA2446Z, AJB2433ZXA"
+  },
+  {
+   "codigo": "NJ2212GJ",
+   "descricao": "Compressor NJ2212GJ — 1 1/2 HP, R-404A LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "5911 kcal/h a 60 Hz · 5276 kcal/h a 50 Hz · substitui: NJ2212GS · equivalente Tecumseh: CAJD2464Z, TAJD2464Z, CAJ2464Z, TAJ2464Z, AWA2440ZXD, AJB2444ZXD, AWA2450ZXD"
+  },
+  {
+   "codigo": "NEU6215GK",
+   "descricao": "Compressor NEU6215GK — 3/4 HP, R-404A HBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "7658 kcal/h a 60 Hz · 6582 kcal/h a 50 Hz · substitui: NT6220GK · equivalente Tecumseh: AEA9430Z, CAE9460Z, AKA9462ZXA, AEA9440Z, HGA4467Z, AKA9462ZXD, CAE9470Z, CAJ9480Z, TAJ9480Z, VSA9490ZXG, HGA4480Z, HGA4492Z, VSA9490ZXT"
+  },
+  {
+   "codigo": "NT6222GK",
+   "descricao": "Compressor NT6222GK — 1 HP, R-404A HBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "10376 kcal/h a 60 Hz · 8494 kcal/h a 50 Hz · substitui: T6222GK · equivalente Tecumseh: HGA4512Z, VSA9490ZXT, CAJ9510Z, TAJ9510Z, TYA9472Z, CAJ9513Z, TAJ9513Z, AWA9512ZXT, AWA9512ZXN"
+  },
+  {
+   "codigo": "NTU6232GKV",
+   "descricao": "Compressor NTU6232GKV — 1+ HP, R-404A HBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "13542 kcal/h a 60 Hz · 11258 kcal/h a 50 Hz · substitui: NT6224GKV · equivalente Tecumseh: VSA9514ZXG, AWA7512ZXD, VSA9512ZNA, VSA9512ZXG, AWA7512ZXT, VSA9512ZXT, TYA9486Z, AWA9512ZXT, VSA9517ZGX"
+  },
+  {
+   "codigo": "NTU6234GKV",
+   "descricao": "Compressor NTU6234GKV — 1 1/4 HP, R-404A HBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "15552 kcal/h a 60 Hz · 13088 kcal/h a 50 Hz · substitui: NTU6234GSV · equivalente Tecumseh: CAJ4517Z, TAJ4517Z, AWA7515ZXT, AWA9514ZXT, AWA9514ZXN, VSA9514ZXT, VSA9514ZNA, AWA7515ZXD"
+  },
+  {
+   "codigo": "NTU6240GKV",
+   "descricao": "Compressor NTU6240GKV — 1 1/2 HP, R-404A HBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "18199 / 19320 kcal/h a 60 Hz · 15215 / 19320 kcal/h a 50 Hz · substitui: J9238GK, NJ9238GK, NTU6238GKV · equivalente Tecumseh: CAJ4519Z, TAJ4519Z, VSA9517ZNA, FH4522Z, TFH4522Z, VSA9517ZXT, CAJD9520Z, TAJD9520Z, AVA9519ZXG, VSA9521ZXT, VSA9521ZNA"
+  },
+  {
+   "codigo": "NJ9238GS",
+   "descricao": "Compressor NJ9238GS — 1 1/2 HP, R-404A HBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "18199 / 19320 kcal/h a 60 Hz · 15215 / 19320 kcal/h a 50 Hz · substitui: J9238GK, NJ9238GK, NTU6238GKV · equivalente Tecumseh: CAJ4519Z, TAJ4519Z, VSA9517ZNA, FH4522Z, TFH4522Z, VSA9517ZXT, CAJD9520Z, TAJD9520Z, AVA9519ZXG, VSA9521ZXT, VSA9521ZNA"
+  },
+  {
+   "codigo": "NJX6250GK",
+   "descricao": "Compressor NJX6250GK — 2 HP, R-404A HBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "23038 kcal/h a 60 Hz · 20206 kcal/h a 50 Hz · equivalente Tecumseh: CAJ4519Z · equivalente Elgin: TCA0042, TCM0030"
+  },
+  {
+   "codigo": "NEU6210E",
+   "descricao": "Compressor NEU6210E — 1/2 HP, R-422 / R-22 HBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "4869 kcal/h a 60 Hz · 4195 kcal/h a 50 Hz · substitui: NE6210E, NE6211E · equivalente Tecumseh: AE9422E, AE3450E, AE9430E, CAE4450E, CAE9450T · equivalente Elgin: TCM2030, TEM2030"
+  },
+  {
+   "codigo": "NEU6214E",
+   "descricao": "Compressor NEU6214E — 3/4 HP, R-422 / R-22 HBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "6618 kcal/h a 60 Hz · 5743 kcal/h a 50 Hz · substitui: NE6217E, NE9213E · equivalente Tecumseh: AE9440E, CAE9460T, AEA5460EX, RGA5460EX, RGA5467E, AKA5470EX, TYA9448E, AE5470E, RGA5472E, AE5475E · equivalente Elgin: TEM2035, TCM2040"
+  },
+  {
+   "codigo": "NJ9226E",
+   "descricao": "Compressor NJ9226E — 1+ HP, R-422 / R-22 HBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "12280 kcal/h a 60 Hz · 10323 kcal/h a 50 Hz · equivalente Tecumseh: RGA5512E, CAJ9513T, TAJ9513T, RKA5512EX, AKA5512EX, TYA9474E, AK5515E · equivalente Elgin: TCM2062"
+  },
+  {
+   "codigo": "NJ9232E",
+   "descricao": "Compressor NJ9232E — 1 1/4 HP, R-422 / R-22 HBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "13984 kcal/h a 60 Hz · 12660 kcal/h a 50 Hz · equivalente Tecumseh: RKA5513E, CAJ4517E, RKB5513EX, AWG5515EX, AK5515E, TAJ4517T, RKA5513EX"
+  },
+  {
+   "codigo": "NJ7240F",
+   "descricao": "Compressor NJ7240F — 1 1/2 HP, R-422 / R-22 HBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "19366 kcal/h a 60 Hz · 16552 kcal/h a 50 Hz · substitui: NJ7238E · equivalente Tecumseh: RKA5515E, AJB5515EX, RKA5518E, CAJ4519T, TAJ4519T, RKC5515EX, RKA5518EX, RKA5515EX, AJA5518EX, AWF5516EX, AWG5519EX, AJA5517EX, AJC5519EX, AWG4520EX"
+  },
+  {
+   "codigo": "NJ7240P",
+   "descricao": "Compressor NJ7240P — 1 1/2 HP, R-422 / R-22 HBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "19366 kcal/h a 60 Hz · 16552 kcal/h a 50 Hz · substitui: NJ7238E · equivalente Tecumseh: RKA5515E, AJB5515EX, RKA5518E, CAJ4519T, TAJ4519T, RKC5515EX, RKA5518EX, RKA5515EX, AJA5518EX, AWF5516EX, AWG5519EX, AJA5517EX, AJC5519EX, AWG4520EX"
+  },
+  {
+   "codigo": "EMI30ER",
+   "descricao": "Compressor EMI30ER — 1/10 HP, Blends LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "350 kcal/h a 60 Hz · 290 kcal/h a 50 Hz · equivalente Tecumseh: AZ1328D, AEA1336AXA, AZ1335D"
+  },
+  {
+   "codigo": "EMI45ER",
+   "descricao": "Compressor EMI45ER — 1/8 HP, Blends LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "485 kcal/h a 60 Hz · 380 kcal/h a 50 Hz · equivalente Tecumseh: AZ1340D, AEA1343AXA, AE1343A"
+  },
+  {
+   "codigo": "EMI55ER",
+   "descricao": "Compressor EMI55ER — 1/6 HP, Blends LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "570 kcal/h a 60 Hz · 460 kcal/h a 50 Hz · equivalente Tecumseh: AZ1335D"
+  },
+  {
+   "codigo": "EM65NR",
+   "descricao": "Compressor EM65NR — 1/5 HP, Blends LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "635 kcal/h a 60 Hz · equivalente Tecumseh: AZ1360D, AEA1360AXA, AE1360A"
+  },
+  {
+   "codigo": "FFC60BK",
+   "descricao": "Compressor FFC60BK — 1/5+ HP, Blends LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "759 kcal/h a 60 Hz · 631 kcal/h a 50 Hz · substitui: FFUS60BK · equivalente Tecumseh: AE1370V · equivalente Elgin: TCB1008"
+  },
+  {
+   "codigo": "FFUS60AK",
+   "descricao": "Compressor FFUS60AK — 1/5+ HP, Blends LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "759 kcal/h a 60 Hz · 631 kcal/h a 50 Hz · substitui: FFUS60BK · equivalente Tecumseh: AE1370V · equivalente Elgin: TCB1008"
+  },
+  {
+   "codigo": "FFUS80AK",
+   "descricao": "Compressor FFUS80AK — 1/4+ HP, Blends LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "910 kcal/h a 60 Hz · 750 kcal/h a 50 Hz · substitui: FFUS70AK · equivalente Tecumseh: AE1380A, AE1390V, AEB1380AXA, AE2110A, AEA1410AXA · equivalente Elgin: TCB1012"
+  },
+  {
+   "codigo": "FFU100AK",
+   "descricao": "Compressor FFU100AK — 1/3 HP, Blends LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "1050 kcal/h a 60 Hz · 860 kcal/h a 50 Hz · equivalente Tecumseh: AE1410V, AEA2410AXA, AEB1411AXA"
+  },
+  {
+   "codigo": "FFI12BX",
+   "descricao": "Compressor FFI12BX — 1/3+ HP, Blends LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "1350 kcal/h a 60 Hz · 1150 kcal/h a 50 Hz · substitui: FFI12BK · equivalente Tecumseh: AE2413A, AEA2413AXA, AEB1413AXA"
+  },
+  {
+   "codigo": "FFU130AX",
+   "descricao": "Compressor FFU130AX — 1/3+ HP, Blends LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "1405 kcal/h a 60 Hz · equivalente Tecumseh: AE2415A, AEA2415AAB, AJA2416AXA"
+  },
+  {
+   "codigo": "FFI12BK",
+   "descricao": "Compressor FFI12BK — 1/3+ HP, Blends HBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "4158 / 4520 kcal/h a 60 Hz · 3616 kcal/h a 50 Hz · equivalente Tecumseh: AE4440A, AEA3440AXA, AEA4440AXA · equivalente Elgin: TCA1042"
+  },
+  {
+   "codigo": "EMR40CLP",
+   "descricao": "Compressor EMR40CLP — 1/8 HP, R-600a LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "384 kcal/h a 60 Hz · substitui: EMUE40CLP · equivalente Tecumseh: TA1340M"
+  },
+  {
+   "codigo": "EMU40CLP",
+   "descricao": "Compressor EMU40CLP — 1/8 HP, R-600a LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "408 kcal/h a 60 Hz · 346 kcal/h a 50 Hz · substitui: EMUE40CLP"
+  },
+  {
+   "codigo": "EMR60CLP",
+   "descricao": "Compressor EMR60CLP — 1/6 HP, R-600a LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "609 kcal/h a 60 Hz · substitui: EM2T60CLP, EM2S60CLP, EM2V60CLC, EM2P60CLP, EMZS60CLC, EMU60CLP"
+  },
+  {
+   "codigo": "EMU60CLP",
+   "descricao": "Compressor EMU60CLP — 1/6 HP, R-600a LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "584 kcal/h a 60 Hz · 496 kcal/h a 50 Hz · substitui: EM2T60CLP, EM2S60CLP, EM2V60CLC, EM2P60CLP, EMZS60CLC, EMU60CLP"
+  },
+  {
+   "codigo": "EMR70CLP",
+   "descricao": "Compressor EMR70CLP — 1/5 HP, R-600a LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "645 kcal/h a 60 Hz · substitui: EM2S70CLP, EM2P70CLP · equivalente Tecumseh: TA1360M"
+  },
+  {
+   "codigo": "EMYE70CLP",
+   "descricao": "Compressor EMYE70CLP — 1/5 HP, R-600a LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "694 kcal/h a 60 Hz · 621 kcal/h a 50 Hz · substitui: EM2S70CLP, EM2P70CLP · equivalente Tecumseh: TA1360M · equivalente Elgin: TCB0008"
+  },
+  {
+   "codigo": "EGAS80CLP",
+   "descricao": "Compressor EGAS80CLP — 1/4 HP, R-600a LBP",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "833 kcal/h a 60 Hz · 648 kcal/h a 50 Hz · substitui: EGYS90CLP · equivalente Tecumseh: TA1380M"
+  },
+  {
+   "codigo": "ENL 20",
+   "descricao": "Compressor ENL 20 — 1/12 HP, R-134a (Elgin ENL)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "2.2 cm³ · 116 kcal/h a -10 °C · 60 Hz · conexões 6,5 / 5,1 / 6,5 · óleo 200 ml · 4.1 kg"
+  },
+  {
+   "codigo": "ENL 30",
+   "descricao": "Compressor ENL 30 — 1/10 HP, R-134a (Elgin ENL)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "3 cm³ · 152 kcal/h a -10 °C · 60 Hz · conexões 6,5 / 5,1 / 6,5 · óleo 200 ml · 5 kg"
+  },
+  {
+   "codigo": "ENL 40",
+   "descricao": "Compressor ENL 40 — 1/8 HP, R-134a (Elgin ENL)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "3.6 cm³ · 166 kcal/h a -10 °C · 60 Hz · conexões 6,5 / 5,1 / 6,5 · óleo 200 ml · 5 kg"
+  },
+  {
+   "codigo": "ENL 45",
+   "descricao": "Compressor ENL 45 — 1/8+ HP, R-134a (Elgin ENL)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "4.3 cm³ · 200 kcal/h a -10 °C · 60 Hz · conexões 6,5 / 5,1 / 6,5 · óleo 200 ml · 6.4 kg"
+  },
+  {
+   "codigo": "ENL 55",
+   "descricao": "Compressor ENL 55 — 1/6 HP, R-134a (Elgin ENL)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "5.1 cm³ · 264 kcal/h a -10 °C · 60 Hz · conexões 6,5 / 5,1 / 6,5 · óleo 200 ml · 6.4 kg"
+  },
+  {
+   "codigo": "ENLE 45",
+   "descricao": "Compressor ENLE 45 — 1/8+ HP, R-134a (Elgin ENL)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "4.3 cm³ · 200 kcal/h a -10 °C · 60 Hz · conexões 6,5 / 5,1 / 6,5 · óleo 200 ml · 6.4 kg"
+  },
+  {
+   "codigo": "ENLE 55",
+   "descricao": "Compressor ENLE 55 — 1/6 HP, R-134a (Elgin ENL)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "5.1 cm³ · 264 kcal/h a -10 °C · 60 Hz · conexões 6,5 / 5,1 / 6,5 · óleo 200 ml · 6.4 kg"
+  },
+  {
+   "codigo": "ENLE 59",
+   "descricao": "Compressor ENLE 59 — 1/5 HP, R-134a (Elgin ENL)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "5.9 cm³ · 321 kcal/h a -10 °C · 60 Hz · conexões 6,5 / 5,1 / 6,5 · óleo 280 ml · 6.4 kg"
+  },
+  {
+   "codigo": "ENLE 0065",
+   "descricao": "Compressor ENLE 0065 — 1/5 HP, R-134a (Elgin ENL)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "6.5 cm³ · 355 kcal/h a -10 °C · 60 Hz · conexões 8,1 / 6,5 / 8,1 · óleo 280 ml · 7.3 kg"
+  },
+  {
+   "codigo": "ENLE 0085",
+   "descricao": "Compressor ENLE 0085 — 1/4 HP, R-134a (Elgin ENL)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "8.5 cm³ · 365 kcal/h a -10 °C · 60 Hz · conexões 8,1 / 6,5 / 8,1 · óleo 280 ml · 7.5 kg"
+  },
+  {
+   "codigo": "ENLE 0115",
+   "descricao": "Compressor ENLE 0115 — 1/3 HP, R-134a (Elgin ENL)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "11.5 cm³ · 500 kcal/h a -10 °C · 60 Hz · conexões 8,1 / 6,5 / 8,1 · óleo 280 ml · 8 kg"
+  },
+  {
+   "codigo": "ENLE 0130",
+   "descricao": "Compressor ENLE 0130 — 1/3+ HP, R-134a (Elgin ENL)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "13 cm³ · 654 kcal/h a -10 °C · 60 Hz · conexões 8,1 / 6,5 / 8,1 · óleo 280 ml · 8 kg"
+  },
+  {
+   "codigo": "ENL 3030",
+   "descricao": "Compressor ENL 3030 — 1/8+ HP, R-290 (Elgin ENL)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "3 cm³ · 219 kcal/h a -10 °C · 60 Hz · conexões 6,5 / 5,1 / 6,5 · óleo 200 ml · 5 kg"
+  },
+  {
+   "codigo": "ENL 3040",
+   "descricao": "Compressor ENL 3040 — 1/6 HP, R-290 (Elgin ENL)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "3.5 cm³ · 247 kcal/h a -10 °C · 60 Hz · conexões 6,5 / 5,1 / 6,5 · óleo 200 ml · 5.7 kg"
+  },
+  {
+   "codigo": "ENL 3045",
+   "descricao": "Compressor ENL 3045 — 1/5 HP, R-290 (Elgin ENL)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "4.5 cm³ · 321 kcal/h a -10 °C · 60 Hz · conexões 6,5 / 5,1 / 6,5 · óleo 200 ml · 6.7 kg"
+  },
+  {
+   "codigo": "ENLE 3055",
+   "descricao": "Compressor ENLE 3055 — 1/4 HP, R-290 (Elgin ENL)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "5.5 cm³ · 417 kcal/h a -10 °C · 60 Hz · conexões 6,5 / 5,1 / 6,5 · óleo 200 ml · 7.6 kg"
+  },
+  {
+   "codigo": "ENLE 3065",
+   "descricao": "Compressor ENLE 3065 — 1/4+ HP, R-290 (Elgin ENL)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "6.5 cm³ · 466 kcal/h a -10 °C · 60 Hz · conexões 8,1 / 6,5 / 8,1 · óleo 280 ml · 7.9 kg"
+  },
+  {
+   "codigo": "ENLE 3075",
+   "descricao": "Compressor ENLE 3075 — 1/3 HP, R-290 (Elgin ENL)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "7.5 cm³ · 477 kcal/h a -10 °C · 60 Hz · conexões 8,1 / 6,5 / 8,1 · óleo 280 ml · 7.9 kg"
+  },
+  {
+   "codigo": "ENLE 3085",
+   "descricao": "Compressor ENLE 3085 — 1/3+ HP, R-290 (Elgin ENL)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "8.5 cm³ · 558 kcal/h a -10 °C · 60 Hz · conexões 8,1 / 6,5 / 8,1 · óleo 280 ml · 9.5 kg"
+  },
+  {
+   "codigo": "ENLE 3115",
+   "descricao": "Compressor ENLE 3115 — 1/2 HP, R-290 (Elgin ENL)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "11.5 cm³ · 721 kcal/h a -10 °C · 60 Hz · conexões 8,1 / 6,5 / 8,1 · óleo 280 ml · 9.8 kg"
+  },
+  {
+   "codigo": "ECP 0065",
+   "descricao": "Compressor ECP 0065 — 1/5 HP, R-134a (Elgin ECP)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "6.5 cm³ · 317 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "ECP 0085",
+   "descricao": "Compressor ECP 0085 — 1/4 HP, R-134a (Elgin ECP)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "8.5 cm³ · 354 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "ECP 0115",
+   "descricao": "Compressor ECP 0115 — 1/3 HP, R-134a (Elgin ECP)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "11.5 cm³ · 502 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "ECP 4140",
+   "descricao": "Compressor ECP 4140 — 7/8 HP, R-404A (Elgin ECP)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "14 cm³ · 1050 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "ECP 4160",
+   "descricao": "Compressor ECP 4160 — 1 HP, R-404A (Elgin ECP)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "16 cm³ · 1201 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "ECP 4190",
+   "descricao": "Compressor ECP 4190 — 1 1/4 HP, R-404A (Elgin ECP)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "19 cm³ · 1550 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCM 0013",
+   "descricao": "Compressor TCM 0013 — 1/6 HP, R-134a (Elgin TCM)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "233 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCM 0015",
+   "descricao": "Compressor TCM 0015 — 1/4 HP, R-134a (Elgin TCM)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "329 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCM 0020",
+   "descricao": "Compressor TCM 0020 — 1/3 HP, R-134a (Elgin TCM)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "410 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCM 0030",
+   "descricao": "Compressor TCM 0030 — 1/2 HP, R-134a (Elgin TCM)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "553 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCM 0035",
+   "descricao": "Compressor TCM 0035 — 1/2+ HP, R-134a (Elgin TCM)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "756 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCM 0040",
+   "descricao": "Compressor TCM 0040 — 7/8 HP, R-134a (Elgin TCM)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "805 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCM 0050",
+   "descricao": "Compressor TCM 0050 — 1 HP, R-134a (Elgin TCM)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "1038 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCM 0062",
+   "descricao": "Compressor TCM 0062 — 1 1/4 HP, R-134a (Elgin TCM)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "1210 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCM 2010",
+   "descricao": "Compressor TCM 2010 — 1/6 HP, R-22 (Elgin TCM)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "296 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCM 2015",
+   "descricao": "Compressor TCM 2015 — 1/5 HP, R-22 (Elgin TCM)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "355 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCM 2020",
+   "descricao": "Compressor TCM 2020 — 1/4 HP, R-22 (Elgin TCM)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "525 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCM 2030",
+   "descricao": "Compressor TCM 2030 — 1/2 HP, R-22 (Elgin TCM)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "625 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCM 2040",
+   "descricao": "Compressor TCM 2040 — 7/8 HP, R-22 (Elgin TCM)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "795 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCM 2050",
+   "descricao": "Compressor TCM 2050 — 1 HP, R-22 (Elgin TCM)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "1200 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCM 2062",
+   "descricao": "Compressor TCM 2062 — 1 1/4 HP, R-22 (Elgin TCM)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "1475 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCM 2070",
+   "descricao": "Compressor TCM 2070 — 1 1/3 HP, R-22 (Elgin TCM)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "1507 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCM 4017",
+   "descricao": "Compressor TCM 4017 — 1/5 HP, R-404A (Elgin TCM)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "353 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCM 4021",
+   "descricao": "Compressor TCM 4021 — 1/4 HP, R-404A (Elgin TCM)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "450 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCM 4025",
+   "descricao": "Compressor TCM 4025 — 1/3 HP, R-404A (Elgin TCM)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "560 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCM 4033",
+   "descricao": "Compressor TCM 4033 — 1/2 HP, R-404A (Elgin TCM)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "647 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCM 4037",
+   "descricao": "Compressor TCM 4037 — 3/4 HP, R-404A (Elgin TCM)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "802 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCM 4047",
+   "descricao": "Compressor TCM 4047 — 7/8 HP, R-404A (Elgin TCM)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "1052 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCM 4064",
+   "descricao": "Compressor TCM 4064 — 1 1/4 HP, R-404A (Elgin TCM)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "1315 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCM 4072",
+   "descricao": "Compressor TCM 4072 — 1 1/3 HP, R-404A (Elgin TCM)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "1498 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCM 4080",
+   "descricao": "Compressor TCM 4080 — 1 1/3+ HP, R-404A (Elgin TCM)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "1772 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCB 0008",
+   "descricao": "Compressor TCB 0008 — 1/4 HP, R-134a (Elgin TCB)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "530 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCB 0012",
+   "descricao": "Compressor TCB 0012 — 1/3 HP, R-134a (Elgin TCB)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "813 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCB 4012",
+   "descricao": "Compressor TCB 4012 — 1/3 HP, R-404A (Elgin TCB)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "755 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCB 4016",
+   "descricao": "Compressor TCB 4016 — 1/2 HP, R-404A (Elgin TCB)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "801 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCB 4020",
+   "descricao": "Compressor TCB 4020 — 3/4 HP, R-404A (Elgin TCB)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "1100 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCB 4040",
+   "descricao": "Compressor TCB 4040 — 1 HP, R-404A (Elgin TCB)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "1800 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCB 4046",
+   "descricao": "Compressor TCB 4046 — 1 1/4 HP, R-404A (Elgin TCB)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "2060 kcal/h a -10 °C · 60 Hz · conexões —"
+  },
+  {
+   "codigo": "TCM 2035",
+   "descricao": "Compressor TCM 2035 — 1/2+ HP, R-22 (Elgin TCM)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "619 kcal/h a -10 °C · 50 Hz · conexões —"
+  },
+  {
+   "codigo": "THG1358YS",
+   "descricao": "Compressor THG1358YS — R-134a LBP (Tecumseh Trio)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "600 BTU/h · 5.58 cm³ · 115/127V · ASHRAE −23,3°C · família TH"
+  },
+  {
+   "codigo": "THG1358YGS",
+   "descricao": "Compressor THG1358YGS — R-134a LBP (Tecumseh Trio)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "600 BTU/h · 5.58 cm³ · 220V · ASHRAE −23,3°C · família TH"
+  },
+  {
+   "codigo": "TA1380Y-DS",
+   "descricao": "Compressor TA1380Y-DS — R-134a LBP (Tecumseh Trio)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "820 BTU/h · 6.93 cm³ · 115/127V · ASHRAE −23,3°C · família TA"
+  },
+  {
+   "codigo": "TA1380Y-ES",
+   "descricao": "Compressor TA1380Y-ES — R-134a LBP (Tecumseh Trio)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "830 BTU/h · 6.93 cm³ · 220V · ASHRAE −23,3°C · família TA"
+  },
+  {
+   "codigo": "TCW410Y-DS",
+   "descricao": "Compressor TCW410Y-DS — R-134a L/MBP (Tecumseh Trio)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "1060 BTU/h · 9.74 cm³ · 115/127V · ASHRAE −23,3°C · família TC"
+  },
+  {
+   "codigo": "TCW410Y-ES",
+   "descricao": "Compressor TCW410Y-ES — R-134a L/MBP (Tecumseh Trio)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "1060 BTU/h · 9.74 cm³ · 220V · ASHRAE −23,3°C · família TC"
+  },
+  {
+   "codigo": "TCW413Y-DS",
+   "descricao": "Compressor TCW413Y-DS — R-134a L/MBP (Tecumseh Trio)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "1150 BTU/h · 10.87 cm³ · 115/127V · ASHRAE −23,3°C · família TC"
+  },
+  {
+   "codigo": "TCW413Y-ES",
+   "descricao": "Compressor TCW413Y-ES — R-134a L/MBP (Tecumseh Trio)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "1170 BTU/h · 10.87 cm³ · 220V · ASHRAE −23,3°C · família TC"
+  },
+  {
+   "codigo": "TCW410Y",
+   "descricao": "Compressor TCW410Y — R-134a L/MBP (Tecumseh Legacy)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "1060 BTU/h · 8.36 cm³ · — · ASHRAE −23,3°C (LST) · família TC OptX"
+  },
+  {
+   "codigo": "TCW413Y",
+   "descricao": "Compressor TCW413Y — R-134a L/MBP (Tecumseh Legacy)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "1150 BTU/h · 10.03 cm³ · — · ASHRAE −23,3°C (LST) · família TC OptX"
+  },
+  {
+   "codigo": "TCW415Y",
+   "descricao": "Compressor TCW415Y — R-134a L/MBP (Tecumseh Legacy)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "1350 BTU/h · 12.47 cm³ · — · ASHRAE −23,3°C (LST) · família TC OptX"
+  },
+  {
+   "codigo": "AE4430Y",
+   "descricao": "Compressor AE4430Y — R-134a M/HBP (Tecumseh Legacy)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "3400 BTU/h · 8.02 cm³ · — · ASHRAE 7,2°C (HST) · família AE2"
+  },
+  {
+   "codigo": "AE4440Y",
+   "descricao": "Compressor AE4440Y — R-134a M/HBP (Tecumseh Legacy)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "4300 BTU/h · 10.33 cm³ · — · ASHRAE 7,2°C (HST) · família AE2"
+  },
+  {
+   "codigo": "AE4450Y",
+   "descricao": "Compressor AE4450Y — R-134a M/HBP (Tecumseh Legacy)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "5500 BTU/h · 13.24 cm³ · — · ASHRAE 7,2°C (HST) · família AE2"
+  },
+  {
+   "codigo": "AE4460Y",
+   "descricao": "Compressor AE4460Y — R-134a M/HBP (Tecumseh Legacy)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "6350 BTU/h · 15.09 cm³ · — · ASHRAE 7,2°C (HST) · família AE2"
+  },
+  {
+   "codigo": "AEX413Y",
+   "descricao": "Compressor AEX413Y — R-134a L/MBP (Tecumseh Legacy)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "1300 BTU/h · 12.01 cm³ · — · ASHRAE −23,3°C (HST) · família AE2"
+  },
+  {
+   "codigo": "AEW415Y",
+   "descricao": "Compressor AEW415Y — R-134a L/MBP (Tecumseh Legacy)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "1435 BTU/h · 12.48 cm³ · — · ASHRAE −23,3°C (LST) · família AE2"
+  },
+  {
+   "codigo": "ALX430Y",
+   "descricao": "Compressor ALX430Y — R-134a L/MBP (Tecumseh Legacy)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "15.1 cm³ · — · lançamento — capacidade não publicada (TBD no folheto) · família AL"
+  },
+  {
+   "codigo": "ALX435Y",
+   "descricao": "Compressor ALX435Y — R-134a L/MBP (Tecumseh Legacy)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "17.71 cm³ · — · lançamento — capacidade não publicada (TBD no folheto) · família AL"
+  },
+  {
+   "codigo": "ALX440Y",
+   "descricao": "Compressor ALX440Y — R-134a L/MBP (Tecumseh Legacy)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "19.95 cm³ · — · lançamento — capacidade não publicada (TBD no folheto) · família AL"
+  },
+  {
+   "codigo": "AE2410Z",
+   "descricao": "Compressor AE2410Z — R-404A LBP (Tecumseh Legacy)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "1100 BTU/h · 5.02 cm³ · — · ASHRAE −23,3°C (HST) · família AE2"
+  },
+  {
+   "codigo": "AE2413Z",
+   "descricao": "Compressor AE2413Z — R-404A LBP (Tecumseh Legacy)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "1300 BTU/h · 6.12 cm³ · — · ASHRAE −23,3°C (HST) · família AE2"
+  },
+  {
+   "codigo": "AE2415Z",
+   "descricao": "Compressor AE2415Z — R-404A LBP (Tecumseh Legacy)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "1600 BTU/h · 7.33 cm³ · — · ASHRAE −23,3°C (HST) · família AE2"
+  },
+  {
+   "codigo": "AE2420Z",
+   "descricao": "Compressor AE2420Z — R-404A LBP (Tecumseh Legacy)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "2050 BTU/h · 9.33 cm³ · — · ASHRAE −23,3°C (HST) · família AE2"
+  },
+  {
+   "codigo": "AE2425Z",
+   "descricao": "Compressor AE2425Z — R-404A LBP (Tecumseh Legacy)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "2650 BTU/h · 12.01 cm³ · — · ASHRAE −23,3°C (HST) · família AE2"
+  },
+  {
+   "codigo": "AE2430Z",
+   "descricao": "Compressor AE2430Z — R-404A LBP (Tecumseh Legacy)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "3100 BTU/h · 14.51 cm³ · — · ASHRAE −23,3°C (HST) · família AE2"
+  },
+  {
+   "codigo": "AE4430Z",
+   "descricao": "Compressor AE4430Z — R-404A M/HBP (Tecumseh Legacy)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "3400 BTU/h · 5.16 cm³ · — · ASHRAE 7,2°C (HST) · família AE2"
+  },
+  {
+   "codigo": "AE4440Z",
+   "descricao": "Compressor AE4440Z — R-404A M/HBP (Tecumseh Legacy)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "4350 BTU/h · 6.69 cm³ · — · ASHRAE 7,2°C (HST) · família AE2"
+  },
+  {
+   "codigo": "AE4450Z",
+   "descricao": "Compressor AE4450Z — R-404A M/HBP (Tecumseh Legacy)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "5700 BTU/h · 8.85 cm³ · — · ASHRAE 7,2°C (HST) · família AE2"
+  },
+  {
+   "codigo": "AE4460Z",
+   "descricao": "Compressor AE4460Z — R-404A M/HBP (Tecumseh Legacy)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "6750 BTU/h · 10.33 cm³ · — · ASHRAE 7,2°C (HST) · família AE2"
+  },
+  {
+   "codigo": "AE4470Z",
+   "descricao": "Compressor AE4470Z — R-404A M/HBP (Tecumseh Legacy)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "7900 BTU/h · 12.01 cm³ · — · ASHRAE 7,2°C (HST) · família AE2"
+  },
+  {
+   "codigo": "ALX430Z",
+   "descricao": "Compressor ALX430Z — R-404A L/MBP (Tecumseh Legacy)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "2700 BTU/h · 15.01 cm³ · — · ASHRAE −23,3°C (HST) · família AL"
+  },
+  {
+   "codigo": "ALX440Z",
+   "descricao": "Compressor ALX440Z — R-404A L/MBP (Tecumseh Legacy)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "3560 BTU/h · 19.95 cm³ · — · ASHRAE −23,3°C (HST) · família AL"
+  },
+  {
+   "codigo": "ALX445Z",
+   "descricao": "Compressor ALX445Z — R-404A L/MBP (Tecumseh Legacy)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "21 cm³ · — · lançamento — capacidade não publicada (TBD no folheto) · família AL"
+  },
+  {
+   "codigo": "AL2430U-ES3A",
+   "descricao": "Compressor AL2430U-ES3A — R-290 LBP (Tecumseh AL R-290)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "2800 BTU/h · 15.09 cm³ · 220V/60Hz · ASHRAE −23,3°C · família AL"
+  },
+  {
+   "codigo": "AL2430U-GS3A",
+   "descricao": "Compressor AL2430U-GS3A — R-290 LBP (Tecumseh AL R-290)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "2900 BTU/h · 15.09 cm³ · 220V/50-60Hz · ASHRAE −23,3°C · família AL"
+  },
+  {
+   "codigo": "ALX430U-DS3B",
+   "descricao": "Compressor ALX430U-DS3B — R-290 L/MBP (Tecumseh AL R-290)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "5300 BTU/h · 15.09 cm³ · 115V/60Hz · ASHRAE −6,7°C (a −23,3°C: 2900 BTU/h) · família AL"
+  },
+  {
+   "codigo": "ALX435U-DS3B",
+   "descricao": "Compressor ALX435U-DS3B — R-290 L/MBP (Tecumseh AL R-290)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "6040 BTU/h · 17.71 cm³ · 115V/60Hz · ASHRAE −6,7°C (a −23,3°C: 3460 BTU/h) · família AL"
+  },
+  {
+   "codigo": "ALX435U-ES3A",
+   "descricao": "Compressor ALX435U-ES3A — R-290 L/MBP (Tecumseh AL R-290)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "6040 BTU/h · 17.71 cm³ · 220V/60Hz · ASHRAE −6,7°C (a −23,3°C: 3460 BTU/h) · família AL"
+  },
+  {
+   "codigo": "ALX440U-DS3B",
+   "descricao": "Compressor ALX440U-DS3B — R-290 L/MBP (Tecumseh AL R-290)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "6800 BTU/h · 19.95 cm³ · 115V/60Hz · ASHRAE −6,7°C (a −23,3°C: 3920 BTU/h) · família AL"
+  },
+  {
+   "codigo": "ALX430U-FZ3B",
+   "descricao": "Compressor ALX430U-FZ3B — R-290 L/MBP (Tecumseh AL R-290)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "4650 BTU/h · 15.09 cm³ · 220V/50Hz · ASHRAE −6,7°C (a −23,3°C: 2270 BTU/h) · família AL"
+  },
+  {
+   "codigo": "ALX435U-FZ3B",
+   "descricao": "Compressor ALX435U-FZ3B — R-290 L/MBP (Tecumseh AL R-290)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "5330 BTU/h · 17.71 cm³ · 220V/50Hz · ASHRAE −6,7°C (a −23,3°C: 2850 BTU/h) · família AL"
+  },
+  {
+   "codigo": "ALX440U-FZ3B",
+   "descricao": "Compressor ALX440U-FZ3B — R-290 L/MBP (Tecumseh AL R-290)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "6240 BTU/h · 19.95 cm³ · 220V/50Hz · ASHRAE −6,7°C (a −23,3°C: 3190 BTU/h) · família AL"
+  },
+  {
+   "codigo": "ALX430U-FZ3C",
+   "descricao": "Compressor ALX430U-FZ3C — R-290 L/MBP (Tecumseh AL R-290)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "4740 BTU/h · 15.09 cm³ · 220V/50Hz · ASHRAE −6,7°C (a −23,3°C: 2330 BTU/h) · família AL"
+  },
+  {
+   "codigo": "ALX435U-FZ3C",
+   "descricao": "Compressor ALX435U-FZ3C — R-290 L/MBP (Tecumseh AL R-290)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "5550 BTU/h · 17.71 cm³ · 220V/50Hz · ASHRAE −6,7°C (a −23,3°C: 2810 BTU/h) · família AL"
+  },
+  {
+   "codigo": "ALX440U-FZ3C",
+   "descricao": "Compressor ALX440U-FZ3C — R-290 L/MBP (Tecumseh AL R-290)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "6365 BTU/h · 19.95 cm³ · 220V/50Hz · ASHRAE −6,7°C (a −23,3°C: 3190 BTU/h) · família AL"
+  },
+  {
+   "codigo": "CAJ2446U",
+   "descricao": "Compressor CAJ2446U — R-290 LBP (Tecumseh AJ² Ready-to-Install)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "586 W · 26.2 cm³ · FZ/XA/HZ · EN12900, QPF (nominal) — varia 510 a 1870W entre −35°C e −10°C · família AJ2"
+  },
+  {
+   "codigo": "CAJ2464U",
+   "descricao": "Compressor CAJ2464U — R-290 LBP (Tecumseh AJ² Ready-to-Install)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "827 W · 34.5 cm³ · FZ/XA/HZ · EN12900, QPF (nominal) — varia 720 a 2450W entre −35°C e −10°C · família AJ2"
+  },
+  {
+   "codigo": "CAJ4513U",
+   "descricao": "Compressor CAJ4513U — R-290 M/HBP (Tecumseh AJ² Ready-to-Install)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "1478 W · 25.95 cm³ · FZ · EN12900, QPF (nominal) — varia 1181 a 4787W entre −15°C e +15°C · família AJ2"
+  },
+  {
+   "codigo": "CAJ4518U",
+   "descricao": "Compressor CAJ4518U — R-290 M/HBP (Tecumseh AJ² Ready-to-Install)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Compressor",
+   "observacoes": "2034 W · 34.45 cm³ · FZ · EN12900, QPF (nominal) — varia 1604 a 6343W entre −15°C e +15°C · família AJ2"
   },
   {
    "codigo": "MM 11B",

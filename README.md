@@ -82,9 +82,14 @@ assinalá-lo, porque o grupo "na oficina" não tinha data nenhuma.
 para a conversa de WhatsApp dele. O texto pede as duas coisas sem as quais o acesso não pode ser
 liberado, documento e e-mail, e explica porque tem de ser um e-mail do Google.
 
-**Catálogo de peças do app de compressores.** Botão que traz 43 peças — os componentes do circuito
-da chopeira, 22 micromotores e 11 motoventiladores axiais, com as fichas técnicas. Traz só o que
-ainda não existe, e sempre com preço zerado: o valor é do Giba, não do catálogo.
+**Catálogo do app de compressores.** Botão que traz 209 itens: os componentes do circuito da
+chopeira, 166 compressores (Embraco da tabela de equivalência, Elgin e Tecumseh) e 33
+ventiladores, cada um com a sua ficha. Traz só o que ainda não existe, e sempre com preço zerado:
+o valor é do Giba, não do catálogo.
+
+Cada compressor guarda os modelos que substitui, e a busca olha esse campo — chega uma máquina com
+um código antigo na etiqueta, digita-se o que está lá e aparece o que se compra hoje. Sem isso o
+catálogo seria uma lista de nomes que só serve para quem já sabe o nome.
 
 **Agenda do Google.** Marcar recolha ou entrega cria o compromisso sozinho, e **remarcar muda a
 data no mesmo compromisso** em vez de duplicar — o id do evento fica guardado na ordem. Apagar a
