@@ -1,37 +1,44 @@
 # Testes
 
-Duas suítes que abrem o aplicativo num Chromium de verdade, com um Firestore
-de mentira no lugar do Google.
+Dois níveis, e a ordem importa: o rápido primeiro, para não subir quatro
+navegadores só para descobrir um erro de sintaxe.
+
+## `unidade.js` — as regras, em ~90 ms
+
+```
+node testes/unidade.js
+```
+
+Carrega o `nucleo.js` como módulo do Node e confere as 60 regras que não
+dependem de tela nem de banco: CPF e CNPJ, contas de prazo, orçamento que
+vence, soma com vírgula, o recado que o cliente lê, fluxo de status,
+numeração de OS e laudo, janela da agenda.
+
+É este que se roda **enquanto se mexe**. Custa menos de um segundo, então
+não há desculpa para pular.
+
+Ao acrescentar uma regra ao `nucleo.js`, o teste dela vem junto — se não
+vier, a regra passa a existir sem rede de segurança.
+
+## `rodar.js` — tudo, em ~2 min
 
 ```
 node testes/rodar.js
 ```
 
-O `rodar.js` monta uma cópia do `index.html` com a configuração do Firebase
-preenchida de faz de conta, serve numa porta local e corre as suítes.
+Nesta ordem:
 
-| Arquivo | O que verifica |
-|---|---|
-| `1-cadastros.js` | Portão de acesso, convite por e-mail, CNPJ, cadastro de chopeiras, painel de acessos, e o cliente a ver só o que é dele |
-| `2-chamados.js` | Abertura de chamado, chopeira provisória, mudança de status, linha do tempo, sino e o link do WhatsApp |
-| `3-orcamento.js` | Cadastro de peças, preço em vírgula, orçamento com peças e serviço separados, envio, e a aprovação e a recusa do cliente |
-| `4-laudo-e-semana.js` | Agenda da semana com selo de atraso, emissão do laudo com os ensaios reais, geração do PDF (o arquivo é aberto e conferido), e o modo demonstração dos dois lados |
-| `firestore-de-mentira.js` | O dublê: guarda tudo na sessão do navegador e imita a API do Firestore, incluindo `arrayUnion` e os carimbos de tempo |
+1. **Sintaxe** de `nucleo.js`, `sw.js` e de cada bloco `<script>` do
+   `index.html`. Meio segundo, e apanha a classe de erro mais cruel: a
+   que derruba o aplicativo inteiro em silêncio.
+2. **`unidade.js`**, as regras.
+3. **As quatro suítes de navegador**, num Chromium de verdade com um
+   Firestore de mentira no lugar do Google.
 
-## O que estes testes NÃO cobrem
+É este que se roda **antes de publicar**.
 
-**As regras de segurança.** O dublê não as aplica — ele imita a API, não o
-servidor do Google. O que se testa aqui é o comportamento do aplicativo
-(quem vê que botão, o que é gravado). Para provar as regras seria preciso o
-emulador do Firebase, com `firebase emulators:exec`.
+---
 
-**O ditado e a câmera.** Precisam de microfone e de internet de verdade.
-
-**A aparência do PDF.** O teste confirma que o arquivo é um PDF válido, com a foto embutida e as
-páginas declaradas — não que a folha está bonita. Isso continua a pedir olho humano.
-
-## Se o Chromium não for encontrado
-
-```
-CHROMIUM=/caminho/para/chrome node testes/rodar.js
-```
+*Nota:* as suítes de navegador contam qualquer erro de console como
+problema. Num ambiente sem saída para a internet, os pedidos ao CDN do
+Firebase falham e aparecem como falha — não são.

@@ -214,18 +214,20 @@ Publicando assim, as regras do Firestore continuam a ter de ser enviadas à part
 
 | Arquivo | Para que serve |
 |---|---|
-| `index.html` | O aplicativo inteiro: portão, cadastros, chamados, painel |
+| `index.html` | Telas, formulários, gravação e documentos |
+| `nucleo.js` | As regras puras — sem tela, sem banco, sem rede. Testáveis em 1 s |
 | `firestore.rules` | Quem vê o quê — conferido no servidor |
 | `firebase.json`, `.firebaserc` | Hospedagem e projeto |
 | `manifest.webmanifest` | Nome, cores e ícones para instalar no celular |
 | `sw.js` | Faz o app abrir sem rede depois de instalado |
-| `testes/` | As quatro suítes e o Firestore de mentira |
+| `testes/` | Os testes de unidade, as quatro suítes de navegador e o Firestore de mentira |
 | `pecas-compressores.json` | Catálogo trazido do app de compressores, gerado por script |
 | `MANUAL-CLIENTE.md` | Guia de uma página para mandar ao cliente |
 | `MANUAL-AGENDA-GOOGLE.md` | Como ligar a agenda do Google, uma vez só |
 | `robots.txt` | Pede aos buscadores que não indexem: é app de uso restrito |
 
-Ao publicar uma alteração, incrementar `VERSAO` no `sw.js` — só isso. O número no rodapé é lido
+Ao publicar uma alteração, incrementar `VERSAO` no `sw.js` — e, se acrescentar um arquivo novo,
+pô-lo também na lista `ESSENCIAIS`, senão o aplicativo deixa de abrir sem rede. O número no rodapé é lido
 da cache do service worker, e não escrito à mão: escrito à mão diverge, e uma página a dizer
 "versão 5" quando o aparelho já tem a 6 é pior do que não dizer nada. O rodapé tem ainda
 **procurar atualização**, para quando um aparelho ficou com a versão antiga guardada. O `sw.js` busca o HTML **pela rede primeiro** e só recorre à cache se não houver
@@ -234,12 +236,27 @@ depois de publicada uma correção, e o sintoma é indistinguível de um erro no
 
 ## Testes
 
+Dois níveis, de propósito. Um só nível sempre vira nenhum: se o único teste é lento, deixa de ser
+rodado — e foi assim que um `else` sem fechar derrubou o aplicativo inteiro sem ninguém notar.
+
+**Enquanto se mexe** (menos de um segundo, sem navegador):
+
+```
+node testes/unidade.js
+```
+
+Confere as regras do `nucleo.js` — documento válido, prazo que vira o mês, orçamento que vence,
+soma de orçamento, o texto que o cliente lê, fluxo de status. **60 verificações em ~90 ms.**
+
+**Antes de publicar** (uns dois minutos):
+
 ```
 node testes/rodar.js
 ```
 
-Abre o aplicativo num Chromium de verdade, com um Firestore de mentira no lugar do Google, e
-percorre os fluxos inteiros — **82 verificações**, incluindo gerar o PDF e conferir que o arquivo
+Confere a sintaxe de tudo, corre os testes de unidade, e só depois abre o aplicativo num Chromium
+de verdade, com um Firestore de mentira no lugar do Google, percorrendo os fluxos inteiros —
+**82 verificações**, incluindo gerar o PDF e conferir que o arquivo
 é mesmo um PDF, com a foto embutida. Detalhe do que cobre e do que **não** cobre
 em [`testes/LEIAME.md`](testes/LEIAME.md).
 

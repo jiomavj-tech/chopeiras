@@ -17,10 +17,11 @@
    Ao mudar a aplicação, incrementar VERSAO — as caches antigas são
    apagadas no activate — e atualizar o número em #versaoApp no index.html.
 */
-const VERSAO = 'chopeiras-v6';
+const VERSAO = 'chopeiras-v7';
 const ESSENCIAIS = [
   './',
   './index.html',
+  './nucleo.js',
   './manifest.webmanifest',
   './pecas-compressores.json',
   './icone-192.png',

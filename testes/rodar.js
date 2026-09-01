@@ -13,7 +13,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { spawn } = require('child_process');
+const { spawn, spawnSync } = require('child_process');
 
 const RAIZ = path.join(__dirname, '..');
 /* Porta 0 = o sistema escolhe uma livre. Fixar uma porta faz o teste
@@ -45,11 +45,16 @@ const temporaria = fs.mkdtempSync(path.join(os.tmpdir(), 'chopeiras-teste-'));
 const original = fs.readFileSync(path.join(RAIZ, 'index.html'), 'utf8');
 fs.writeFileSync(path.join(temporaria, 'index.html'), reescreverConfig(original, 'teste'));
 fs.writeFileSync(path.join(temporaria, 'cru.html'), reescreverConfig(original, null));
-['icone-192.png','icone-512.png','icone-mascara.png','manifest.webmanifest']
+/* O núcleo é carregado por <script src> e precisa de estar ao lado da
+   página: sem ele o aplicativo nem arranca, e as quatro suítes falhavam
+   todas com o mesmo erro, que não era defeito nenhum do aplicativo. */
+['icone-192.png','icone-512.png','icone-mascara.png','manifest.webmanifest',
+ 'nucleo.js','pecas-compressores.json']
   .forEach(f => fs.copyFileSync(path.join(RAIZ, f), path.join(temporaria, f)));
 
 const TIPOS = {'.html':'text/html; charset=utf-8', '.png':'image/png',
-               '.webmanifest':'application/manifest+json', '.js':'text/javascript'};
+               '.webmanifest':'application/manifest+json', '.js':'text/javascript',
+               '.json':'application/json'};
 
 const servidor = http.createServer((req, res) => {
   const nome = decodeURIComponent(req.url.split('?')[0]).replace(/^\/+/, '') || 'index.html';
@@ -74,10 +79,51 @@ function correr(suite, ambiente){
   });
 }
 
+/* Conferir a sintaxe custa meio segundo e apanha a classe de erro mais
+   cruel: a que derruba o aplicativo inteiro em silêncio. Já aconteceu —
+   um "else" sem fechar, e nenhuma tela funcionava. */
+function conferirSintaxe(){
+  const alvos = ['nucleo.js', 'sw.js'];
+  for(const f of alvos){
+    const r = spawnSync(process.execPath, ['--check', path.join(RAIZ, f)], {encoding:'utf8'});
+    if(r.status !== 0){
+      console.log('\n✗ ' + f + ' não compila:\n' + (r.stderr || '').split('\n').slice(0,4).join('\n'));
+      return false;
+    }
+  }
+  /* O index.html não é JavaScript: confere-se cada bloco <script> dele. */
+  const blocos = original.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
+  for(let i = 0; i < blocos.length; i++){
+    const js = blocos[i].replace(/^<script[^>]*>/, '').replace(/<\/script>$/, '');
+    const tmp = path.join(temporaria, 'bloco' + i + '.js');
+    fs.writeFileSync(tmp, js);
+    const r = spawnSync(process.execPath, ['--check', tmp], {encoding:'utf8'});
+    fs.rmSync(tmp, {force:true});
+    if(r.status !== 0){
+      console.log('\n✗ bloco <script> ' + (i+1) + ' do index.html não compila:\n' +
+                  (r.stderr || '').split('\n').slice(0,4).join('\n'));
+      return false;
+    }
+  }
+  console.log('  sintaxe: ' + (alvos.length + blocos.length) + ' arquivos, tudo compila');
+  return true;
+}
+
 servidor.listen(PORTA, '127.0.0.1', async () => {
   const url = 'http://127.0.0.1:' + servidor.address().port + '/index.html';
   const ambiente = Object.assign({}, process.env, { URL_TESTE: url });
   let falhou = 0;
+
+  /* Rápido primeiro: se a sintaxe ou uma regra do núcleo estiver errada,
+     não vale subir quatro navegadores para descobrir. */
+  console.log('\n══ antes de tudo ══');
+  if(!conferirSintaxe()){
+    servidor.close();
+    fs.rmSync(temporaria, { recursive: true, force: true });
+    process.exit(1);
+  }
+
+  if(!await correr('unidade.js', ambiente)) falhou++;
 
   for (const suite of ['1-cadastros.js', '2-chamados.js', '3-orcamento.js', '4-laudo-e-semana.js']) {
     if (!await correr(suite, ambiente)) falhou++;
