@@ -110,6 +110,22 @@ certo ('componente com marca conta',  N.componentePreenchido({marca:'Weg'}));
 eq('acha por tipo', N.acharPorTipo([comp], 'Compressor').modelo, 'EMIS80HER');
 eq('não acha o que não tem', N.acharPorTipo([comp], 'Torneira'), undefined);
 
+/* ── etapas e contacto ────────────────────────────────────── */
+eq('a buscar', N.ETAPAS.aBuscar, ['aberto','recolha_agendada']);
+eq('nenhuma etapa se repete entre grupos que se excluem',
+   N.ETAPAS.aBuscar.filter(x => N.ETAPAS.naEntrega.includes(x)), []);
+certo('entregue está na entrega', N.ETAPAS.naEntrega.includes('entregue'));
+certo('concluído fecha o serviço',  N.ETAPAS.fechando.includes('concluido'));
+eq('toda etapa listada existe de verdade',
+   Object.values(N.ETAPAS).flat().filter(id => !N.STATUS.some(s => s.id === id)), []);
+
+eq('WhatsApp na frente do telefone',
+   N.whatsDo({whatsapp:'48 99999-1234', telefone:'48 3333-1111'}), '5548999991234');
+eq('sem WhatsApp usa o telefone',
+   N.whatsDo({telefone:'48 3333-1111'}), '554833331111');
+eq('sem nenhum dos dois, vazio', N.whatsDo({}), '');
+eq('sem cliente, vazio', N.whatsDo(null), '');
+
 /* ── numeração ────────────────────────────────────────────── */
 certo('número de OS no formato',    /^OS-\d{6}-[A-Z0-9]{4}$/.test(N.numeroOS()));
 certo('número de laudo no formato', /^LAU-\d{6}-[A-Z0-9]{4}$/.test(N.numeroLaudo()));

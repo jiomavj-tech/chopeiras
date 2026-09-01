@@ -115,6 +115,21 @@ const STATUS = [
   {id:"cancelado",        rot:"Cancelado",            pill:"dg",   cli:"O chamado foi cancelado."}
 ];
 
+/* As etapas agrupadas por momento do serviço. Estavam escritas à mão em
+   cinco sítios, e uma lista dessas esquecida num deles é o defeito que
+   ninguém vê: a chopeira some da tela e não há erro nenhum a explicar. */
+const ETAPAS = {
+  aBuscar:   ["aberto", "recolha_agendada"],
+  aEntregar: ["concluido", "entrega_agendada", "saiu_pra_entrega"],
+  naEntrega: ["entrega_agendada", "saiu_pra_entrega", "entregue"],
+  fechando:  ["concluido", "entregue"]
+};
+
+/* O número de quem se avisa: o WhatsApp, e o telefone como reserva. */
+function whatsDo(quem){
+  return quem ? soWhats(quem.whatsapp || quem.telefone) : "";
+}
+
 const ABERTOS = ["aberto","recolha_agendada","recebido","em_teste","em_manutencao",
                  "aguardando_peca","orcamento_enviado","orcamento_aprovado",
                  "orcamento_reprovado","concluido","entrega_agendada"];
@@ -337,6 +352,8 @@ function diasAte(iso){
    e tudo continua global, como o resto do aplicativo espera. */
 if(typeof module !== "undefined" && module.exports){
   module.exports = {
+    ETAPAS,
+    whatsDo,
     esc,
     soDigitos,
     cnpjFormatado,

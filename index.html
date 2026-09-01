@@ -762,7 +762,7 @@ async function convidarCliente(clienteId){
 
   /* Com o WhatsApp do cliente no cadastro, vai direto para a conversa
      dele — é um toque a menos e não erra o contacto. */
-  const numero = c ? soWhats(c.whatsapp || c.telefone) : "";
+  const numero = whatsDo(c);
   if(numero){
     window.open("https://wa.me/" + numero + "?text=" + encodeURIComponent(texto), "_blank");
     return;
@@ -1870,10 +1870,10 @@ function cartaoOrdem(o){
   '<div style="margin-top:9px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">' +
     '<span class="pill ' + s.pill + '">' + esc(s.rot) + '</span>' +
     (novo ? '<span class="pill pend">novidade</span>' : '') +
-    (o.agenda && o.agenda.recolhaPrevista && ["aberto","recolha_agendada"].includes(o.status)
+    (o.agenda && o.agenda.recolhaPrevista && ETAPAS.aBuscar.includes(o.status)
       ? '<span class="pill cold">buscar ' + esc(dataCurta(o.agenda.recolhaPrevista)) + '</span>' : '') +
     (o.agenda && o.agenda.entregaPrevista &&
-     ["concluido","entrega_agendada","saiu_pra_entrega"].includes(o.status)
+     ETAPAS.aEntregar.includes(o.status)
       ? '<span class="pill cold">entregar ' + esc(dataCurta(o.agenda.entregaPrevista)) + '</span>' : '') +
     (orcamentoVencido(o) ? '<span class="pill dg">orçamento vencido</span>' : '') +
   '</div></div>';
@@ -2355,7 +2355,7 @@ function cartaoAgenda(){
    o navegador do telemóvel costuma bloquear. */
 function ofereceAvisarCliente(ordem, cliente){
   if(!cliente) return;
-  if(!soWhats(cliente.whatsapp || cliente.telefone)) return;
+  if(!whatsDo(cliente)) return;
   if(confirm("Avisar o cliente no WhatsApp agora?\n\n" + recadoCliente(ordem))){
     avisarWhats(ordem.id);
   }
@@ -2668,7 +2668,7 @@ function painelAdmin(o){
       '<div><label>Entrega prevista</label><input type="date" id="os_entrega" value="' +
         esc((o.agenda&&o.agenda.entregaPrevista)||"") + '"></div>' +
     '</div>' +
-    (["entrega_agendada","saiu_pra_entrega","entregue"].includes(o.status) ?
+    (ETAPAS.naEntrega.includes(o.status) ?
       '<div class="lin">' +
         '<div><label>Data/hora entrega</label><input type="datetime-local" id="os_entrega_real" value="' +
           esc((o.entrega&&o.entrega.quando)||"") + '"></div>' +
@@ -2699,7 +2699,7 @@ function botoesAgendaManual(o){
 
 function botaoWhats(o){
   const c = CLIENTES.find(x => x.id === o.clienteId);
-  const numero = c ? soWhats(c.whatsapp || c.telefone) : "";
+  const numero = whatsDo(c);
   if(!numero) return '<button class="btn" disabled title="Sem WhatsApp no cadastro">Sem WhatsApp</button>';
   return '<button class="btn" onclick="avisarWhats(\'' + o.id + '\')">Avisar no WhatsApp</button>';
 }
@@ -2707,7 +2707,7 @@ function botaoWhats(o){
 function avisarWhats(id){
   const o = ORDENS.find(x => x.id === id) || editando.dados;
   const c = CLIENTES.find(x => x.id === o.clienteId);
-  const numero = c ? soWhats(c.whatsapp || c.telefone) : "";
+  const numero = whatsDo(c);
   if(!numero) return toast("Esta empresa não tem WhatsApp no cadastro.", "err");
 
   /* Nada de número de OS nem de subtotais: o cliente não sabe o que é
@@ -2746,7 +2746,7 @@ async function moverOrdem(){
     atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
   };
 
-  if(["entrega_agendada","saiu_pra_entrega","entregue"].includes(novo)){
+  if(ETAPAS.naEntrega.includes(novo)){
     const entregaQuando = $("os_entrega_real");
     const entregaLocal = $("os_entrega_local");
     if(entregaQuando && entregaQuando.value){
@@ -2761,7 +2761,7 @@ async function moverOrdem(){
 
   /* Concluir sem dizer o que foi feito é o registo que faz falta seis
      meses depois. Avisa, mas não impede: às vezes só se olhou. */
-  if(["concluido","entregue"].includes(novo) && !((o.servicos || []).length)){
+  if(ETAPAS.fechando.includes(novo) && !((o.servicos || []).length)){
     if(!confirm("Nenhum serviço registado neste chamado.\n\n" +
         "Limpeza, ajuste, carga de gás, troca de peça — nada foi anotado. " +
         "Sem isso, daqui a seis meses ninguém sabe o que foi feito nesta máquina.\n\n" +
@@ -3508,168 +3508,118 @@ const COR = {
    o texto e as fotos ocupam a folha; só no fim se sabe o total, e aí o
    rodapé é escrito em todas. */
 function montarLaudo(dados, imagens){
-  const LU = PAG.w - PAG.ml - PAG.mr;
-  const paginas = [];
-  let ops = null, y = 0;
-
-  const cor = (c, traco) => n2(c[0]) + " " + n2(c[1]) + " " + n2(c[2]) + (traco ? " RG" : " rg");
-
-  function escrever(x, base, s, tam, negrito, c){
-    s = paraWinAnsi(s);
-    if(!s) return;
-    ops.push("BT " + cor(c || COR.tinta) + " /" + (negrito ? "F2" : "F1") + " " + n2(tam) +
-             " Tf 1 0 0 1 " + n2(x) + " " + n2(base) + " Tm (" + escPDF(s) + ") Tj ET");
-  }
-  function caixa(x, yy, w, h, c){
-    ops.push(cor(c) + " " + n2(x) + " " + n2(yy) + " " + n2(w) + " " + n2(h) + " re f");
-  }
-  function risco(x1, y1, x2, y2, c, esp){
-    ops.push(cor(c || COR.linha, true) + " " + n2(esp || 0.7) + " w " +
-             n2(x1) + " " + n2(y1) + " m " + n2(x2) + " " + n2(y2) + " l S");
-  }
-  function novaPagina(){
-    ops = []; paginas.push(ops);
-    y = PAG.h - PAG.mt;
-    if(paginas.length > 1){
-      escrever(PAG.ml, y - 7, "Laudo técnico · " +
-               (dados.numeroLaudo || dados.numero) + " · chopeira " +
-               dados.chopeiraCodigo, 8, false, COR.fraca);
-      risco(PAG.ml, y - 13, PAG.w - PAG.mr, y - 13, COR.linha, 0.7);
-      y -= 26;
-    }
-  }
-  const garantir = h => { if(y - h < PAG.mb) novaPagina(); };
-
-  function paragrafo(s, x, larg, tam, negrito, c, entre){
-    entre = entre || tam * 1.38;
-    quebrar(s, larg, tam, negrito).forEach(l => {
-      if(l === ""){ y -= entre * 0.5; return; }
-      garantir(entre);
-      escrever(x, y - tam * 0.86, l, tam, negrito, c);
-      y -= entre;
-    });
-  }
-  function titulo(texto, arrasta){
-    garantir(40 + Math.min(arrasta || 30, 300));
-    y -= 6;
-    escrever(PAG.ml, y - 13, texto, 13, true, COR.tinta);
-    caixa(PAG.ml, y - 19, largura(paraWinAnsi(texto), 13, true), 3.5, COR.marca);
-    y -= 30;
-  }
-  function campo(rot, valor, x, larg){
-    if(!valor) return;
-    escrever(x, y - 7, rot.toUpperCase(), 7, true, COR.fraca);
-    y -= 11;
-    paragrafo(valor, x, larg, 10, false, COR.tinta, 13);
-    y -= 4;
-  }
+  /* Desenha com o mesmo folhaPDF dos outros documentos. Antes tinha os
+     seus próprios ajudantes — 29 linhas iguais às de lá — e qualquer
+     correção no motor do PDF tinha de ser feita duas vezes. */
+  const f = folhaPDF("Laudo técnico · " + (dados.numeroLaudo || dados.numero) +
+                     " · chopeira " + dados.chopeiraCodigo);
 
   /* ── capa ── */
-  novaPagina();
-  escrever(PAG.ml, y - 8, "GIBA SOLUÇÕES", 9, true, COR.marca);
-  y -= 24;
-  escrever(PAG.ml, y - 20, "Laudo técnico de manutenção", 21, true, COR.tinta);
-  y -= 30;
-  escrever(PAG.ml, y - 10,
+  f.novaPagina();
+  f.escrever(PAG.ml, f.y - 8, "GIBA SOLUÇÕES", 9, true, COR.marca);
+  f.y -= 24;
+  f.escrever(PAG.ml, f.y - 20, "Laudo técnico de manutenção", 21, true, COR.tinta);
+  f.y -= 30;
+  f.escrever(PAG.ml, f.y - 10,
            (dados.numeroLaudo ? dados.numeroLaudo + "  ·  " : "") + dados.numero +
            "  ·  chopeira " + dados.chopeiraCodigo + "  ·  " + dados.dataLaudo,
            10, false, COR.fraca);
-  y -= 20;
-  risco(PAG.ml, y, PAG.w - PAG.mr, y, COR.linha, 1);
-  y -= 20;
+  f.y -= 20;
+  f.risco(PAG.ml, f.y, PAG.w - PAG.mr, f.y, COR.linha, 1);
+  f.y -= 20;
 
   /* ── cliente e equipamento, lado a lado ── */
-  const meia = (LU - 18) / 2;
-  const yTopo = y;
-  escrever(PAG.ml, y - 8, "CLIENTE", 8, true, COR.fraca);
-  y -= 16;
+  const meia = (f.LU - 18) / 2;
+  const yTopo = f.y;
+  f.escrever(PAG.ml, f.y - 8, "CLIENTE", 8, true, COR.fraca);
+  f.y -= 16;
   [dados.cliente.nome, dados.cliente.razao, dados.cliente.cnpj ? "CNPJ " + dados.cliente.cnpj : "",
    dados.cliente.endereco, dados.cliente.cidade].filter(Boolean).forEach(l => {
-    paragrafo(l, PAG.ml, meia, 9.5, false, COR.tinta, 12.5);
+    f.paragrafo(l, PAG.ml, meia, 9.5, false, COR.tinta, 12.5);
   });
-  const yEsq = y;
+  const yEsq = f.y;
 
-  y = yTopo;
+  f.y = yTopo;
   const xd = PAG.ml + meia + 18;
-  escrever(xd, y - 8, "EQUIPAMENTO", 8, true, COR.fraca);
-  y -= 16;
+  f.escrever(xd, f.y - 8, "EQUIPAMENTO", 8, true, COR.fraca);
+  f.y -= 16;
   [dados.equipamento.codigo, dados.equipamento.marcaModelo, dados.equipamento.tipo,
    dados.equipamento.compressor, dados.equipamento.gas].filter(Boolean).forEach(l => {
-    paragrafo(l, xd, meia, 9.5, false, COR.tinta, 12.5);
+    f.paragrafo(l, xd, meia, 9.5, false, COR.tinta, 12.5);
   });
-  y = Math.min(yEsq, y) - 10;
-  risco(PAG.ml, y, PAG.w - PAG.mr, y, COR.linha, 0.7);
-  y -= 6;
+  f.y = Math.min(yEsq, f.y) - 10;
+  f.risco(PAG.ml, f.y, PAG.w - PAG.mr, f.y, COR.linha, 0.7);
+  f.y -= 6;
 
   /* ── o corpo ── */
   if(dados.problemaRelatado){
-    titulo("Reclamação do cliente");
-    paragrafo(dados.problemaRelatado, PAG.ml, LU, 10.5, false, COR.tinta, 14);
+    f.titulo("Reclamação do cliente");
+    f.paragrafo(dados.problemaRelatado, PAG.ml, f.LU, 10.5, false, COR.tinta, 14);
   }
   if(dados.problemaConstatado){
-    titulo("Problema constatado");
-    paragrafo(dados.problemaConstatado, PAG.ml, LU, 10.5, false, COR.tinta, 14);
+    f.titulo("Problema constatado");
+    f.paragrafo(dados.problemaConstatado, PAG.ml, f.LU, 10.5, false, COR.tinta, 14);
   }
 
   if((dados.componentes || []).length){
-    titulo("Ensaios realizados");
+    f.titulo("Ensaios realizados");
     dados.componentes.forEach(c => {
-      garantir(46);
-      y -= 4;
-      escrever(PAG.ml, y - 10, c.nome, 10.5, true, COR.tinta);
-      y -= 17;
-      paragrafo(c.ensaios, PAG.ml + 10, LU - 10, 9.8, false, COR.tinta, 13);
+      f.garantir(46);
+      f.y -= 4;
+      f.escrever(PAG.ml, f.y - 10, c.nome, 10.5, true, COR.tinta);
+      f.y -= 17;
+      f.paragrafo(c.ensaios, PAG.ml + 10, f.LU - 10, 9.8, false, COR.tinta, 13);
       if(c.conclusao){
         const c1 = /condena|substitu|troca|defeit/i.test(c.conclusao) ? COR.critico : COR.ok;
-        garantir(14);
-        escrever(PAG.ml + 10, y - 9, "→ " + c.conclusao, 9.8, true, c1);
-        y -= 16;
+        f.garantir(14);
+        f.escrever(PAG.ml + 10, f.y - 9, "→ " + c.conclusao, 9.8, true, c1);
+        f.y -= 16;
       }
-      y -= 3;
+      f.y -= 3;
     });
   }
 
   if(dados.servicoExecutado || (dados.servicos || []).length){
-    titulo("Serviço executado");
+    f.titulo("Serviço executado");
     if(dados.servicoExecutado){
-      paragrafo(dados.servicoExecutado, PAG.ml, LU, 10.5, false, COR.tinta, 14);
-      if((dados.servicos || []).length) y -= 8;
+      f.paragrafo(dados.servicoExecutado, PAG.ml, f.LU, 10.5, false, COR.tinta, 14);
+      if((dados.servicos || []).length) f.y -= 8;
     }
     /* O que foi registado na máquina, item a item, com data. É isto que
        responde "o que foi feito" quando o laudo é lido meses depois. */
     (dados.servicos || []).forEach(sv => {
-      garantir(20);
-      escrever(PAG.ml, y - 9, "•", 10, false, COR.fraca);
-      escrever(PAG.ml + 12, y - 9, sv.tipo, 10, true, COR.tinta);
-      escrever(PAG.w - PAG.mr - largura(paraWinAnsi(sv.quando), 8.5, false), y - 9,
+      f.garantir(20);
+      f.escrever(PAG.ml, f.y - 9, "•", 10, false, COR.fraca);
+      f.escrever(PAG.ml + 12, f.y - 9, sv.tipo, 10, true, COR.tinta);
+      f.escrever(PAG.w - PAG.mr - largura(paraWinAnsi(sv.quando), 8.5, false), f.y - 9,
                sv.quando, 8.5, false, COR.fraca);
-      y -= 14;
-      if(sv.peca)    paragrafo(sv.peca,    PAG.ml + 12, LU - 12, 9.5, false, COR.tinta, 12.5);
-      if(sv.detalhe) paragrafo(sv.detalhe, PAG.ml + 12, LU - 12, 9.5, false, COR.fraca, 12.5);
-      y -= 5;
+      f.y -= 14;
+      if(sv.peca)    f.paragrafo(sv.peca,    PAG.ml + 12, f.LU - 12, 9.5, false, COR.tinta, 12.5);
+      if(sv.detalhe) f.paragrafo(sv.detalhe, PAG.ml + 12, f.LU - 12, 9.5, false, COR.fraca, 12.5);
+      f.y -= 5;
     });
   }
 
   if((dados.pecas || []).length){
-    titulo("Peças substituídas");
+    f.titulo("Peças substituídas");
     dados.pecas.forEach(p => {
-      garantir(15);
-      escrever(PAG.ml, y - 9, "•", 10, false, COR.fraca);
+      f.garantir(15);
+      f.escrever(PAG.ml, f.y - 9, "•", 10, false, COR.fraca);
       const t = p.qtd ? p.qtd + " × " + p.descricao : p.descricao;
-      paragrafo(t, PAG.ml + 12, LU - 12 - (p.valor ? 90 : 0), 10, false, COR.tinta, 13.5);
+      f.paragrafo(t, PAG.ml + 12, f.LU - 12 - (p.valor ? 90 : 0), 10, false, COR.tinta, 13.5);
       if(p.valor){
-        escrever(PAG.w - PAG.mr - largura(paraWinAnsi(p.valor), 10, true), y + 13.5 - 9,
+        f.escrever(PAG.w - PAG.mr - largura(paraWinAnsi(p.valor), 10, true), f.y + 13.5 - 9,
                  p.valor, 10, true, COR.tinta);
       }
     });
     if(dados.totais){
-      y -= 6;
-      risco(PAG.ml, y, PAG.w - PAG.mr, y, COR.linha, 0.7);
-      y -= 16;
-      escrever(PAG.ml, y, "Total do serviço", 10, true, COR.tinta);
-      escrever(PAG.w - PAG.mr - largura(paraWinAnsi(dados.totais), 11, true), y,
+      f.y -= 6;
+      f.risco(PAG.ml, f.y, PAG.w - PAG.mr, f.y, COR.linha, 0.7);
+      f.y -= 16;
+      f.escrever(PAG.ml, f.y, "Total do serviço", 10, true, COR.tinta);
+      f.escrever(PAG.w - PAG.mr - largura(paraWinAnsi(dados.totais), 11, true), f.y,
                dados.totais, 11, true, COR.marca);
-      y -= 18;
+      f.y -= 18;
     }
   }
 
@@ -3677,71 +3627,61 @@ function montarLaudo(dados, imagens){
      Vai depois do serviço de propósito: primeiro o que foi feito,
      depois como a máquina ficou. */
   if(((dados.ficha || {}).itens || []).length){
-    titulo("Ficha técnica do equipamento");
+    f.titulo("Ficha técnica do equipamento");
     if(dados.ficha.desde){
-      paragrafo("Ficha original de " + dados.ficha.desde + ".", PAG.ml, LU, 9, false, COR.fraca, 12);
-      y -= 4;
+      f.paragrafo("Ficha original de " + dados.ficha.desde + ".", PAG.ml, f.LU, 9, false, COR.fraca, 12);
+      f.y -= 4;
     }
     dados.ficha.itens.forEach(it => {
-      garantir(24);
-      escrever(PAG.ml, y - 9, it.tipo, 10, true, COR.tinta);
+      f.garantir(24);
+      f.escrever(PAG.ml, f.y - 9, it.tipo, 10, true, COR.tinta);
       const marca = paraWinAnsi(it.estado);
-      escrever(PAG.w - PAG.mr - largura(marca, 8, true), y - 9, it.estado, 8, true,
+      f.escrever(PAG.w - PAG.mr - largura(marca, 8, true), f.y - 9, it.estado, 8, true,
                it.estado === "original" ? COR.fraca : COR.marca);
-      y -= 13;
-      if(it.resumo) paragrafo(it.resumo, PAG.ml + 12, LU - 12, 9.5, false, COR.tinta, 12.5);
-      if(it.era)    paragrafo("era: " + it.era, PAG.ml + 12, LU - 12, 8.5, false, COR.fraca, 11.5);
-      y -= 5;
+      f.y -= 13;
+      if(it.resumo) f.paragrafo(it.resumo, PAG.ml + 12, f.LU - 12, 9.5, false, COR.tinta, 12.5);
+      if(it.era)    f.paragrafo("era: " + it.era, PAG.ml + 12, f.LU - 12, 8.5, false, COR.fraca, 11.5);
+      f.y -= 5;
     });
   }
 
   if(dados.recomendacoes){
-    titulo("Recomendações");
-    paragrafo(dados.recomendacoes, PAG.ml, LU, 10.5, false, COR.tinta, 14);
+    f.titulo("Recomendações");
+    f.paragrafo(dados.recomendacoes, PAG.ml, f.LU, 10.5, false, COR.tinta, 14);
   }
 
   /* ── fotos ── */
   const fotos = (dados.fotos || []).map(id => imagens[id]).filter(Boolean);
   if(fotos.length){
-    titulo("Registro fotográfico", 200);
+    f.titulo("Registro fotográfico", 200);
     fotos.forEach(img => {
-      const larg = Math.min(LU, 330);
+      const larg = Math.min(f.LU, 330);
       const alt = larg * img.h / img.w;
-      garantir(alt + 14);
-      ops.push("q " + n2(larg) + " 0 0 " + n2(alt) + " " + n2(PAG.ml) + " " +
-               n2(y - alt) + " cm /" + img.nome + " Do Q");
-      y -= alt + 14;
+      f.garantir(alt + 14);
+      f.cru("q " + n2(larg) + " 0 0 " + n2(alt) + " " + n2(PAG.ml) + " " +
+               n2(f.y - alt) + " cm /" + img.nome + " Do Q");
+      f.y -= alt + 14;
     });
   }
 
   /* ── assinaturas ── */
-  garantir(96);
-  y -= 24;
-  risco(PAG.ml, y, PAG.w - PAG.mr, y, COR.linha, 0.7);
-  y -= 34;
-  const larguraAss = (LU - 30) / 2;
-  risco(PAG.ml, y, PAG.ml + larguraAss, y, COR.tinta, 0.7);
-  risco(PAG.ml + larguraAss + 30, y, PAG.w - PAG.mr, y, COR.tinta, 0.7);
-  y -= 12;
-  escrever(PAG.ml, y, dados.tecnico || "Técnico responsável", 9, false, COR.tinta);
-  escrever(PAG.ml + larguraAss + 30, y, dados.cliente.nome || "Cliente", 9, false, COR.tinta);
-  y -= 11;
-  escrever(PAG.ml, y, "Técnico responsável", 8, false, COR.fraca);
-  escrever(PAG.ml + larguraAss + 30, y, "Recebido por", 8, false, COR.fraca);
+  f.garantir(96);
+  f.y -= 24;
+  f.risco(PAG.ml, f.y, PAG.w - PAG.mr, f.y, COR.linha, 0.7);
+  f.y -= 34;
+  const larguraAss = (f.LU - 30) / 2;
+  f.risco(PAG.ml, f.y, PAG.ml + larguraAss, f.y, COR.tinta, 0.7);
+  f.risco(PAG.ml + larguraAss + 30, f.y, PAG.w - PAG.mr, f.y, COR.tinta, 0.7);
+  f.y -= 12;
+  f.escrever(PAG.ml, f.y, dados.tecnico || "Técnico responsável", 9, false, COR.tinta);
+  f.escrever(PAG.ml + larguraAss + 30, f.y, dados.cliente.nome || "Cliente", 9, false, COR.tinta);
+  f.y -= 11;
+  f.escrever(PAG.ml, f.y, "Técnico responsável", 8, false, COR.fraca);
+  f.escrever(PAG.ml + larguraAss + 30, f.y, "Recebido por", 8, false, COR.fraca);
 
-  /* ── rodapé em todas as páginas, agora que se sabe quantas são ── */
-  paginas.forEach((pg, i) => {
-    const guarda = ops;
-    ops = pg;
-    risco(PAG.ml, PAG.mb - 14, PAG.w - PAG.mr, PAG.mb - 14, COR.linha, 0.7);
-    escrever(PAG.ml, PAG.mb - 26, "Giba Soluções · laudo emitido em " + dados.dataLaudo,
-             8, false, COR.fraca);
-    const p = "Página " + (i + 1) + " de " + paginas.length;
-    escrever(PAG.w - PAG.mr - largura(paraWinAnsi(p), 8, false), PAG.mb - 26, p, 8, false, COR.fraca);
-    ops = guarda;
-  });
+  f.rodape(dados.dataLaudo, "laudo");
 
-  return paginas;
+  return f.paginas;
 }
 
 function escreverPDF(paginas, imagens, dados){
@@ -4206,7 +4146,7 @@ async function baixarLaudo(){
    o que está parado na bancada, e o que entregar.
    ═══════════════════════════════════════════════════════════════════ */
 const GRUPOS = [
-  {id:"buscar",  rot:"Buscar",     status:["aberto","recolha_agendada"],
+  {id:"buscar",  rot:"Buscar",     status: ETAPAS.aBuscar,
    data:"recolhaPrevista",
    vazio:"Nada para buscar."},
   {id:"oficina", rot:"Na oficina", status:["recebido","em_teste","em_manutencao",
@@ -4279,13 +4219,29 @@ function folhaPDF(rodapeTexto){
         y -= entre;
       });
     },
-    titulo(txt){
-      f.garantir(46);
+    /* "arrasta" é quanto do que vem a seguir se quer manter junto do
+       título: sem isto um título cai no fim da página e o conteúdo dele
+       começa na seguinte, que é feio e confunde quem lê. */
+    titulo(txt, arrasta){
+      f.garantir(40 + Math.min(arrasta || 30, 300));
       y -= 6;
       f.escrever(PAG.ml, y - 13, txt, 13, true, COR.tinta);
       f.caixa(PAG.ml, y - 19, largura(paraWinAnsi(txt), 13, true), 3.5, COR.marca);
       y -= 30;
     },
+
+    /* rótulo pequeno em cima, valor por baixo — a ficha do cliente e a
+       do equipamento são feitas disto. */
+    campo(rot, valor, x, larg){
+      if(!valor) return;
+      f.escrever(x, y - 7, rot.toUpperCase(), 7, true, COR.fraca);
+      y -= 11;
+      f.paragrafo(valor, x, larg, 10, false, COR.tinta, 13);
+      y -= 4;
+    },
+
+    /* para o que não passa pelos ajudantes — desenhar imagem, por ora */
+    cru(op){ ops.push(op); },
     rodape(dataEmissao, oQue){
       paginas.forEach((pg, i) => {
         const guarda = ops;
