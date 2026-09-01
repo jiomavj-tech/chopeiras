@@ -153,6 +153,24 @@ const ordenado = N.ordenar([
 ]).map(o => o.id);
 eq('mais recente primeiro', ordenado, ['nova','meio','velha']);
 
+/* ── o service worker conhece tudo o que a página pede? ──────
+   Esta apanhou-me: separei o CSS para style.css e esqueci-o na lista do
+   sw.js. Sem rede, o aplicativo abria sem estilo nenhum — e é defeito
+   que só aparece longe do escritório, onde não há como consertar. */
+const fs = require('fs'), caminho = require('path');
+const raiz = caminho.join(__dirname, '..');
+const html = fs.readFileSync(caminho.join(raiz, 'index.html'), 'utf8');
+const sw   = fs.readFileSync(caminho.join(raiz, 'sw.js'), 'utf8');
+
+const pedidos = [...html.matchAll(/(?:src|href)="\.\/([^"]+)"/g)].map(m => m[1]);
+const guardados = [...sw.matchAll(/'\.\/([^']+)'/g)].map(m => m[1]);
+
+eq('tudo o que o index.html pede está guardado para o offline',
+   pedidos.filter(f => !guardados.includes(f)), []);
+eq('nada é guardado sem existir no disco',
+   guardados.filter(f => f && !fs.existsSync(caminho.join(raiz, f))), []);
+certo('há ficheiros guardados', guardados.length > 5);
+
 /* ── resultado ────────────────────────────────────────────── */
 console.log('');
 if(falhas.length){

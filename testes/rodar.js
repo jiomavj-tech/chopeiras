@@ -43,13 +43,24 @@ function reescreverConfig(html, valor){
 
 const temporaria = fs.mkdtempSync(path.join(os.tmpdir(), 'chopeiras-teste-'));
 const original = fs.readFileSync(path.join(RAIZ, 'index.html'), 'utf8');
-fs.writeFileSync(path.join(temporaria, 'index.html'), reescreverConfig(original, 'teste'));
-fs.writeFileSync(path.join(temporaria, 'cru.html'), reescreverConfig(original, null));
+
+/* A configuração do Firebase passou do index.html para o arranque.js na
+   separação. É ela que se troca por valores de teste — e por valores por
+   preencher, para a suíte conferir a tela de "como ligar ao Firebase".
+   Como cru.html precisa de um arranque diferente do de index.html, cada
+   um leva o seu, e o cru aponta para o dele. */
+const arranque = fs.readFileSync(path.join(RAIZ, 'arranque.js'), 'utf8');
+fs.writeFileSync(path.join(temporaria, 'arranque.js'), reescreverConfig(arranque, 'teste'));
+fs.writeFileSync(path.join(temporaria, 'arranque-cru.js'), reescreverConfig(arranque, null));
+fs.writeFileSync(path.join(temporaria, 'index.html'), original);
+fs.writeFileSync(path.join(temporaria, 'cru.html'),
+  original.replace('./arranque.js', './arranque-cru.js'));
 /* O núcleo é carregado por <script src> e precisa de estar ao lado da
    página: sem ele o aplicativo nem arranca, e as quatro suítes falhavam
    todas com o mesmo erro, que não era defeito nenhum do aplicativo. */
 ['icone-192.png','icone-512.png','icone-mascara.png','manifest.webmanifest',
- 'nucleo.js','pecas-compressores.json']
+ 'style.css','pecas-compressores.json',
+ 'nucleo.js', 'base.js', 'clientes.js', 'chopeiras.js', 'acessos.js', 'chamados.js', 'integracoes.js', 'servicos.js', 'orcamento.js', 'documentos.js', 'demo.js']
   .forEach(f => fs.copyFileSync(path.join(RAIZ, f), path.join(temporaria, f)));
 
 const TIPOS = {'.html':'text/html; charset=utf-8', '.png':'image/png',
@@ -83,7 +94,7 @@ function correr(suite, ambiente){
    cruel: a que derruba o aplicativo inteiro em silêncio. Já aconteceu —
    um "else" sem fechar, e nenhuma tela funcionava. */
 function conferirSintaxe(){
-  const alvos = ['nucleo.js', 'sw.js'];
+  const alvos = ['nucleo.js', 'arranque.js', 'base.js', 'clientes.js', 'chopeiras.js', 'acessos.js', 'chamados.js', 'integracoes.js', 'servicos.js', 'orcamento.js', 'documentos.js', 'demo.js', 'sw.js'];
   for(const f of alvos){
     const r = spawnSync(process.execPath, ['--check', path.join(RAIZ, f)], {encoding:'utf8'});
     if(r.status !== 0){

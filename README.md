@@ -214,8 +214,20 @@ Publicando assim, as regras do Firestore continuam a ter de ser enviadas à part
 
 | Arquivo | Para que serve |
 |---|---|
-| `index.html` | Telas, formulários, gravação e documentos |
-| `nucleo.js` | As regras puras — sem tela, sem banco, sem rede. Testáveis em 1 s |
+| `index.html` | Só a estrutura e a ordem de carregamento — 141 linhas |
+| `style.css` | A folha de estilo. Cores todas em variáveis no `:root` |
+| `nucleo.js` | As regras puras — sem tela, sem banco, sem rede. Testáveis em 90 ms |
+| `arranque.js` | Firebase, portão de acesso, gravação sem esperar a rede |
+| `base.js` | Atalhos, estado em memória, navegação |
+| `clientes.js` | Empresas e pessoas: cadastro, e-mails liberados, convite |
+| `chopeiras.js` | Equipamentos e a ficha técnica dos componentes |
+| `acessos.js` | Quem entra, e o que o cliente vê da empresa dele |
+| `chamados.js` | Ordens de serviço: abrir, mover, prazos e recados |
+| `integracoes.js` | O que sai para fora: WhatsApp e agenda do Google |
+| `servicos.js` | Serviços executados na máquina, e o ditado por voz |
+| `orcamento.js` | Catálogo de peças, montar e responder orçamento |
+| `documentos.js` | Motor de PDF, laudo, relatório e avulsos |
+| `demo.js` | Firestore de mentira, para experimentar sem configurar |
 | `firestore.rules` | Quem vê o quê — conferido no servidor |
 | `firebase.json`, `.firebaserc` | Hospedagem e projeto |
 | `manifest.webmanifest` | Nome, cores e ícones para instalar no celular |
@@ -226,8 +238,14 @@ Publicando assim, as regras do Firestore continuam a ter de ser enviadas à part
 | `MANUAL-AGENDA-GOOGLE.md` | Como ligar a agenda do Google, uma vez só |
 | `robots.txt` | Pede aos buscadores que não indexem: é app de uso restrito |
 
+São **scripts clássicos, não módulos**, de propósito: o aplicativo tem 147 handlers escritos no
+próprio HTML (`onclick="salvarCliente()"`), e módulo tem escopo próprio — todos parariam de
+funcionar de uma vez. A ordem de carregamento está comentada no `index.html`.
+
 Ao publicar uma alteração, incrementar `VERSAO` no `sw.js` — e, se acrescentar um arquivo novo,
-pô-lo também na lista `ESSENCIAIS`, senão o aplicativo deixa de abrir sem rede. O número no rodapé é lido
+pô-lo também na lista `ESSENCIAIS`, senão o aplicativo deixa de abrir sem rede. Esta esquecemo-la
+uma vez, com o `style.css`: sem rede o aplicativo abria sem estilo nenhum. Agora há um teste que
+compara o que o `index.html` pede com o que o `sw.js` guarda, e falha se divergirem. O número no rodapé é lido
 da cache do service worker, e não escrito à mão: escrito à mão diverge, e uma página a dizer
 "versão 5" quando o aparelho já tem a 6 é pior do que não dizer nada. O rodapé tem ainda
 **procurar atualização**, para quando um aparelho ficou com a versão antiga guardada. O `sw.js` busca o HTML **pela rede primeiro** e só recorre à cache se não houver
@@ -245,8 +263,8 @@ rodado — e foi assim que um `else` sem fechar derrubou o aplicativo inteiro se
 node testes/unidade.js
 ```
 
-Confere as regras do `nucleo.js` — documento válido, prazo que vira o mês, orçamento que vence,
-soma de orçamento, o texto que o cliente lê, fluxo de status. **60 verificações em ~90 ms.**
+Confere as regras do `nucleo.js` e a lista do service worker — documento válido, prazo que vira o mês, orçamento que vence,
+soma de orçamento, o texto que o cliente lê, fluxo de status. **72 verificações em ~90 ms.**
 
 **Antes de publicar** (uns dois minutos):
 
