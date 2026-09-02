@@ -175,6 +175,23 @@ equipamentos dele com a ficha completa de cada um.
 Isto não é conferido dentro da página. Está em `firestore.rules` e é conferido antes de gravar —
 mesmo que alguém abra o console do navegador e tente escrever direto no banco, a regra recusa.
 
+### O que as regras também limitam
+
+| | limite | porquê |
+|---|---|---|
+| Foto | 800 mil caracteres | uma foto a 1280 px sai com 130 a 330 mil; o pior caso medido, ruído puro, deu 662 mil |
+| Chamado | campos fechados, texto até 4 mil, 5 fotos | sem isso o chamado podia nascer com orçamento ou laudo já inventados |
+| Chopeira provisória | código e observações curtos | é criada pelo cliente, e só ela |
+| Bloqueio | segura mesmo com convite antigo | o convite é a chave que liberta quem entrou cedo demais; ao bloquear, tira-se a chave |
+
+**O que as regras não conseguem:** contar documentos. Travar quem cria mil chamados pede
+[App Check](https://firebase.google.com/docs/app-check), que é definição de consola e não regra.
+
+**A defesa que não está no código:** quem entrar na conta `gibasolucoes@gmail.com` *é* o
+administrador, para todos os efeitos — nenhuma regra ajuda, porque para o servidor é ele mesmo.
+A verificação em duas etapas nessa conta vale mais do que tudo o que está neste arquivo. De
+preferência com app autenticador, não SMS, e com os códigos de recuperação em papel.
+
 ## Ligar ao Firebase (uma vez só)
 
 O aplicativo abre já com as instruções na tela enquanto não estiver ligado. Em resumo:
