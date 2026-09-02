@@ -70,7 +70,26 @@ async function liberar(uid, valor){
     return;
   }
   try{
-    await db.collection("usuarios").doc(uid).update({ativo: !!valor});
+    /* "bloqueado" é a marca que a regra do servidor confere: distingue
+       quem nunca foi liberado de quem o administrador barrou. */
+    await db.collection("usuarios").doc(uid).update({ativo: !!valor, bloqueado: !valor});
+
+    /* Bloquear tem de segurar. Quem tem convite pode ligar-se sozinho à
+       empresa dele no acesso seguinte — é o que impede quem entrou antes
+       de ser liberado de ficar pendente para sempre. Só que a mesma
+       porta desfazia o bloqueio: bloqueava-se alguém e, ao abrir o
+       aplicativo, ele voltava a entrar. O convite é a chave, e ao
+       bloquear tira-se a chave. */
+    const email = (u && u.email || "").toLowerCase();
+    if(email){
+      if(!valor){
+        await db.collection("convites").doc(email).delete();
+      } else if(u && u.clienteId){
+        await db.collection("convites").doc(email).set({
+          clienteId: u.clienteId, criadoEm: firebase.firestore.FieldValue.serverTimestamp()});
+      }
+    }
+
     toast(valor ? "Acesso liberado." : "Acesso bloqueado.", "ok");
     telaAcessos();
   }catch(e){ toast("Não deu: " + (e.message||e), "err"); }
@@ -78,8 +97,27 @@ async function liberar(uid, valor){
 
 async function vincular(uid){
   const v = $("vinc_"+uid).value || null;
+  const u = USUARIOS.find(x => x.uid === uid);
   try{
     await db.collection("usuarios").doc(uid).update({clienteId: v});
+
+    /* O convite manda mais do que esta decisão: no acesso seguinte, a
+       pessoa liga-se sozinha à empresa que o convite disser. Se ficasse
+       um convite antigo apontando para outra empresa, ela voltaria para
+       lá e a mudança feita aqui desfazia-se sem aviso nenhum.
+
+       Por isso o convite acompanha: apagado quando se desliga, e
+       reescrito para a empresa nova quando se muda. */
+    const email = (u && u.email || "").toLowerCase();
+    if(email){
+      if(v){
+        await db.collection("convites").doc(email).set({
+          clienteId: v, criadoEm: firebase.firestore.FieldValue.serverTimestamp()});
+      } else {
+        await db.collection("convites").doc(email).delete();
+      }
+    }
+
     toast(v ? "Ligado a " + nomeCliente(v) + "." : "Desligado da empresa.", "ok");
     telaAcessos();
   }catch(e){ toast("Não deu: " + (e.message||e), "err"); }

@@ -171,6 +171,22 @@ eq('nada é guardado sem existir no disco',
    guardados.filter(f => f && !fs.existsSync(caminho.join(raiz, f))), []);
 certo('há ficheiros guardados', guardados.length > 5);
 
+/* ── as regras do Firestore dizem o que devem dizer? ─────────
+   Não substituem o emulador, mas apanham o esquecimento: um campo novo
+   que a regra devia proteger e não protege. Duas destas falhas já
+   aconteceram nesta sessão. */
+const regras = fs.readFileSync(caminho.join(raiz, 'firestore.rules'), 'utf8');
+
+certo('a foto tem teto de tamanho',      /dataUrl\.size\(\) <= \d+/.test(regras));
+certo('o chamado nasce com campos fechados', /keys\(\)\.hasOnly\(/.test(regras));
+certo('o bloqueio trava a auto-liberação',
+      /get\('bloqueado', false\) != true/.test(regras));
+eq('nenhum campo de acesso fica desprotegido na regra do próprio nome',
+   ['ativo','papel','clienteId','email','bloqueado']
+     .filter(c => !new RegExp("hasAny\\(\\[[^\\]]*'" + c + "'").test(regras)), []);
+certo('o chamado do cliente continua a nascer como aberto',
+      /request\.resource\.data\.status == 'aberto'/.test(regras));
+
 /* ── resultado ────────────────────────────────────────────── */
 console.log('');
 if(falhas.length){

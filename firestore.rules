@@ -40,6 +40,21 @@ service cloud.firestore {
       return eu().clienteId;
     }
 
+    /* ── Limites de tamanho ───────────────────────────────────────
+       As regras conseguem limitar o TAMANHO e o FORMATO do que se
+       grava. Não conseguem contar documentos — para travar quem cria
+       mil chamados é preciso o App Check, que é definição de consola e
+       não regra. Aqui fecha-se o que dá para fechar: ninguém enche um
+       documento até ao limite do Firestore só porque o app não o faria.
+
+       800 mil caracteres na foto: uma foto de chopeira reduzida a 1280
+       px sai com 130 a 330 mil, e o pior caso medido — ruído puro, que
+       comprime pior do que qualquer fotografia — deu 662 mil.        */
+
+    function textoCurto(v, max){
+      return !(v is string) || v.size() <= max;
+    }
+
     /* Existe convite aberto para o meu e-mail? */
     function temConvite(){
       return exists(/databases/$(database)/documents/convites/$(meuEmail()));
@@ -87,7 +102,7 @@ service cloud.firestore {
         autenticado()
         && request.auth.uid == uid
         && !request.resource.data.diff(resource.data).affectedKeys()
-             .hasAny(['ativo', 'papel', 'clienteId', 'email'])
+             .hasAny(['ativo', 'papel', 'clienteId', 'email', 'bloqueado'])
       );
 
       /* Uma exceção, e só esta: quem já tinha entrado antes de o
@@ -97,6 +112,12 @@ service cloud.firestore {
       allow update: if autenticado()
         && request.auth.uid == uid
         && temConvite()
+        /* Bloqueio do administrador segura, mesmo que fique um convite
+           para trás. Sem esta linha, a mesma porta que liberta quem
+           entrou cedo demais desfazia um bloqueio: bloqueava-se alguém e
+           ele voltava a entrar-se sozinho no acesso seguinte. */
+        && resource.data.get('bloqueado', false) != true
+        && request.resource.data.get('bloqueado', false) != true
         && request.resource.data.diff(resource.data).affectedKeys()
              .hasOnly(['ativo', 'clienteId', 'ultimoAcesso'])
         && request.resource.data.ativo == true
@@ -126,6 +147,9 @@ service cloud.firestore {
         liberado()
         && request.resource.data.clienteId == minhaEmpresa()
         && request.resource.data.provisorio == true
+        && textoCurto(request.resource.data.codigo, 60)
+        && textoCurto(request.resource.data.observacoes, 2000)
+        && textoCurto(request.resource.data.thumb, 20000)
       );
 
       allow update, delete: if ehAdmin();
@@ -139,12 +163,26 @@ service cloud.firestore {
     match /ordens/{id} {
       allow read: if ehAdmin() || (liberado() && resource.data.clienteId == minhaEmpresa());
 
+      /* O hasOnly é o que impede o chamado de nascer com orçamento,
+         laudo ou histórico já inventados: sem ele, a regra conferia o
+         que estava lá e ignorava tudo o resto que viesse junto. Não era
+         acesso a dados de outrem — era poder forjar, dentro do próprio
+         chamado, um orçamento que o administrador nunca fez. */
       allow create: if ehAdmin() || (
         liberado()
         && request.resource.data.clienteId == minhaEmpresa()
         && request.resource.data.status == 'aberto'
         && request.resource.data.abertoPor.uid == request.auth.uid
         && request.resource.data.naoLidoAdmin == true
+        && request.resource.data.keys().hasOnly([
+             'numero', 'clienteId', 'chopeiraId', 'chopeiraCodigo', 'status',
+             'problemaRelatado', 'fotos', 'thumb', 'historico', 'agenda',
+             'abertoPor', 'naoLidoAdmin', 'naoLidoCliente',
+             'abertoEm', 'atualizadoEm'])
+        && textoCurto(request.resource.data.problemaRelatado, 4000)
+        && request.resource.data.fotos.size() <= 5
+        && textoCurto(request.resource.data.thumb, 20000)
+        && request.resource.data.historico.size() <= 1
       );
 
       allow update: if ehAdmin() || (
@@ -191,7 +229,9 @@ service cloud.firestore {
        ao abrir chamado com foto), mas só marcada com a empresa dele. */
     match /fotos/{id} {
       allow read:   if ehAdmin() || (liberado() && resource.data.clienteId == minhaEmpresa());
-      allow create: if ehAdmin() || (liberado() && request.resource.data.clienteId == minhaEmpresa());
+      allow create: if (ehAdmin() || (liberado() && request.resource.data.clienteId == minhaEmpresa()))
+        && request.resource.data.dataUrl is string
+        && request.resource.data.dataUrl.size() <= 800000;
       allow update, delete: if ehAdmin();
     }
   }
