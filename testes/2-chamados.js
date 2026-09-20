@@ -23,7 +23,10 @@ const falha = t => { passos.push('  FALHA ' + t); erros.push(t); };
      Segue-se em frente no primeiro e recusa-se o segundo, que abriria
      uma janela para fora. */
   pg.on('dialog', d => /WhatsApp/.test(d.message()) ? d.dismiss() : d.accept());
-  const ruido = /gstatic|ERR_TUNNEL|sw\.js|service worker|A bad HTTP response code/i;
+  /* ERR_CERT_AUTHORITY_INVALID: em máquina atrás de proxy com certificado
+     próprio, o Chromium recusa os scripts de fora. A página em teste vem
+     por http do 127.0.0.1, então este erro nunca é do aplicativo. */
+  const ruido = /gstatic|ERR_TUNNEL|ERR_CERT_AUTHORITY_INVALID|sw\.js|service worker|A bad HTTP response code/i;
   pg.on('console', m => { if (m.type() === 'error' && !ruido.test(m.text())) erros.push('console: ' + m.text()); });
   pg.on('pageerror', e => erros.push('pageerror: ' + e.message));
 

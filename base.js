@@ -13,6 +13,17 @@
 const $ = id => document.getElementById(id);
 
 let toastTimer = null;
+/* Redesenhar a tela inteira a cada tecla apaga a caixa de busca e
+   escreve outra igual — e o teclado do telemóvel, que estava ligado à
+   primeira, fecha-se. Na prática entrava só a primeira letra e a busca
+   ficava inútil justamente nas listas grandes, que são as únicas em que
+   ela faz falta. Troca-se só a lista; a caixa fica de pé, com o foco e
+   o cursor onde estavam. */
+function trocarLista(id, html){
+  const alvo = $(id);
+  if(alvo) alvo.innerHTML = html;
+}
+
 function toast(msg, tipo){
   const t = $("toast");
   t.textContent = msg;

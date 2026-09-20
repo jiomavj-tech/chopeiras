@@ -82,14 +82,42 @@ assinalá-lo, porque o grupo "na oficina" não tinha data nenhuma.
 para a conversa de WhatsApp dele. O texto pede as duas coisas sem as quais o acesso não pode ser
 liberado, documento e e-mail, e explica porque tem de ser um e-mail do Google.
 
-**Catálogo do app de compressores.** Botão que traz 209 itens: os componentes do circuito da
-chopeira, 166 compressores (Embraco da tabela de equivalência, Elgin e Tecumseh) e 33
-ventiladores, cada um com a sua ficha. Traz só o que ainda não existe, e sempre com preço zerado:
-o valor é do Giba, não do catálogo.
+**Catálogo do app de compressores.** Botão que traz 398 itens: os componentes do circuito da
+chopeira, 166 compressores (Embraco da tabela de equivalência, Elgin e Tecumseh), 33 ventiladores
+e 189 itens de material elétrico. Traz só o que ainda não existe, e sempre com preço zerado: o
+valor é do Giba, não do catálogo.
 
-Cada compressor guarda os modelos que substitui, e a busca olha esse campo — chega uma máquina com
-um código antigo na etiqueta, digita-se o que está lá e aparece o que se compra hoje. Sem isso o
-catálogo seria uma lista de nomes que só serve para quem já sabe o nome.
+O material elétrico é o que faltava e é o que mais se troca: relé de partida, protetor térmico,
+capacitor de partida e de marcha, relé amperométrico DICOM, kit de relé e de protetor Tecumseh
+(com o código antigo ao lado do novo) e PTC — **cada um com o número de peça**, não só o nome.
+
+Busca-se pelo modelo do compressor, que é o que está escrito na máquina. Cada item de material
+elétrico guarda nas observações a que compressores serve e em que tensão; cada compressor guarda
+os modelos que substitui. Digita-se `FG70AK` e aparecem o relé `513506090` e o protetor
+`13554056`, com a tensão de cada um. Sem isso o catálogo seria uma lista de nomes que só serve
+para quem já sabe o nome.
+
+Capacitor não tem número de peça: o que o identifica é a faixa em µF e a tensão, e é assim que
+está na descrição — procurar por um código que não existe em catálogo nenhum só faria perder
+tempo na frente do cliente.
+
+O arquivo é **dado gerado**: corrigir uma tabela aqui seria perder a correção na próxima vez. As
+tabelas moram no app de compressores, e é lá que se mexe. Depois:
+
+```
+node ferramentas/gerar-catalogo.mjs            # procura em ../giba-compressores/index.html
+node ferramentas/gerar-catalogo.mjs /outro/caminho/index.html
+node testes/unidade.js                         # apanha catálogo truncado, repetido ou com preço
+```
+
+O preço sai sempre zerado, de propósito: o valor de venda é do Giba e mora no Firestore dele. Se o
+catálogo trouxesse preço, uma regeração apagaria a tabela de preços inteira.
+
+**A busca não perde o teclado.** Com a lista grande, procurar é a única forma de usar o cadastro —
+e a tela inteira era redesenhada a cada tecla, o que apagava a caixa de busca e escrevia outra
+igual. No telemóvel o teclado fechava e entrava só a primeira letra. Agora troca-se apenas a
+lista: a caixa fica de pé, com o cursor onde estava. Vale para peças, chopeiras e clientes —
+as três tinham o mesmo defeito.
 
 **Agenda do Google.** Marcar recolha ou entrega cria o compromisso sozinho, e **remarcar muda a
 data no mesmo compromisso** em vez de duplicar — o id do evento fica guardado na ordem. Apagar a
@@ -250,7 +278,8 @@ Publicando assim, as regras do Firestore continuam a ter de ser enviadas à part
 | `manifest.webmanifest` | Nome, cores e ícones para instalar no celular |
 | `sw.js` | Faz o app abrir sem rede depois de instalado |
 | `testes/` | Os testes de unidade, as quatro suítes de navegador e o Firestore de mentira |
-| `pecas-compressores.json` | Catálogo trazido do app de compressores, gerado por script |
+| `pecas-compressores.json` | Catálogo trazido do app de compressores — **dado gerado, não se edita à mão** |
+| `ferramentas/gerar-catalogo.mjs` | Gera o arquivo acima a partir do app de compressores |
 | `MANUAL-CLIENTE.md` | Guia de uma página para mandar ao cliente |
 | `MANUAL-AGENDA-GOOGLE.md` | Como ligar a agenda do Google, uma vez só |
 | `robots.txt` | Pede aos buscadores que não indexem: é app de uso restrito |
@@ -280,8 +309,9 @@ rodado — e foi assim que um `else` sem fechar derrubou o aplicativo inteiro se
 node testes/unidade.js
 ```
 
-Confere as regras do `nucleo.js` e a lista do service worker — documento válido, prazo que vira o mês, orçamento que vence,
-soma de orçamento, o texto que o cliente lê, fluxo de status. **72 verificações em ~90 ms.**
+Confere as regras do `nucleo.js`, a lista do service worker, o catálogo de peças e o que as
+regras do Firestore dizem — documento válido, prazo que vira o mês, orçamento que vence, soma de
+orçamento, o texto que o cliente lê, fluxo de status. **85 verificações em ~90 ms.**
 
 **Antes de publicar** (uns dois minutos):
 
@@ -291,8 +321,8 @@ node testes/rodar.js
 
 Confere a sintaxe de tudo, corre os testes de unidade, e só depois abre o aplicativo num Chromium
 de verdade, com um Firestore de mentira no lugar do Google, percorrendo os fluxos inteiros —
-**82 verificações**, incluindo gerar o PDF e conferir que o arquivo
-é mesmo um PDF, com a foto embutida. Detalhe do que cobre e do que **não** cobre
+**88 verificações**, incluindo trazer o catálogo do Compressores inteiro e achar um relé pelo
+modelo do compressor, e gerar o PDF e conferir que o arquivo é mesmo um PDF, com a foto embutida. Detalhe do que cobre e do que **não** cobre
 em [`testes/LEIAME.md`](testes/LEIAME.md).
 
 ## O que ficou de fora, e porquê

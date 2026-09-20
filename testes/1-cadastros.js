@@ -19,7 +19,10 @@ function falha(t){ passos.push('  FALHA ' + t); erros.push(t); }
 
   /* o SDK real e o service worker são barrados de propósito neste teste:
      as falhas de rede que eles geram não são erro do aplicativo. */
-  const ruido = /gstatic|ERR_TUNNEL|sw\.js|service worker|A bad HTTP response code/i;
+  /* ERR_CERT_AUTHORITY_INVALID: em máquina atrás de proxy com certificado
+     próprio, o Chromium recusa os scripts de fora. A página em teste vem
+     por http do 127.0.0.1, então este erro nunca é do aplicativo. */
+  const ruido = /gstatic|ERR_TUNNEL|ERR_CERT_AUTHORITY_INVALID|sw\.js|service worker|A bad HTTP response code/i;
   pg.on('console', m => {
     if (m.type() === 'error' && !ruido.test(m.text())) erros.push('console: ' + m.text());
   });

@@ -99,17 +99,29 @@ async function importarPecasCompressores(){
   }
 }
 
-function telaPecas(){
-  if(editando && editando.tipo === "peca") return formPeca();
-
+/* As observações entram na busca de propósito: é lá que fica o
+   "substitui: EM20HHR, EM20HHP…" de cada compressor, e o "serve:
+   FG70AK" de cada relé e protetor. Chega uma máquina, digita-se o que
+   está escrito nela e aparece o que se compra hoje. */
+function listaPecas(){
   const busca = (window.__buscaPec || "").toLowerCase();
-  /* As observações entram na busca de propósito: é lá que fica o
-     "substitui: EM20HHR, EM20HHP…" de cada compressor. Chega uma
-     máquina com um modelo antigo, digita-se o código que está na
-     etiqueta e aparece o que se compra hoje. */
   const lista = PECAS.filter(p => !busca ||
     [p.codigo, p.descricao, p.aplicacao, p.observacoes]
       .map(x => x || "").join(" ").toLowerCase().includes(busca));
+
+  return lista.length ? lista.map(cartaoPeca).join("") :
+    '<div class="vazio">' + (PECAS.length ? "Nada encontrado." :
+      "Nenhuma peça cadastrada. Lance as que você mais troca — elas entram no orçamento com um toque.") +
+    '</div>';
+}
+
+function filtrarPecas(v){
+  window.__buscaPec = v;
+  trocarLista("listaPecas", listaPecas());
+}
+
+function telaPecas(){
+  if(editando && editando.tipo === "peca") return formPeca();
 
   $("tela").innerHTML =
     '<div class="btns" style="margin:0 0 12px">' +
@@ -117,12 +129,9 @@ function telaPecas(){
       '<button class="btn" id="btImportar" onclick="importarPecasCompressores()">Trazer do Compressores</button>' +
       '<button class="btn" onclick="atualizar()">Atualizar</button>' +
     '</div>' +
-    '<div class="busca"><input placeholder="Código, descrição, ou o modelo antigo que substitui" value="' +
-      esc(window.__buscaPec||"") + '" oninput="window.__buscaPec=this.value;telaPecas()"></div>' +
-    (lista.length ? lista.map(cartaoPeca).join("") :
-      '<div class="vazio">' + (PECAS.length ? "Nada encontrado." :
-        "Nenhuma peça cadastrada. Lance as que você mais troca — elas entram no orçamento com um toque.") +
-      '</div>');
+    '<div class="busca"><input placeholder="Código, descrição, ou o modelo da máquina" value="' +
+      esc(window.__buscaPec||"") + '" oninput="filtrarPecas(this.value)"></div>' +
+    '<div id="listaPecas">' + listaPecas() + '</div>';
 }
 
 function cartaoPeca(p){

@@ -25,7 +25,10 @@ const falha = t => { passos.push('  FALHA ' + t); erros.push(t); };
     if(d.type() === 'prompt') return d.accept(respostaDoPrompt);
     return d.accept();
   });
-  const ruido = /gstatic|ERR_TUNNEL|sw\.js|service worker|A bad HTTP response code/i;
+  /* ERR_CERT_AUTHORITY_INVALID: em máquina atrás de proxy com certificado
+     próprio, o Chromium recusa os scripts de fora. A página em teste vem
+     por http do 127.0.0.1, então este erro nunca é do aplicativo. */
+  const ruido = /gstatic|ERR_TUNNEL|ERR_CERT_AUTHORITY_INVALID|sw\.js|service worker|A bad HTTP response code/i;
   pg.on('console', m => { if (m.type() === 'error' && !ruido.test(m.text())) erros.push('console: ' + m.text()); });
   pg.on('pageerror', e => erros.push('pageerror: ' + e.message));
 
@@ -90,12 +93,69 @@ const falha = t => { passos.push('  FALHA ' + t); erros.push(t); };
                         : falha('sugestões: ' + nSug);
   await pg.click('button:has-text("Cancelar")');
 
+  let t;
+
+  // ── 3b. trazer o catálogo do Giba Compressores
+  /* O catálogo é um arquivo à parte, e é grande: compressores,
+     ventiladores e o material elétrico com o número de peça de cada
+     relé, protetor e capacitor. Este teste existe porque ninguém
+     percebe que o arquivo deixou de ser copiado até um técnico
+     procurar um código na frente do cliente e não achar nada. */
+  await pg.click('#btImportar');
+  await pg.waitForFunction(() => Object.keys(window.__LOJA.pecas).length > 300,
+    null, { timeout: 30000 });
+  const nPecas = await pg.evaluate(() => Object.keys(window.__LOJA.pecas).length);
+  const catalogo = await pg.evaluate(() => Object.values(window.__LOJA.pecas));
+  const eletricas = catalogo.filter(p => p.aplicacao === 'Material elétrico');
+  (nPecas === 399 && eletricas.length === 189)
+    ? ok('catálogo trazido: ' + nPecas + ' peças, ' + eletricas.length + ' de material elétrico')
+    : falha('trouxe ' + nPecas + ' peças, ' + eletricas.length + ' elétricas');
+
+  catalogo.filter(p => p.aplicacao === 'Material elétrico' || p.aplicacao === 'Compressor')
+          .every(p => p.precoVenda === 0)
+    ? ok('catálogo chega com preço zerado — o valor é dele, não do fornecedor')
+    : falha('veio peça com preço de fábrica');
+
+  /* O que o técnico tem na mão é o modelo escrito no compressor, não o
+     código do relé. A busca tem de ir pelas observações. */
+  /* Letra a letra, e não de uma vez: é assim que a pessoa digita, e é
+     só assim que se apanha a tela a ser redesenhada por baixo da caixa
+     de busca — que apagava o <input> em uso, fechava o teclado do
+     telemóvel e deixava entrar só a primeira letra. */
+  await pg.click('.busca input');
+  await pg.keyboard.type('FG70AK', { delay: 40 });
+  await pg.waitForTimeout(400);
+  const caixa = await pg.evaluate(() => ({
+    focada: document.activeElement === document.querySelector('.busca input'),
+    valor: document.querySelector('.busca input').value }));
+  (caixa.focada && caixa.valor === 'FG70AK')
+    ? ok('a caixa de busca não perde o foco enquanto se digita')
+    : falha('busca depois de digitar: ' + JSON.stringify(caixa));
+  const achou = await pg.textContent('#tela');
+  (achou.includes('513506090') && achou.includes('Relé de partida')
+    && achou.includes('Protetor térmico'))
+    ? ok('procurar pelo modelo do compressor acha o relé e o protetor dele')
+    : falha('busca por FG70AK: ' + achou.slice(0, 200));
+
+  await pg.fill('.busca input', '');
+  await pg.evaluate(() => filtrarPecas(''));
+  await pg.waitForTimeout(300);
+
+  // ── 3c. trazer de novo não duplica
+  await pg.click('#btImportar');
+  await pg.waitForTimeout(800);
+  const depoisDeRepetir = await pg.evaluate(() => Object.keys(window.__LOJA.pecas).length);
+  t = await pg.textContent('#toast');
+  (depoisDeRepetir === nPecas && t.includes("já estão"))
+    ? ok('trazer duas vezes não duplica nada')
+    : falha('segunda importação: ' + depoisDeRepetir + ' peças, aviso ' + t);
+
   // ── 4. peça sem descrição é recusada
   await pg.click('button:has-text("+ Nova peça")');
   await pg.fill('#p_preco', '10');
   await pg.click('#btPeca');
   await pg.waitForTimeout(300);
-  let t = await pg.textContent('#toast');
+  t = await pg.textContent('#toast');
   t.includes('Falta a descrição') ? ok('peça sem descrição recusada') : falha('recusa: ' + t);
   await pg.click('button:has-text("Cancelar")');
 
@@ -113,7 +173,13 @@ const falha = t => { passos.push('  FALHA ' + t); erros.push(t); };
   // ── 6. montar o orçamento: peça do catálogo + serviço na mão
   await pg.click('button:has-text("Montar o orçamento")');
   await pg.waitForSelector('button:has-text("+ Acrescentar")');
-  await pg.selectOption('select[onchange^="itemDoCatalogo"]', { index: 1 });
+  /* Escolhida pelo nome, e não pela posição: o catálogo do Compressores
+     entrou na mesma lista e a primeira opção já não é a peça deste teste. */
+  const opKP1 = await pg.$$eval('select[onchange^="itemDoCatalogo"] option',
+    os => (os.find(o => o.textContent.includes('KP1')) || {}).value);
+  opKP1 ? ok('a peça do cadastro continua na lista do orçamento')
+        : falha('KP1 sumiu da lista do catálogo');
+  await pg.selectOption('select[onchange^="itemDoCatalogo"]', opKP1);
   await pg.waitForTimeout(300);
   const doCatalogo = await pg.evaluate(() => editando.orc.itens[0]);
   (doCatalogo && doCatalogo.descricao.includes('KP1') && doCatalogo.valorUnit === 289.9

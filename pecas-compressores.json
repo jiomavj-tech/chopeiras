@@ -1,6 +1,6 @@
 {
- "origem": "Giba Compressores — equivalência, catálogos Elgin e Tecumseh, ventiladores e diagrama elétrico da chopeira",
- "gerado": "2026-09-01",
+ "origem": "Giba Compressores — equivalência, catálogos Elgin/Tecumseh/Embraco, índice de material elétrico, ventiladores e diagrama da chopeira",
+ "gerado": "2026-09-20",
  "pecas": [
   {
    "codigo": "KP1",
@@ -81,6 +81,1518 @@
    "precoVenda": 0,
    "aplicacao": "Chopeira",
    "observacoes": "Motor simples; liga com o pré-resfriador ou por chave própria, conforme o modelo."
+  },
+  {
+   "codigo": "13534209",
+   "descricao": "Protetor térmico 13534209",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: FG65HAK · Embraco FG65HAK · 220-240 V 50 Hz · kit de ALTO torque (HST)"
+  },
+  {
+   "codigo": "13554048",
+   "descricao": "Protetor térmico 13554048",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: FG70AK · Embraco FG70AK · 115 V 60 Hz · kit de ALTO torque (HST)"
+  },
+  {
+   "codigo": "13554056",
+   "descricao": "Protetor térmico 13554056",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: FG70AK · Embraco FG70AK · 220 V 60 Hz · kit de ALTO torque (HST)"
+  },
+  {
+   "codigo": "13554064",
+   "descricao": "Protetor térmico 13554064",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: FG80AK · Embraco FG80AK · 220 V 60 Hz · kit de ALTO torque (HST)"
+  },
+  {
+   "codigo": "13554072",
+   "descricao": "Protetor térmico 13554072",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: FG85HAK · Embraco FG85HAK · 220-240 V 50 Hz · kit de ALTO torque (HST)"
+  },
+  {
+   "codigo": "13554080",
+   "descricao": "Protetor térmico 13554080",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: FG80AK · Embraco FG80AK · 115 V 60 Hz · kit de ALTO torque (HST)"
+  },
+  {
+   "codigo": "13554170",
+   "descricao": "Protetor térmico 13554170",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: FG95HAK · Embraco FG95HAK · 220-240 V 50 Hz · kit de ALTO torque (HST)"
+  },
+  {
+   "codigo": "13554471",
+   "descricao": "Protetor térmico 13554471",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: FG75HAK · Embraco FG75HAK · 220-240 V 50 Hz · kit de ALTO torque (HST)"
+  },
+  {
+   "codigo": "513506082",
+   "descricao": "Relé de partida 513506082",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: FG70AK · Embraco FG70AK · 115 V 60 Hz · kit de ALTO torque (HST)"
+  },
+  {
+   "codigo": "513506090",
+   "descricao": "Relé de partida 513506090",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: FG70AK · Embraco FG70AK · 220 V 60 Hz · kit de ALTO torque (HST)"
+  },
+  {
+   "codigo": "513506104",
+   "descricao": "Relé de partida 513506104",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: FG80AK · Embraco FG80AK · 115 V 60 Hz · kit de ALTO torque (HST)"
+  },
+  {
+   "codigo": "513506112",
+   "descricao": "Relé de partida 513506112",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: FG80AK · Embraco FG80AK · 220 V 60 Hz · kit de ALTO torque (HST)"
+  },
+  {
+   "codigo": "513506341",
+   "descricao": "Relé de partida 513506341",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: FG95HAK · Embraco FG95HAK · 220-240 V 50 Hz · kit de ALTO torque (HST)"
+  },
+  {
+   "codigo": "513506597",
+   "descricao": "Relé de partida 513506597",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: FG65HAK · Embraco FG65HAK · 220-240 V 50 Hz · kit de ALTO torque (HST)"
+  },
+  {
+   "codigo": "513506600",
+   "descricao": "Relé de partida 513506600",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: FG75HAK · Embraco FG75HAK · 220-240 V 50 Hz · kit de ALTO torque (HST)"
+  },
+  {
+   "codigo": "513506619",
+   "descricao": "Relé de partida 513506619",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: FG85HAK · Embraco FG85HAK · 220-240 V 50 Hz · kit de ALTO torque (HST)"
+  },
+  {
+   "codigo": "MS2-4.7L-01",
+   "descricao": "Relé de partida MS2-4.7L-01",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENL 20 D · Elgin ENL 20 D · 127 V 60 Hz · MCC 1.2 A · LRA 14.5 A"
+  },
+  {
+   "codigo": "MP4NE276 LL80-52",
+   "descricao": "Protetor térmico MP4NE276 LL80-52",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENL 20 D · Elgin ENL 20 D · 127 V 60 Hz · MCC 1.2 A · LRA 14.5 A"
+  },
+  {
+   "codigo": "MS2-15L-01",
+   "descricao": "Relé de partida MS2-15L-01",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENL 20 E, ENL 45 H, ENL 55 H, ENL 3030 E, ENL 3040 E, ENL 3045 E · Elgin ENL 20 E · 220 V 60 Hz · MCC 0.55 A · LRA 7.8 A · Elgin ENL 45 H · 220 V 50 Hz · MCC 0.81 A · LRA 11.6 A"
+  },
+  {
+   "codigo": "MP4SE134 LL30-52",
+   "descricao": "Protetor térmico MP4SE134 LL30-52",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENL 20 E · Elgin ENL 20 E · 220 V 60 Hz · MCC 0.55 A · LRA 7.8 A"
+  },
+  {
+   "codigo": "QP2-4R7",
+   "descricao": "Relé de partida QP2-4R7",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENL 30 D, ENL 40 D · Elgin ENL 30 D · 127 V 60 Hz · MCC 1.6 A · LRA 18 A · Elgin ENL 40 D · 127 V 60 Hz · MCC 1.8 A · LRA 18 A"
+  },
+  {
+   "codigo": "B100-120",
+   "descricao": "Protetor térmico B100-120",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENL 30 D, ENL 40 D, ENL 45 D, ENL 55 E, ENLE 45 D, ENLE 59 E, ENLE 0065 E, ENLE 0085 E · Elgin ENL 30 D · 127 V 60 Hz · MCC 1.6 A · LRA 18 A · Elgin ENL 40 D · 127 V 60 Hz · MCC 1.8 A · LRA 18 A"
+  },
+  {
+   "codigo": "QP2-22",
+   "descricao": "Relé de partida QP2-22",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENL 30 E, ENL 40 E, ENL 40 H, ENL 45 E, ENL 55 E · Elgin ENL 30 E · 220 V 60 Hz · MCC 0.7 A · LRA 9.8 A · Elgin ENL 40 E · 220 V 60 Hz · MCC 0.8 A · LRA 9.8 A"
+  },
+  {
+   "codigo": "B48-125",
+   "descricao": "Protetor térmico B48-125",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENL 30 E, ENL 40 E, ENL 40 H · Elgin ENL 30 E · 220 V 60 Hz · MCC 0.7 A · LRA 9.8 A · Elgin ENL 40 E · 220 V 60 Hz · MCC 0.8 A · LRA 9.8 A"
+  },
+  {
+   "codigo": "QP2-12",
+   "descricao": "Relé de partida QP2-12",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENL 45 D, ENL 55 D · Elgin ENL 45 D · 127 V 60 Hz · MCC 2.3 A · LRA 23.4 A · Elgin ENL 55 D · 127 V 60 Hz · MCC 2.5 A · LRA 23.4 A"
+  },
+  {
+   "codigo": "B64-120",
+   "descricao": "Protetor térmico B64-120",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENL 45 E, ENLE 45 E · Elgin ENL 45 E · 220 V 60 Hz · MCC 0.9 A · LRA 12 A · Elgin ENLE 45 E · 220 V 60 Hz · MCC 0.9 A · LRA 8.6 A"
+  },
+  {
+   "codigo": "MP4SE181 BLL44-52",
+   "descricao": "Protetor térmico MP4SE181 BLL44-52",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENL 45 H · Elgin ENL 45 H · 220 V 50 Hz · MCC 0.81 A · LRA 11.6 A"
+  },
+  {
+   "codigo": "B120-120",
+   "descricao": "Protetor térmico B120-120",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENL 55 D, ENLE 0115 E · Elgin ENL 55 D · 127 V 60 Hz · MCC 2.5 A · LRA 23.4 A · Elgin ENLE 0115 E · 220 V 60 Hz · MCC 1.6 A · LRA 15.8 A"
+  },
+  {
+   "codigo": "MP4NE222 LL64-52",
+   "descricao": "Protetor térmico MP4NE222 LL64-52",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENL 55 H, ENL 3030 E · Elgin ENL 55 H · 220 V 50 Hz · MCC 0.96 A · LRA 11.6 A · Elgin ENL 3030 E · 220 V 60 Hz · MCC 0.8 A · LRA 12 A"
+  },
+  {
+   "codigo": "QL2-10.3",
+   "descricao": "Relé de partida QL2-10.3",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENLE 45 D, ENLE 55 D, ENLE 59 D, ENLE 0065 D, ENLE 0085 D, ENLE 3115 E, PTM 0059 D, PTM 0065 D · Elgin ENLE 45 D · 127 V 60 Hz · MCC 2.3 A · LRA 18.2 A · Elgin ENLE 55 D · 127 V 60 Hz · MCC 2.8 A · LRA 20.2 A"
+  },
+  {
+   "codigo": "",
+   "descricao": "Capacitor de partida 161–193 / 165 V",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENLE 45 D, ENLE 55 D, ENLE 59 D, ENLE 0115 D, ENLE 0130 D, PTM 0030 D, PTM 0040 E, PTM 0059 D, PTM 0065 D · Elgin ENLE 45 D · 127 V 60 Hz · MCC 2.3 A · LRA 18.2 A · Elgin ENLE 55 D · 127 V 60 Hz · MCC 2.8 A · LRA 20.2 A"
+  },
+  {
+   "codigo": "QL2-4.8",
+   "descricao": "Relé de partida QL2-4.8",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENLE 45 E, ENLE 55 E, ENLE 0065 E, ENLE 0085 E, PTM 0065 E, PTM 0085 E · Elgin ENLE 45 E · 220 V 60 Hz · MCC 0.9 A · LRA 8.6 A · Elgin ENLE 55 E · 220 V 60 Hz · MCC 1.2 A · LRA 10.3 A"
+  },
+  {
+   "codigo": "",
+   "descricao": "Capacitor de partida 64–77 / 330 V",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENLE 45 E, ENLE 0065 E, ENLE 0085 E, ENLE 0115 E, ENLE 0130 E, ENLE 3055 E, ENLE 3065 E, ENLE 3075 E, ENLE 3085 E, ENLE 3115 E, PTM 0030 E, PTM 0062 E e mais 5 · Elgin ENLE 45 E · 220 V 60 Hz · MCC 0.9 A · LRA 8.6 A · Elgin ENLE 0065 E · 220 V 60 Hz · MCC 1.7 A · LRA 9 A"
+  },
+  {
+   "codigo": "B210-120",
+   "descricao": "Protetor térmico B210-120",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENLE 55 D, ENLE 59 D, ENLE 0065 D, ENLE 0085 D, ENLE 3115 E · Elgin ENLE 55 D · 127 V 60 Hz · MCC 2.8 A · LRA 20.2 A · Elgin ENLE 59 D · 127 V 60 Hz · MCC 3.3 A · LRA 20.2 A"
+  },
+  {
+   "codigo": "B80-120",
+   "descricao": "Protetor térmico B80-120",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENLE 55 E · Elgin ENLE 55 E · 220 V 60 Hz · MCC 1.2 A · LRA 10.3 A"
+  },
+  {
+   "codigo": "",
+   "descricao": "Capacitor de partida 88–108 / 330 V",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENLE 55 E, ENLE 59 E, PTM 0059 E · Elgin ENLE 55 E · 220 V 60 Hz · MCC 1.2 A · LRA 10.3 A · Elgin ENLE 59 E · 220 V 60 Hz · MCC 1.6 A · LRA 10.3 A"
+  },
+  {
+   "codigo": "QL2-6.1",
+   "descricao": "Relé de partida QL2-6.1",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENLE 59 E, PTM 0059 E · Elgin ENLE 59 E · 220 V 60 Hz · MCC 1.6 A · LRA 10.3 A · Elgin unidade PTM 0059 E · 1/5 HP · compressor ENLE 59 E · 220 V 60 Hz"
+  },
+  {
+   "codigo": "",
+   "descricao": "Capacitor de partida 124–149 / 165 V",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENLE 0065 D, ENLE 0085 D · Elgin ENLE 0065 D · 127 V 60 Hz · MCC 3.48 A · LRA 20.2 A · Elgin ENLE 0085 D · 127 V 60 Hz · MCC 3.65 A · LRA 20.2 A"
+  },
+  {
+   "codigo": "QL2-20.9",
+   "descricao": "Relé de partida QL2-20.9",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENLE 0115 D, ENLE 0130 D · Elgin ENLE 0115 D · 127 V 60 Hz · MCC 4 A · LRA 38.1 A · Elgin ENLE 0130 D · 127 V 60 Hz · MCC 5.6 A · LRA 38.1 A"
+  },
+  {
+   "codigo": "B300-120",
+   "descricao": "Protetor térmico B300-120",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENLE 0115 D, ENLE 0130 D · Elgin ENLE 0115 D · 127 V 60 Hz · MCC 4 A · LRA 38.1 A · Elgin ENLE 0130 D · 127 V 60 Hz · MCC 5.6 A · LRA 38.1 A"
+  },
+  {
+   "codigo": "QL2-11.0",
+   "descricao": "Relé de partida QL2-11.0",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENLE 0115 E, ENLE 0130 E, PTM 0115 E, PTM 0130 E · Elgin ENLE 0115 E · 220 V 60 Hz · MCC 1.6 A · LRA 15.8 A · Elgin ENLE 0130 E · 220 V 60 Hz · MCC 2.7 A · LRA 15.8 A"
+  },
+  {
+   "codigo": "B180-130",
+   "descricao": "Protetor térmico B180-130",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENLE 0130 E, ENLE 3075 E · Elgin ENLE 0130 E · 220 V 60 Hz · MCC 2.7 A · LRA 15.8 A · Elgin ENLE 3075 E · 220 V 60 Hz · MCC 1.8 A · LRA 15.9 A"
+  },
+  {
+   "codigo": "DRB30N61A2",
+   "descricao": "Protetor térmico DRB30N61A2",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENL 3040 E, ENL 3045 E · Elgin ENL 3040 E · 220 V 60 Hz · MCC 0.9 A · LRA 12.6 A · Elgin ENL 3045 E · 220 V 60 Hz · MCC 1.1 A · LRA 12.6 A"
+  },
+  {
+   "codigo": "QL2-4.6",
+   "descricao": "Relé de partida QL2-4.6",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENLE 3055 E · Elgin ENLE 3055 E · 220 V 60 Hz · MCC 1.3 A · LRA 15.9 A"
+  },
+  {
+   "codigo": "MP4RE408B LL110-52",
+   "descricao": "Protetor térmico MP4RE408B LL110-52",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENLE 3055 E · Elgin ENLE 3055 E · 220 V 60 Hz · MCC 1.3 A · LRA 15.9 A"
+  },
+  {
+   "codigo": "QL2-5.2",
+   "descricao": "Relé de partida QL2-5.2",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENLE 3065 E · Elgin ENLE 3065 E · 220 V 60 Hz · MCC 1.6 A · LRA 15.9 A"
+  },
+  {
+   "codigo": "MP4RE414 LL120-52",
+   "descricao": "Protetor térmico MP4RE414 LL120-52",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENLE 3065 E · Elgin ENLE 3065 E · 220 V 60 Hz · MCC 1.6 A · LRA 15.9 A"
+  },
+  {
+   "codigo": "QL2-6.0",
+   "descricao": "Relé de partida QL2-6.0",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENLE 3075 E · Elgin ENLE 3075 E · 220 V 60 Hz · MCC 1.8 A · LRA 15.9 A"
+  },
+  {
+   "codigo": "QL2-6.7",
+   "descricao": "Relé de partida QL2-6.7",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENLE 3085 E · Elgin ENLE 3085 E · 220 V 60 Hz · MCC 1.9 A · LRA 16.6 A"
+  },
+  {
+   "codigo": "MP4RE435 LL150-52",
+   "descricao": "Protetor térmico MP4RE435 LL150-52",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: ENLE 3085 E · Elgin ENLE 3085 E · 220 V 60 Hz · MCC 1.9 A · LRA 16.6 A"
+  },
+  {
+   "codigo": "MTRPH 3831",
+   "descricao": "Relé de partida MTRPH 3831",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: PTM 0020 E · Elgin unidade PTM 0020 E · 1/3 HP · compressor TCM 0020 E · 220 V 60 Hz"
+  },
+  {
+   "codigo": "",
+   "descricao": "Capacitor de partida 124–149 / 330 V",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: PTM 0020 E · Elgin unidade PTM 0020 E · 1/3 HP · compressor TCM 0020 E · 220 V 60 Hz"
+  },
+  {
+   "codigo": "MTRPH 6931",
+   "descricao": "Relé de partida MTRPH 6931",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: PTM 0030 D · Elgin unidade PTM 0030 D · 1/2 HP · compressor TCM 0030 D · 127 V 60 Hz"
+  },
+  {
+   "codigo": "MTRPH 5231",
+   "descricao": "Relé de partida MTRPH 5231",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: PTM 0030 E · Elgin unidade PTM 0030 E · 1/2 HP · compressor TCM 0030 E · 220 V 60 Hz"
+  },
+  {
+   "codigo": "MTRPH 5531",
+   "descricao": "Relé de partida MTRPH 5531",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: PTM 0040 E, PTM 0040 H · Elgin unidade PTM 0040 E · 7/8 HP · compressor TCM 0040 E · 220 V 60 Hz · Elgin unidade PTM 0040 H · 7/8 HP · compressor TCM 0040 H · 220 V 50 Hz"
+  },
+  {
+   "codigo": "RVA 3AH 6D",
+   "descricao": "Relé de partida RVA 3AH 6D",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: PTM 0062 E · Elgin unidade PTM 0062 E · 1 1/4 HP · compressor TCM 0062 E · 220 V 60 Hz"
+  },
+  {
+   "codigo": "",
+   "descricao": "Capacitor de funcionamento 20 / 380 V",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: PTM 0062 E · Elgin unidade PTM 0062 E · 1 1/4 HP · compressor TCM 0062 E · 220 V 60 Hz"
+  },
+  {
+   "codigo": "",
+   "descricao": "Capacitor de partida 243 a 292 µF (mín. 150 VAC)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: FG70AK, FG80AK · Embraco FG70AK · 115 V 60 Hz · kit de ALTO torque (HST) · Embraco FG80AK · 115 V 60 Hz · kit de ALTO torque (HST)"
+  },
+  {
+   "codigo": "",
+   "descricao": "Capacitor de partida 72 a 88 µF (mín. 250 VAC)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: FG70AK, FG80AK · Embraco FG70AK · 220 V 60 Hz · kit de ALTO torque (HST) · Embraco FG80AK · 220 V 60 Hz · kit de ALTO torque (HST)"
+  },
+  {
+   "codigo": "",
+   "descricao": "Capacitor de partida 64 a 77 µF (mín. 220 VAC)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: FG65HAK, FG75HAK, FG85HAK · Embraco FG65HAK · 220-240 V 50 Hz · kit de ALTO torque (HST) · Embraco FG75HAK · 220-240 V 50 Hz · kit de ALTO torque (HST)"
+  },
+  {
+   "codigo": "",
+   "descricao": "Capacitor de partida 64 a 77 µF (mín. 250 VAC)",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: FG95HAK · Embraco FG95HAK · 220-240 V 50 Hz · kit de ALTO torque (HST)"
+  },
+  {
+   "codigo": "RP4818",
+   "descricao": "Relé amperométrico (DICOM) RP4818",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AE4440AS · Compressor Tecumseh AE4440AS · 1/4 HP · Relé amperométrico DICOM · também listado como AE4440"
+  },
+  {
+   "codigo": "RP5318",
+   "descricao": "Relé amperométrico (DICOM) RP5318",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AE4448AS · Compressor Tecumseh AE4448AS · 1/2 HP · Relé amperométrico DICOM"
+  },
+  {
+   "codigo": "RPC5661",
+   "descricao": "Relé amperométrico (DICOM) RPC5661",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AKM19AS · Compressor Tecumseh AKM19AS · 1/2 HP · Relé Tecumseh"
+  },
+  {
+   "codigo": "RP4218",
+   "descricao": "Relé amperométrico (DICOM) RP4218",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "compressor não confirmado · Mesma série DICOM. HP e compressor NÃO confirmados em fonte."
+  },
+  {
+   "codigo": "K90-11",
+   "descricao": "Kit de protetor Tecumseh K90-11",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA0418AXA, AEA2380ZXA, AEA2410AXA, AEA2411JXA, AEA4430AXA, AJA4461AXD · Compressor Tecumseh AEA0418AXA · Compressor Tecumseh AEA2380ZXA"
+  },
+  {
+   "codigo": "K90-01",
+   "descricao": "Kit de protetor Tecumseh K90-01",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA1336AXA, AEA3417YXD · Compressor Tecumseh AEA1336AXA · kit antigo P83541 · Compressor Tecumseh AEA3417YXD"
+  },
+  {
+   "codigo": "P83541",
+   "descricao": "Kit de protetor Tecumseh (código antigo) P83541",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA1336AXA · Compressor AEA1336AXA · substituído por K90-01"
+  },
+  {
+   "codigo": "K71-05",
+   "descricao": "Kit de relé Tecumseh K71-05",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA1338YXA, AEA1343AXA, AEA3414AXA, AEA3414YXA · Compressor Tecumseh AEA1338YXA · Compressor Tecumseh AEA1343AXA · kit antigo P82654"
+  },
+  {
+   "codigo": "K90-03",
+   "descricao": "Kit de protetor Tecumseh K90-03",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA1338YXA · Compressor Tecumseh AEA1338YXA · kit antigo P83628"
+  },
+  {
+   "codigo": "P83628",
+   "descricao": "Kit de protetor Tecumseh (código antigo) P83628",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA1338YXA · Compressor AEA1338YXA · substituído por K90-03"
+  },
+  {
+   "codigo": "P82654",
+   "descricao": "Kit de relé Tecumseh (código antigo) P82654",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA1343AXA, AEA3414AXA, AEA3414YXA · Compressor AEA1343AXA · substituído por K71-05 · Compressor AEA3414AXA · substituído por K71-05"
+  },
+  {
+   "codigo": "K90-02",
+   "descricao": "Kit de protetor Tecumseh K90-02",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA1343AXA · Compressor Tecumseh AEA1343AXA · kit antigo P83480"
+  },
+  {
+   "codigo": "P83480",
+   "descricao": "Kit de protetor Tecumseh (código antigo) P83480",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA1343AXA · Compressor AEA1343AXA · substituído por K90-02"
+  },
+  {
+   "codigo": "K71-08",
+   "descricao": "Kit de relé Tecumseh K71-08",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA1360AXA, AEA1360YXA, AEA3415ZXA, AEA3417AXA, AEA3417YXA, AEA3440YXD, AEA4440AXD, AEA4440YXD, AEB1343AXA, AZA0395YXA, TPA0413YXA, TPA0415YXA · Compressor Tecumseh AEA1360AXA · kit antigo P82927 · Compressor Tecumseh AEA1360YXA · kit antigo P82927"
+  },
+  {
+   "codigo": "P82927",
+   "descricao": "Kit de relé Tecumseh (código antigo) P82927",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA1360AXA, AEA1360YXA, AEA3417AXA, AEA3417YXA, AEA4440YXD, AZA0395YXA · Compressor AEA1360AXA · substituído por K71-08 · Compressor AEA1360YXA · substituído por K71-08"
+  },
+  {
+   "codigo": "K90-07",
+   "descricao": "Kit de protetor Tecumseh K90-07",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA1360AXA, AEA1380AXA, AEA3414AXA, AEA3414YXA, AEA3417AXA, AEA3417YXA, AEB3425AXA · Compressor Tecumseh AEA1360AXA · kit antigo P83601 · Compressor Tecumseh AEA1380AXA"
+  },
+  {
+   "codigo": "P83601",
+   "descricao": "Kit de protetor Tecumseh (código antigo) P83601",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA1360AXA, AEA3414AXA, AEA3414YXA, AEA3417AXA, AEA3417YXA · Compressor AEA1360AXA · substituído por K90-07 · Compressor AEA3414AXA · substituído por K90-07"
+  },
+  {
+   "codigo": "K90-04",
+   "descricao": "Kit de protetor Tecumseh K90-04",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA1360YXA, AZA0370YXA · Compressor Tecumseh AEA1360YXA · kit antigo P83535 · Compressor Tecumseh AZA0370YXA · kit antigo P83535"
+  },
+  {
+   "codigo": "P83535",
+   "descricao": "Kit de protetor Tecumseh (código antigo) P83535",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA1360YXA, AZA0370YXA · Compressor AEA1360YXA · substituído por K90-04 · Compressor AZA0370YXA · substituído por K90-04"
+  },
+  {
+   "codigo": "K90-14",
+   "descricao": "Kit de protetor Tecumseh K90-14",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA1410AXA, AKA5510EXV, RKA5512EXV, TPA9419YXA, TPA9421YXA · Compressor Tecumseh AEA1410AXA · Compressor Tecumseh AKA5510EXV"
+  },
+  {
+   "codigo": "K71-09",
+   "descricao": "Kit de relé Tecumseh K71-09",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA1411EXA, AEA3430AXA, AEA3430YXA, AEA4430AXA, AEA4430YXA, AEA9415EXA, AEA9415ZXA, AEB1411AXA, AEB1413AXA · Compressor Tecumseh AEA1411EXA · kit antigo P82928 · Compressor Tecumseh AEA3430AXA · kit antigo P82928"
+  },
+  {
+   "codigo": "P82928",
+   "descricao": "Kit de relé Tecumseh (código antigo) P82928",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA1411EXA, AEA3430AXA, AEA3430YXA, AEA4430AXA, AEA4430YXA, AEA9415EXA, AEA9415ZXA, AEB1411AXA, AEB1413AXA · Compressor AEA1411EXA · substituído por K71-09 · Compressor AEA3430AXA · substituído por K71-09"
+  },
+  {
+   "codigo": "K90-10",
+   "descricao": "Kit de protetor Tecumseh K90-10",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA1411EXA, AEA3425YXA, AEA3430AXA, AEA3430YXA, AEA8467EXA, AEA8469EXA · Compressor Tecumseh AEA1411EXA · kit antigo P83458 · Compressor Tecumseh AEA3425YXA · kit antigo P83458"
+  },
+  {
+   "codigo": "P83458",
+   "descricao": "Kit de protetor Tecumseh (código antigo) P83458",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA1411EXA, AEA3425YXA, AEA3430AXA, AEA3430YXA · Compressor AEA1411EXA · substituído por K90-10 · Compressor AEA3425YXA · substituído por K90-10"
+  },
+  {
+   "codigo": "K90-16",
+   "descricao": "Kit de protetor Tecumseh K90-16",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA1415EXA, AEA3440AXA, AEA4440AXA, AEA4440YXA, AKA5483EXD, AKA9442EXD, AKA9458JXD, RKA5490CXD, RKA5490EXD · Compressor Tecumseh AEA1415EXA · kit antigo P83509 · Compressor Tecumseh AEA3440AXA · kit antigo P83509"
+  },
+  {
+   "codigo": "P83509",
+   "descricao": "Kit de protetor Tecumseh (código antigo) P83509",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA1415EXA, AEA3440AXA, AEA4440AXA, AEA4440YXA, AKA5483EXD, AKA9442EXD, RKA5490EXD · Compressor AEA1415EXA · substituído por K90-16 · Compressor AEA3440AXA · substituído por K90-16"
+  },
+  {
+   "codigo": "K71-12",
+   "descricao": "Kit de relé Tecumseh K71-12",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA2380ZXA, AEA2410AXA, AEA2411JXA, AEA2413AXA · Compressor Tecumseh AEA2380ZXA · kit antigo P82940 · Compressor Tecumseh AEA2410AXA · kit antigo P82940"
+  },
+  {
+   "codigo": "P82940",
+   "descricao": "Kit de relé Tecumseh (código antigo) P82940",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA2380ZXA, AEA2410AXA, AEA2413AXA · Compressor AEA2380ZXA · substituído por K71-12 · Compressor AEA2410AXA · substituído por K71-12"
+  },
+  {
+   "codigo": "K71-01",
+   "descricao": "Kit de relé Tecumseh K71-01",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA2410YXA, AEA2411ZXA, AEA2413YXA, AEA2415AAB, AEA2416JXA, AEA4448AXA, AEA4448YXA, AEA9419YXA, AEA9422EXA, AEA9422ZXA · Compressor Tecumseh AEA2410YXA · kit antigo P82473 · Compressor Tecumseh AEA2411ZXA · kit antigo P82473"
+  },
+  {
+   "codigo": "P82473",
+   "descricao": "Kit de relé Tecumseh (código antigo) P82473",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA2410YXA, AEA2411ZXA, AEA2413YXA, AEA2415AAB, AEA4448AXA, AEA4448YXA, AEA9422EXA, AEA9422ZXA · Compressor AEA2410YXA · substituído por K71-01 · Compressor AEA2411ZXA · substituído por K71-01"
+  },
+  {
+   "codigo": "K90-17",
+   "descricao": "Kit de protetor Tecumseh K90-17",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA2410YXA, AEA2413YXA, AEA2415AAB, AJA2416AXA, RKA5470YXD, RKA5486YXD, RKA5510EXD, TPA9423YXA · Compressor Tecumseh AEA2410YXA · Compressor Tecumseh AEA2413YXA"
+  },
+  {
+   "codigo": "K90-15",
+   "descricao": "Kit de protetor Tecumseh K90-15",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA2411ZXA, AEA2416JXA, AEA3430YXU, AEA9422EXA · Compressor Tecumseh AEA2411ZXA · kit antigo P83503 · Compressor Tecumseh AEA2416JXA"
+  },
+  {
+   "codigo": "P83503",
+   "descricao": "Kit de protetor Tecumseh (código antigo) P83503",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA2411ZXA, AEA9422EXA · Compressor AEA2411ZXA · substituído por K90-15 · Compressor AEA9422EXA · substituído por K90-15"
+  },
+  {
+   "codigo": "K90-12",
+   "descricao": "Kit de protetor Tecumseh K90-12",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA2413AXA, AEA4430YXA, AEA9415EXA, AKA9438ZXD, RKA5490EXV, RKA5510EXV · Compressor Tecumseh AEA2413AXA · kit antigo P83532 · Compressor Tecumseh AEA4430YXA · kit antigo P83532"
+  },
+  {
+   "codigo": "P83532",
+   "descricao": "Kit de protetor Tecumseh (código antigo) P83532",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA2413AXA, AEA4430YXA, AEA9415EXA, AKA9438ZXD, RKA5490EXV · Compressor AEA2413AXA · substituído por K90-12 · Compressor AEA4430YXA · substituído por K90-12"
+  },
+  {
+   "codigo": "K90-08",
+   "descricao": "Kit de protetor Tecumseh K90-08",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA3425AXA, AEA4440YXD, AEB1380AXA · Compressor Tecumseh AEA3425AXA · Compressor Tecumseh AEA4440YXD"
+  },
+  {
+   "codigo": "K71-04",
+   "descricao": "Kit de relé Tecumseh K71-04",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA3425YXA · Compressor Tecumseh AEA3425YXA · kit antigo P82635"
+  },
+  {
+   "codigo": "P82635",
+   "descricao": "Kit de relé Tecumseh (código antigo) P82635",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA3425YXA · Compressor AEA3425YXA · substituído por K71-04"
+  },
+  {
+   "codigo": "K71-10",
+   "descricao": "Kit de relé Tecumseh K71-10",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA3440AXA, AEA3440YXA, AEA4440AXA, AEA4440YXA, TPA9417YXA · Compressor Tecumseh AEA3440AXA · kit antigo P82929 · Compressor Tecumseh AEA3440YXA · kit antigo P82929"
+  },
+  {
+   "codigo": "P82929",
+   "descricao": "Kit de relé Tecumseh (código antigo) P82929",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA3440AXA, AEA3440YXA, AEA4440AXA, AEA4440YXA · Compressor AEA3440AXA · substituído por K71-10 · Compressor AEA3440YXA · substituído por K71-10"
+  },
+  {
+   "codigo": "K90-21",
+   "descricao": "Kit de protetor Tecumseh K90-21",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA3440YXA, AEA5460EXA, AEA9422ZXA, AJ4492A, AJA4492AXD, AJA4492YXD, RKA5513CXD, RKA5513EXD, RKA5515EXV · Compressor Tecumseh AEA3440YXA · kit antigo P83739-1 · Compressor Tecumseh AEA5460EXA · kit antigo P83739-1"
+  },
+  {
+   "codigo": "P83739-1",
+   "descricao": "Kit de protetor Tecumseh (código antigo) P83739-1",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA3440YXA, AEA5460EXA, AEA9422ZXA, AJA4492AXD, AJA4492YXD, RKA5513EXD, RKA5515EXV · Compressor AEA3440YXA · substituído por K90-21 · Compressor AEA5460EXA · substituído por K90-21"
+  },
+  {
+   "codigo": "K90-19",
+   "descricao": "Kit de protetor Tecumseh K90-19",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA4448AXA, AKA4476YXD, AKA5470YXA, AKA5510EXD, AKA9427ZXA, AKA9441AXD, RKA5512CXD, RKA5512EXD · Compressor Tecumseh AEA4448AXA · Compressor Tecumseh AKA4476YXD"
+  },
+  {
+   "codigo": "K90-22",
+   "descricao": "Kit de protetor Tecumseh K90-22",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA4448YXA, AKA5470EXA, AKA5512EXD, AKA9462ZXD, AKA9474JXD · Compressor Tecumseh AEA4448YXA · kit antigo P83530 · Compressor Tecumseh AKA5470EXA · kit antigo P83530"
+  },
+  {
+   "codigo": "P83530",
+   "descricao": "Kit de protetor Tecumseh (código antigo) P83530",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA4448YXA, AKA5470EXA, AKA5512EXD, AKA9462ZXD · Compressor AEA4448YXA · substituído por K90-22 · Compressor AKA5470EXA · substituído por K90-22"
+  },
+  {
+   "codigo": "K71-19",
+   "descricao": "Kit de relé Tecumseh K71-19",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA5455EXA, AEA5460EXA, AEA5465EXA, AEA5470EXA, AEA8458EXA, AEA8467EXA, AEA8469EXA, AEA8475EXA, AHA4518AXD, AHA4520EXD, AHA4522EXD, AHA4524EXD e mais 123 · Compressor Tecumseh AEA5455EXA · Compressor Tecumseh AEA5460EXA · kit antigo P82965"
+  },
+  {
+   "codigo": "P82965",
+   "descricao": "Kit de relé Tecumseh (código antigo) P82965",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA5460EXA, AHA4518AXD, AHA4525AXD, AHA7514AXD, AHB7511AXD, AJA5517EXD, AJB2433ZXA, AJB5515EXD, AJC5519EXD, AKA5470EXA, AKA5483EXA, AKA5483EXD e mais 21 · Compressor AEA5460EXA · substituído por K71-19 · Compressor AHA4518AXD · substituído por K71-19"
+  },
+  {
+   "codigo": "K90-13",
+   "descricao": "Kit de protetor Tecumseh K90-13",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA9415ZXA, AJA7441AXD, AKA4460YXD, AKA9428EXD, AKA9428ZXD · Compressor Tecumseh AEA9415ZXA · Compressor Tecumseh AJA7441AXD"
+  },
+  {
+   "codigo": "K71-06",
+   "descricao": "Kit de relé Tecumseh K71-06",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA9423YXA, TPA9419YXA, TPA9421YXA, TPA9423YXA · Compressor Tecumseh AEA9423YXA · kit antigo P82773 · Compressor Tecumseh TPA9419YXA"
+  },
+  {
+   "codigo": "P82773",
+   "descricao": "Kit de relé Tecumseh (código antigo) P82773",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEA9423YXA, TPA9421YXA · Compressor AEA9423YXA · substituído por K71-06 · Compressor TPA9421YXA · substituído por K71-06"
+  },
+  {
+   "codigo": "K90-09",
+   "descricao": "Kit de protetor Tecumseh K90-09",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEB1411AXA, AEB1413AXA, AJA2419ZXD, AJA2424JXD, AJA2425AXD, AKA9427ZXD · Compressor Tecumseh AEB1411AXA · kit antigo P83507 · Compressor Tecumseh AEB1413AXA · kit antigo P83507"
+  },
+  {
+   "codigo": "P83507",
+   "descricao": "Kit de protetor Tecumseh (código antigo) P83507",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AEB1411AXA, AEB1413AXA, AJA2419ZXD, AJA2425AXD, AKA9427ZXD · Compressor AEB1411AXA · substituído por K90-09 · Compressor AEB1413AXA · substituído por K90-09"
+  },
+  {
+   "codigo": "K71-20",
+   "descricao": "Kit de relé Tecumseh K71-20",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AGA4534AXN, AGA4543AXN, AGA5546EXN, AGA5553EXN, AGA5561EXN, AGA5568EXN, AGA9530ZXN, AGA9534ZXN, AGB5546EXN, AGB5553EXN, AHA2490ZXD, AHA4540EXD e mais 18 · Compressor Tecumseh AGA4534AXN · kit antigo P82966 · Compressor Tecumseh AGA4543AXN · kit antigo P82966"
+  },
+  {
+   "codigo": "P82966",
+   "descricao": "Kit de relé Tecumseh (código antigo) P82966",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AGA4534AXN, AGA4543AXN, AGA5553EXN, AGA5561EXN, AGA5568EXN, AVA2490ZXN, AVA2512ZXN, AVA4542EXN, AVA5532EXN, AVA5535EXN, AVA5538EXN, AVA5542EXN e mais 5 · Compressor AGA4534AXN · substituído por K71-20 · Compressor AGA4543AXN · substituído por K71-20"
+  },
+  {
+   "codigo": "K71-17",
+   "descricao": "Kit de relé Tecumseh K71-17",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AHA2465ZXB, AHA2466AXD, AHA2480JXB, AHA2511JXB, AHA7480AXD, AHA7511AXD, AJB2433ZXD, AKA9438ZXD, AKA9442EXD, AKA9451ZXD, AKA9455EXD, AKA9455ZXD e mais 4 · Compressor Tecumseh AHA2465ZXB · Compressor Tecumseh AHA2466AXD · kit antigo P82961"
+  },
+  {
+   "codigo": "P82961",
+   "descricao": "Kit de relé Tecumseh (código antigo) P82961",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AHA2466AXD, AHA7480AXD, AJB2433ZXD, AKA9438ZXD, AKA9442EXD, AKA9455EXD, AKA9455ZXD, AKA9462EXD · Compressor AHA2466AXD · substituído por K71-17 · Compressor AHA7480AXD · substituído por K71-17"
+  },
+  {
+   "codigo": "K71-16",
+   "descricao": "Kit de relé Tecumseh K71-16",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AHA7513ZXD, AJA2425ZXD, AJA4512AXD, AJA4512YXD, AJA7455ZXD, AJA7490ZXD, AJA7494ZXD, AJA9484EXD, AJB7461JXD, AKA2419ZXD, AKA5512EXD, AKA9462ZXD e mais 22 · Compressor Tecumseh AHA7513ZXD · Compressor Tecumseh AJA2425ZXD · kit antigo P82960"
+  },
+  {
+   "codigo": "K71-11",
+   "descricao": "Kit de relé Tecumseh K71-11",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJ4492A, AJA2416AXA, AJA4492AXD, AJA4492YXD, AJA6435AXA, AJA7461YXD, AKA4482YXA · Compressor Tecumseh AJ4492A · Compressor Tecumseh AJA2416AXA · kit antigo P82935"
+  },
+  {
+   "codigo": "K90-38",
+   "descricao": "Kit de protetor Tecumseh K90-38",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJ7465K, AJA4492AXA, AJA4492YXA, AJA7461YXA, AJA7465AXA · Compressor Tecumseh AJ7465K · Compressor Tecumseh AJA4492AXA"
+  },
+  {
+   "codigo": "K90-31",
+   "descricao": "Kit de protetor Tecumseh K90-31",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA1420EXA, AJB5515EXV · Compressor Tecumseh AJA1420EXA · Compressor Tecumseh AJB5515EXV"
+  },
+  {
+   "codigo": "P82935",
+   "descricao": "Kit de relé Tecumseh (código antigo) P82935",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA2416AXA, AJA4492AXD, AJA4492YXD, AJA7461YXD · Compressor AJA2416AXA · substituído por K71-11 · Compressor AJA4492AXD · substituído por K71-11"
+  },
+  {
+   "codigo": "K71-13",
+   "descricao": "Kit de relé Tecumseh K71-13",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA2419YXA, AJA2419ZXA, AJA2424JXA, AJA7461YXA, AJA7465AXA · Compressor Tecumseh AJA2419YXA · kit antigo P82957 · Compressor Tecumseh AJA2419ZXA · kit antigo P82957"
+  },
+  {
+   "codigo": "P82957",
+   "descricao": "Kit de relé Tecumseh (código antigo) P82957",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA2419YXA, AJA2419ZXA, AJA7461YXA, AJA7465AXA · Compressor AJA2419YXA · substituído por K71-13 · Compressor AJA2419ZXA · substituído por K71-13"
+  },
+  {
+   "codigo": "K90-30",
+   "descricao": "Kit de protetor Tecumseh K90-30",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA2419YXA, AJA2419ZXA · Compressor Tecumseh AJA2419YXA · kit antigo P83547 · Compressor Tecumseh AJA2419ZXA · kit antigo P83547"
+  },
+  {
+   "codigo": "P83547",
+   "descricao": "Kit de protetor Tecumseh (código antigo) P83547",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA2419YXA, AJA2419ZXA · Compressor AJA2419YXA · substituído por K90-30 · Compressor AJA2419ZXA · substituído por K90-30"
+  },
+  {
+   "codigo": "K71-15",
+   "descricao": "Kit de relé Tecumseh K71-15",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA2425AXA · Compressor Tecumseh AJA2425AXA · kit antigo P82959"
+  },
+  {
+   "codigo": "P82959",
+   "descricao": "Kit de relé Tecumseh (código antigo) P82959",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA2425AXA · Compressor AJA2425AXA · substituído por K71-15"
+  },
+  {
+   "codigo": "K90-32",
+   "descricao": "Kit de protetor Tecumseh K90-32",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA2425AXA · Compressor Tecumseh AJA2425AXA · kit antigo P83960"
+  },
+  {
+   "codigo": "P83960",
+   "descricao": "Kit de protetor Tecumseh (código antigo) P83960",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA2425AXA · Compressor AJA2425AXA · substituído por K90-32"
+  },
+  {
+   "codigo": "K71-18",
+   "descricao": "Kit de relé Tecumseh K71-18",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA2425ZXA · Compressor Tecumseh AJA2425ZXA · kit antigo P82963"
+  },
+  {
+   "codigo": "P82963",
+   "descricao": "Kit de relé Tecumseh (código antigo) P82963",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA2425ZXA · Compressor AJA2425ZXA · substituído por K71-18"
+  },
+  {
+   "codigo": "K90-35",
+   "descricao": "Kit de protetor Tecumseh K90-35",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA2425ZXA, AJA9484EXD, AKA4460YXA, AKA9428EXA, AKA9428ZXA · Compressor Tecumseh AJA2425ZXA · kit antigo P83548 · Compressor Tecumseh AJA9484EXD · kit antigo P83548"
+  },
+  {
+   "codigo": "P83548",
+   "descricao": "Kit de protetor Tecumseh (código antigo) P83548",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA2425ZXA, AJA9484EXD, AKA4460YXA, AKA9428EXA · Compressor AJA2425ZXA · substituído por K90-35 · Compressor AJA9484EXD · substituído por K90-35"
+  },
+  {
+   "codigo": "P82960",
+   "descricao": "Kit de relé Tecumseh (código antigo) P82960",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA2425ZXD, AJA4512AXD, AJA4512YXD, AJA7494ZXD, AJA9484EXD, AKA5512EXD, AKA9462ZXD, AWA2450ZXD, AWA7490ZXD, AWG4520EXN, AWG5519EXN, RKA5518EXD · Compressor AJA2425ZXD · substituído por K71-16 · Compressor AJA4512AXD · substituído por K71-16"
+  },
+  {
+   "codigo": "K90-18",
+   "descricao": "Kit de protetor Tecumseh K90-18",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA2425ZXD, AJA7461YXD, AJB7465AXD, AKA5512EXV, AKA8515CXV, AKA8515EXV, RGA5450EXA, RGA5460EXA · Compressor Tecumseh AJA2425ZXD · kit antigo P83512 · Compressor Tecumseh AJA7461YXD · kit antigo P83512"
+  },
+  {
+   "codigo": "P83512",
+   "descricao": "Kit de protetor Tecumseh (código antigo) P83512",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA2425ZXD, AJA7461YXD, AJB7465AXD, AKA5512EXV, RGA5460EXA · Compressor AJA2425ZXD · substituído por K90-18 · Compressor AJA7461YXD · substituído por K90-18"
+  },
+  {
+   "codigo": "K71-02",
+   "descricao": "Kit de relé Tecumseh K71-02",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA2430JXA, AJA4461AXA, AJA7441AXA, AJA7441AXD, AJB4461AXA, AJB7465AXD, AKA4460YXA, AKA4476YXA, AKA9427ZXA, AKA9428EXA, AKA9434AXA, AKA9434AXD e mais 3 · Compressor Tecumseh AJA2430JXA · Compressor Tecumseh AJA4461AXA · kit antigo P82481-1"
+  },
+  {
+   "codigo": "P82481-1",
+   "descricao": "Kit de relé Tecumseh (código antigo) P82481-1",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA4461AXA, AJB7465AXD · Compressor AJA4461AXA · substituído por K71-02 · Compressor AJB7465AXD · substituído por K71-02"
+  },
+  {
+   "codigo": "K90-34",
+   "descricao": "Kit de protetor Tecumseh K90-34",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA4461AXA, AJA5518EXV, AJB5515EXD, AKA9438ZXA · Compressor Tecumseh AJA4461AXA · kit antigo P83991-1 · Compressor Tecumseh AJA5518EXV · kit antigo P83991-1"
+  },
+  {
+   "codigo": "P83991-1",
+   "descricao": "Kit de protetor Tecumseh (código antigo) P83991-1",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA4461AXA, AJA5518EXV, AJB5515EXD, AKA9438ZXA · Compressor AJA4461AXA · substituído por K90-34 · Compressor AJA5518EXV · substituído por K90-34"
+  },
+  {
+   "codigo": "K71-14",
+   "descricao": "Kit de relé Tecumseh K71-14",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA4492AXA, AJA4492YXA · Compressor Tecumseh AJA4492AXA · kit antigo P82958 · Compressor Tecumseh AJA4492YXA · kit antigo P82958"
+  },
+  {
+   "codigo": "P82958",
+   "descricao": "Kit de relé Tecumseh (código antigo) P82958",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA4492AXA, AJA4492YXA · Compressor AJA4492AXA · substituído por K71-14 · Compressor AJA4492YXA · substituído por K71-14"
+  },
+  {
+   "codigo": "K90-24",
+   "descricao": "Kit de protetor Tecumseh K90-24",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA4512AXD, AJA7490ZXD, AJA8520EXD, AKA9451ZXA, HGA5480EXA, RGA5480CXA, RGA5480EXA, RKA5512YXD, RKA5515EXD · Compressor Tecumseh AJA4512AXD · Compressor Tecumseh AJA7490ZXD"
+  },
+  {
+   "codigo": "K90-23",
+   "descricao": "Kit de protetor Tecumseh K90-23",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA4512YXD, AKA9434AXA, AKA9434AXD, AKA9441AXA · Compressor Tecumseh AJA4512YXD · kit antigo P83514 · Compressor Tecumseh AKA9434AXA · kit antigo P83514"
+  },
+  {
+   "codigo": "P83514",
+   "descricao": "Kit de protetor Tecumseh (código antigo) P83514",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA4512YXD, AKA9434AXA, AKA9434AXD, AKA9441AXA · Compressor AJA4512YXD · substituído por K90-23 · Compressor AKA9434AXA · substituído por K90-23"
+  },
+  {
+   "codigo": "K90-36",
+   "descricao": "Kit de protetor Tecumseh K90-36",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA5517EXD, AJA5519EXV · Compressor Tecumseh AJA5517EXD · kit antigo P83523 · Compressor Tecumseh AJA5519EXV"
+  },
+  {
+   "codigo": "P83523",
+   "descricao": "Kit de protetor Tecumseh (código antigo) P83523",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA5517EXD · Compressor AJA5517EXD · substituído por K90-36"
+  },
+  {
+   "codigo": "K71-21",
+   "descricao": "Kit de relé Tecumseh K71-21",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA5517EXV, AJA5518EXV, AJA5519EXV, AJB5515EXV, AKA5512EXA, AKA5512EXV, AKA8515CXV, AKA8515EXV, AWF5522EXN, AWF5528EVA, AWG5528EVA, AWJ5528EVA e mais 6 · Compressor Tecumseh AJA5517EXV · Compressor Tecumseh AJA5518EXV · kit antigo P82969"
+  },
+  {
+   "codigo": "P82969",
+   "descricao": "Kit de relé Tecumseh (código antigo) P82969",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA5518EXV, AJB5515EXV, AKA5512EXA, AKA5512EXV, AWF5522EXN, RKA5512EXD, RKA5513EXD, RKA5515EXD · Compressor AJA5518EXV · substituído por K71-21 · Compressor AJB5515EXV · substituído por K71-21"
+  },
+  {
+   "codigo": "K90-39",
+   "descricao": "Kit de protetor Tecumseh K90-39",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA5519EXD, AJC5519EXD, AKA5511EXA, AKA5512EXA, AKA8511EXA, AKA8513EXA · Compressor Tecumseh AJA5519EXD · Compressor Tecumseh AJC5519EXD · kit antigo P83527"
+  },
+  {
+   "codigo": "P82498-1",
+   "descricao": "Kit de relé Tecumseh (código antigo) P82498-1",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA7441AXA, AKA4460YXA, AKA4476YXA, AKA9427ZXA, AKA9428EXA, AKA9434AXA, AKA9438ZXA, AKA9441AXA, AKA9442EXA · Compressor AJA7441AXA · substituído por K71-02 · Compressor AKA4460YXA · substituído por K71-02"
+  },
+  {
+   "codigo": "K90-33",
+   "descricao": "Kit de protetor Tecumseh K90-33",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA7441AXA · Compressor Tecumseh AJA7441AXA · kit antigo P83656-1"
+  },
+  {
+   "codigo": "P83656-1",
+   "descricao": "Kit de protetor Tecumseh (código antigo) P83656-1",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJA7441AXA · Compressor AJA7441AXA · substituído por K90-33"
+  },
+  {
+   "codigo": "K90-29",
+   "descricao": "Kit de protetor Tecumseh K90-29",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJB2433ZXA, AJB2444ZXD · Compressor Tecumseh AJB2433ZXA · Compressor Tecumseh AJB2444ZXD"
+  },
+  {
+   "codigo": "K90-20",
+   "descricao": "Kit de protetor Tecumseh K90-20",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJB2433ZXD, AKA9455EXD, AKA9455ZXD, AKA9462EXD, AKA9466JXD · Compressor Tecumseh AJB2433ZXD · Compressor Tecumseh AKA9455EXD"
+  },
+  {
+   "codigo": "P83527",
+   "descricao": "Kit de protetor Tecumseh (código antigo) P83527",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AJC5519EXD, AKA5511EXA, AKA5512EXA · Compressor AJC5519EXD · substituído por K90-39 · Compressor AKA5511EXA · substituído por K90-39"
+  },
+  {
+   "codigo": "K71-22",
+   "descricao": "Kit de relé Tecumseh K71-22",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AKA4460YXD, AKA4476YXD · Compressor Tecumseh AKA4460YXD · kit antigo P82983 · Compressor Tecumseh AKA4476YXD · kit antigo P82983"
+  },
+  {
+   "codigo": "P82983",
+   "descricao": "Kit de relé Tecumseh (código antigo) P82983",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AKA4460YXD, AKA4476YXD · Compressor AKA4460YXD · substituído por K71-22 · Compressor AKA4476YXD · substituído por K71-22"
+  },
+  {
+   "codigo": "K90-27",
+   "descricao": "Kit de protetor Tecumseh K90-27",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AKA4476YXA, AKA4482YXA, AKA9455ZXA, AKA9458JXA, HGA0470EXA, RGA5510BAA, RGA5510EXA, RGA5511BAA, RGA5512CXA, RGA5512EXA, RGB5510EXA, RKA5512EXA · Compressor Tecumseh AKA4476YXA · kit antigo P83544 · Compressor Tecumseh AKA4482YXA"
+  },
+  {
+   "codigo": "P83544",
+   "descricao": "Kit de protetor Tecumseh (código antigo) P83544",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AKA4476YXA, AKA9455ZXA, RGA5510EXA, RKA5512EXA · Compressor AKA4476YXA · substituído por K90-27 · Compressor AKA9455ZXA · substituído por K90-27"
+  },
+  {
+   "codigo": "K90-26",
+   "descricao": "Kit de protetor Tecumseh K90-26",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AKA5483EXA, RKA5518EXD · Compressor Tecumseh AKA5483EXA · kit antigo P83515 · Compressor Tecumseh RKA5518EXD · kit antigo P83515"
+  },
+  {
+   "codigo": "P83515",
+   "descricao": "Kit de protetor Tecumseh (código antigo) P83515",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AKA5483EXA, RKA5518EXD · Compressor AKA5483EXA · substituído por K90-26 · Compressor RKA5518EXD · substituído por K90-26"
+  },
+  {
+   "codigo": "K90-25",
+   "descricao": "Kit de protetor Tecumseh K90-25",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AKA5494EXA, AKA5510EXA, RKA5454YXA, RKA5480EXA, RKA5490EXA · Compressor Tecumseh AKA5494EXA · Compressor Tecumseh AKA5510EXA · kit antigo P83528"
+  },
+  {
+   "codigo": "P83528",
+   "descricao": "Kit de protetor Tecumseh (código antigo) P83528",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AKA5510EXA, RKA5490EXA · Compressor AKA5510EXA · substituído por K90-25 · Compressor RKA5490EXA · substituído por K90-25"
+  },
+  {
+   "codigo": "K90-37",
+   "descricao": "Kit de protetor Tecumseh K90-37",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AKA9442EXA · Compressor Tecumseh AKA9442EXA · kit antigo P83549"
+  },
+  {
+   "codigo": "P83549",
+   "descricao": "Kit de protetor Tecumseh (código antigo) P83549",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AKA9442EXA · Compressor AKA9442EXA · substituído por K90-37"
+  },
+  {
+   "codigo": "K90-40",
+   "descricao": "Kit de protetor Tecumseh K90-40",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AKA9462ZXA, AKA9474JXA · Compressor Tecumseh AKA9462ZXA · kit antigo P83539 · Compressor Tecumseh AKA9474JXA"
+  },
+  {
+   "codigo": "P83539",
+   "descricao": "Kit de protetor Tecumseh (código antigo) P83539",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AKA9462ZXA · Compressor AKA9462ZXA · substituído por K90-40"
+  },
+  {
+   "codigo": "K71-07",
+   "descricao": "Kit de relé Tecumseh K71-07",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AZA0370YXA · Compressor Tecumseh AZA0370YXA · kit antigo P82926"
+  },
+  {
+   "codigo": "P82926",
+   "descricao": "Kit de relé Tecumseh (código antigo) P82926",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AZA0370YXA · Compressor AZA0370YXA · substituído por K71-07"
+  },
+  {
+   "codigo": "K90-06",
+   "descricao": "Kit de protetor Tecumseh K90-06",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AZA0395YXA · Compressor Tecumseh AZA0395YXA · kit antigo P83536"
+  },
+  {
+   "codigo": "P83536",
+   "descricao": "Kit de protetor Tecumseh (código antigo) P83536",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: AZA0395YXA · Compressor AZA0395YXA · substituído por K90-06"
+  },
+  {
+   "codigo": "K90-28",
+   "descricao": "Kit de protetor Tecumseh K90-28",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: HGA9468ZXA, RKA5513CXA, RKA5513EXA, RKB5513EXA, RKG5513EXA · Compressor Tecumseh HGA9468ZXA · Compressor Tecumseh RKA5513CXA"
+  },
+  {
+   "codigo": "P83545",
+   "descricao": "Kit de protetor Tecumseh (código antigo) P83545",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: RKB5513EXA · Compressor RKB5513EXA · substituído por K90-28"
+  },
+  {
+   "codigo": "K71-23",
+   "descricao": "Kit de relé Tecumseh K71-23",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: THA1340YXA, THG1340YXA, TPA1370YXA, TPA1380YXA, TPA1390YXA, TPA1410YXA, TPA1413YXA, TPB1370YXA, TPB1390YXA, TPE1370YXA, TPE1380YXA · Compressor Tecumseh THA1340YXA · Compressor Tecumseh THG1340YXA"
+  },
+  {
+   "codigo": "K90-05",
+   "descricao": "Kit de protetor Tecumseh K90-05",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: TPA1370YXA, TPA1380YXA, TPA1390YXA, TPA1410YXA, TPB1370YXA, TPE1370YXA, TPE1380YXA, TPE1390YXA · Compressor Tecumseh TPA1370YXA · Compressor Tecumseh TPA1380YXA"
+  },
+  {
+   "codigo": "P82999",
+   "descricao": "Kit de relé Tecumseh (código antigo) P82999",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: TPA1380YXA, TPA1390YXA, TPA1410YXA · Compressor TPA1380YXA · substituído por K71-23 · Compressor TPA1390YXA · substituído por K71-23"
+  },
+  {
+   "codigo": "8EA1BX",
+   "descricao": "PTC 8EA1BX",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: 8EA1BX · Resistência a frio: 2.8 a 5.2 Ω"
+  },
+  {
+   "codigo": "7M4R7XXX",
+   "descricao": "PTC 7M4R7XXX",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: 7M4R7XXX · Resistência a frio: 3.8 a 5.6 Ω"
+  },
+  {
+   "codigo": "8M4R7XXX",
+   "descricao": "PTC 8M4R7XXX",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: 8M4R7XXX · Resistência a frio: 3.8 a 5.6 Ω"
+  },
+  {
+   "codigo": "8EA14CX",
+   "descricao": "PTC 8EA14CX",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: 8EA14CX · Resistência a frio: 3.8 a 5.6 Ω"
+  },
+  {
+   "codigo": "8EA4BX",
+   "descricao": "PTC 8EA4BX",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: 8EA4BX · Resistência a frio: 3.5 a 6.5 Ω"
+  },
+  {
+   "codigo": "8EA3BX",
+   "descricao": "PTC 8EA3BX",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: 8EA3BX · Resistência a frio: 3.5 a 6.5 Ω"
+  },
+  {
+   "codigo": "8EA21CX",
+   "descricao": "PTC 8EA21CX",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: 8EA21CX · Resistência a frio: 3.5 a 6.5 Ω"
+  },
+  {
+   "codigo": "8EA5BX",
+   "descricao": "PTC 8EA5BX",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: 8EA5BX · Resistência a frio: 14 a 26 Ω"
+  },
+  {
+   "codigo": "7M220XXX",
+   "descricao": "PTC 7M220XXX",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: 7M220XXX · Resistência a frio: 17.6 a 26.4 Ω"
+  },
+  {
+   "codigo": "8M220XXX",
+   "descricao": "PTC 8M220XXX",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: 8M220XXX · Resistência a frio: 17.6 a 26.4 Ω"
+  },
+  {
+   "codigo": "8EA17CX",
+   "descricao": "PTC 8EA17CX",
+   "unidade": "un",
+   "precoVenda": 0,
+   "aplicacao": "Material elétrico",
+   "observacoes": "serve: 8EA17CX · Resistência a frio: 17.6 a 26.4 Ω"
   },
   {
    "codigo": "EMIS20HHR",

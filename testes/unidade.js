@@ -171,6 +171,38 @@ eq('nada é guardado sem existir no disco',
    guardados.filter(f => f && !fs.existsSync(caminho.join(raiz, f))), []);
 certo('há ficheiros guardados', guardados.length > 5);
 
+/* ── o catálogo do Giba Compressores ──────────────────────────
+   É um arquivo de dados, e arquivo de dados estraga calado: basta uma
+   vírgula a mais, ou o gerador rodar com a tabela errada, para o botão
+   "Trazer do Compressores" passar a trazer meia dúzia de itens sem que
+   nada dê erro. */
+const cat = JSON.parse(fs.readFileSync(caminho.join(raiz, 'pecas-compressores.json'), 'utf8'));
+const pecas = cat.pecas || [];
+
+certo('o catálogo traz o acervo inteiro, não um pedaço', pecas.length > 350);
+certo('o material elétrico entrou no catálogo',
+      pecas.filter(p => p.aplicacao === 'Material elétrico').length > 150);
+certo('os compressores entraram no catálogo',
+      pecas.filter(p => p.aplicacao === 'Compressor').length > 100);
+eq('nenhuma peça do catálogo chega com preço de fábrica',
+   pecas.filter(p => p.precoVenda !== 0).length, 0);
+eq('toda peça do catálogo tem descrição e unidade',
+   pecas.filter(p => !p.descricao || !p.unidade).length, 0);
+
+/* A importação recusa repetido por código OU por descrição. Se o
+   próprio arquivo trouxer repetidos, a segunda importação fica a
+   comparar consigo mesma e o técnico vê a peça duas vezes na lista. */
+const codigos = pecas.map(p => (p.codigo || '').toLowerCase()).filter(Boolean);
+eq('sem código repetido dentro do catálogo', codigos.length - new Set(codigos).size, 0);
+const descr = pecas.map(p => (p.descricao || '').toLowerCase());
+eq('sem descrição repetida dentro do catálogo', descr.length - new Set(descr).size, 0);
+
+/* O técnico procura pelo modelo escrito no compressor, não pelo código
+   do relé — e quem carrega essa ligação são as observações. */
+certo('dá para chegar ao relé pelo modelo do compressor',
+      pecas.some(p => p.aplicacao === 'Material elétrico'
+        && /FG70AK/.test(p.observacoes || '')));
+
 /* ── as regras do Firestore dizem o que devem dizer? ─────────
    Não substituem o emulador, mas apanham o esquecimento: um campo novo
    que a regra devia proteger e não protege. Duas destas falhas já

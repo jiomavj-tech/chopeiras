@@ -94,7 +94,8 @@ function correr(suite, ambiente){
    cruel: a que derruba o aplicativo inteiro em silêncio. Já aconteceu —
    um "else" sem fechar, e nenhuma tela funcionava. */
 function conferirSintaxe(){
-  const alvos = ['nucleo.js', 'arranque.js', 'base.js', 'clientes.js', 'chopeiras.js', 'acessos.js', 'chamados.js', 'integracoes.js', 'servicos.js', 'orcamento.js', 'documentos.js', 'demo.js', 'sw.js'];
+  const alvos = ['nucleo.js', 'arranque.js', 'base.js', 'clientes.js', 'chopeiras.js', 'acessos.js', 'chamados.js', 'integracoes.js', 'servicos.js', 'orcamento.js', 'documentos.js', 'demo.js', 'sw.js',
+    'ferramentas/gerar-catalogo.mjs'];
   for(const f of alvos){
     const r = spawnSync(process.execPath, ['--check', path.join(RAIZ, f)], {encoding:'utf8'});
     if(r.status !== 0){

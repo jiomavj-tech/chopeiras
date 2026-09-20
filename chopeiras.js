@@ -24,6 +24,16 @@ function telaChopeiras(){
     return;
   }
 
+  $("tela").innerHTML =
+    (EU.admin ? '<div class="btns" style="margin:0 0 12px">' +
+      '<button class="btn pri" onclick="novaChopeira()">+ Nova chopeira</button>' +
+      '<button class="btn" onclick="atualizar()">Atualizar</button></div>' : '') +
+    '<div class="busca"><input placeholder="Buscar pelo número, marca ou local" value="'+esc(window.__buscaCho||"")+
+      '" oninput="filtrarChopeiras(this.value)"></div>' +
+    '<div id="listaChopeiras">' + corpoChopeiras() + '</div>';
+}
+
+function corpoChopeiras(){
   const busca = (window.__buscaCho || "").toLowerCase();
   const lista = CHOPEIRAS.filter(c=>{
     if(!busca) return true;
@@ -31,16 +41,15 @@ function telaChopeiras(){
       .map(x => x || "").join(" ").toLowerCase().includes(busca);
   });
 
-  $("tela").innerHTML =
-    (EU.admin ? '<div class="btns" style="margin:0 0 12px">' +
-      '<button class="btn pri" onclick="novaChopeira()">+ Nova chopeira</button>' +
-      '<button class="btn" onclick="atualizar()">Atualizar</button></div>' : '') +
-    '<div class="busca"><input placeholder="Buscar pelo número, marca ou local" value="'+esc(window.__buscaCho||"")+
-      '" oninput="window.__buscaCho=this.value;telaChopeiras()"></div>' +
-    (lista.length ? lista.map(cartaoChopeira).join("") :
-      '<div class="vazio">' + (CHOPEIRAS.length ? "Nada encontrado." :
-        (EU.admin ? "Nenhuma chopeira cadastrada ainda." :
-          "Nenhuma chopeira cadastrada na sua empresa ainda.")) + '</div>');
+  return lista.length ? lista.map(cartaoChopeira).join("") :
+    '<div class="vazio">' + (CHOPEIRAS.length ? "Nada encontrado." :
+      (EU.admin ? "Nenhuma chopeira cadastrada ainda." :
+        "Nenhuma chopeira cadastrada na sua empresa ainda.")) + '</div>';
+}
+
+function filtrarChopeiras(v){
+  window.__buscaCho = v;
+  trocarLista("listaChopeiras", corpoChopeiras());
 }
 
 function cartaoChopeira(c){

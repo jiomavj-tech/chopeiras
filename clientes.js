@@ -89,14 +89,26 @@ function copiarConvite(){
   }
 }
 
-function telaClientes(){
-  if(editando && editando.tipo === "cliente") return formCliente();
+function corpoClientes(){
   const busca = (window.__buscaCli || "").toLowerCase();
   const lista = CLIENTES.filter(c=>{
     if(!busca) return true;
     return [c.nomeFantasia, c.razaoSocial, c.cnpj, c.cpf, c.cidade]
       .map(x => x || "").join(" ").toLowerCase().includes(busca);
   });
+
+  return lista.length ? lista.map(cartaoCliente).join("") :
+    '<div class="vazio">' + (CLIENTES.length ? "Nada encontrado." :
+      "Nenhuma empresa cadastrada ainda. Comece pela primeira.") + '</div>';
+}
+
+function filtrarClientes(v){
+  window.__buscaCli = v;
+  trocarLista("listaClientes", corpoClientes());
+}
+
+function telaClientes(){
+  if(editando && editando.tipo === "cliente") return formCliente();
 
   $("tela").innerHTML =
     '<div class="btns" style="margin:0 0 12px">' +
@@ -105,10 +117,8 @@ function telaClientes(){
       '<button class="btn" onclick="atualizar()">Atualizar</button>' +
     '</div>' +
     '<div class="busca"><input placeholder="Buscar por nome, CNPJ, CPF ou cidade" value="'+esc(window.__buscaCli||"")+
-      '" oninput="window.__buscaCli=this.value;telaClientes()"></div>' +
-    (lista.length ? lista.map(cartaoCliente).join("") :
-      '<div class="vazio">' + (CLIENTES.length ? "Nada encontrado." :
-        "Nenhuma empresa cadastrada ainda. Comece pela primeira.") + '</div>');
+      '" oninput="filtrarClientes(this.value)"></div>' +
+    '<div id="listaClientes">' + corpoClientes() + '</div>';
 }
 
 function cartaoCliente(c){
