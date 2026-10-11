@@ -132,6 +132,19 @@ metade.
 Campo escrito errado é recusado de propósito: `compressorModelo2` gravaria calado e o aplicativo
 nunca mais leria aquele valor. É melhor parar na conferência.
 
+**Fotos.** A lista pode trazer fotos, embutidas como `data:image/jpeg;base64,...` — e um
+equipamento passa a poder ter **várias**: a máquina, o compressor, a plaqueta, a etiqueta de
+série. É isso que se quer olhar quando ela volta e ninguém lembra como estava. A ficha mostra
+todas numa galeria.
+
+Uma linha que traz **só o número e as fotos** é entendida como "junta estas fotos ao que já está
+cadastrado": acrescenta à galeria, sem tocar em nada do que você já preencheu, e sem apagar foto
+que já lá estivesse. É o caso de quem cadastrou à mão e tem as fotos noutro lugar.
+
+Se o número dessa linha não bater com equipamento nenhum, as fotos **não entram** e a tela nomeia
+os números que não achou. Cadastrar na mesma faria nascer uma chopeira em branco, com fotos
+penduradas e mais nada — que é pior do que não fazer.
+
 A lista **não mora neste repositório**, e não deve morar. A página é pública: a relação de
 equipamentos de um cliente, com patrimônio e número de série, não pode ficar numa URL que qualquer
 pessoa abre. Por isso a tela recebe o arquivo do seu aparelho, e não um arquivo publicado ao lado
@@ -330,7 +343,7 @@ node testes/unidade.js
 
 Confere as regras do `nucleo.js`, a lista do service worker, o catálogo de peças e o que as
 regras do Firestore dizem — documento válido, prazo que vira o mês, orçamento que vence, soma de
-orçamento, o texto que o cliente lê, fluxo de status. **100 verificações em ~90 ms.**
+orçamento, o texto que o cliente lê, fluxo de status. **107 verificações em ~90 ms.**
 
 **Antes de publicar** (uns dois minutos):
 
@@ -340,7 +353,7 @@ node testes/rodar.js
 
 Confere a sintaxe de tudo, corre os testes de unidade, e só depois abre o aplicativo num Chromium
 de verdade, com um Firestore de mentira no lugar do Google, percorrendo os fluxos inteiros —
-**93 verificações**, incluindo importar uma lista de equipamentos, trazer o catálogo do
+**97 verificações**, incluindo importar uma lista de equipamentos e juntar fotos a quem já está cadastrado, trazer o catálogo do
 Compressores inteiro e achar um relé pelo
 modelo do compressor, e gerar o PDF e conferir que o arquivo é mesmo um PDF, com a foto embutida. Detalhe do que cobre e do que **não** cobre
 em [`testes/LEIAME.md`](testes/LEIAME.md).

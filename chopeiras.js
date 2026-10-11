@@ -80,14 +80,24 @@ function verChopeiraId(id){
   if(!c) return;
   editando = {tipo:"verChopeira", id:id, dados:c, foto:null};
   telaChopeiras();
-  if(c.fotoId) carregarFoto(c.fotoId);
+  fotosDa(c).forEach((fid, i) => carregarFoto(fid, i));
 }
 
-async function carregarFoto(fotoId){
+/* Uma chopeira tinha uma foto só. Passou a ter várias — a máquina, o
+   compressor, a plaqueta, a etiqueta de série — porque é isso que se
+   quer olhar quando ela volta e ninguém lembra como estava. Os registos
+   antigos têm fotoId e não fotos; os dois formatos convivem, e por isso
+   quem lê passa sempre por aqui. */
+function fotosDa(c){
+  if(Array.isArray(c.fotos) && c.fotos.length) return c.fotos;
+  return c.fotoId ? [c.fotoId] : [];
+}
+
+async function carregarFoto(fotoId, i){
   try{
     const s = await db.collection("fotos").doc(fotoId).get();
     if(s.exists && editando && editando.tipo === "verChopeira"){
-      const img = $("fotoGrande");
+      const img = $("fotoGrande" + (i || 0));
       if(img){ img.src = s.data().dataUrl; img.style.display = "block"; }
     }
   }catch(e){ /* sem foto, a tela vive sem ela */ }
@@ -346,8 +356,14 @@ function verChopeira(){
         '<h2 class="mono" style="font-size:22px">'+esc(c.codigo||"sem número")+'</h2></div>' +
         (EU.admin ? '<button class="btn sm" onclick="editarChopeira(\''+c.id+'\')">Editar</button>' : '') +
       '</div>' +
-      (c.fotoId ? '<img id="fotoGrande" class="foto" style="display:none" alt="Foto da chopeira">' :
-        (c.thumb ? '<img class="foto" src="'+esc(c.thumb)+'" alt="Foto da chopeira">' : '')) +
+      (fotosDa(c).length
+        ? '<div class="galeria">' + fotosDa(c).map((f, i) =>
+            '<img id="fotoGrande' + i + '" class="foto" style="display:none" ' +
+            'alt="Foto ' + (i+1) + ' de ' + fotosDa(c).length + ' da chopeira">').join("") +
+          '</div>' +
+          (fotosDa(c).length > 1
+            ? '<div class="esc">' + fotosDa(c).length + ' fotos deste equipamento.</div>' : '')
+        : (c.thumb ? '<img class="foto" src="'+esc(c.thumb)+'" alt="Foto da chopeira">' : '')) +
       '<h3>Equipamento</h3><table style="width:100%">' +
         linha("Marca", c.marca) + linha("Modelo", c.modelo) + linha("Tipo", c.tipo) +
         linha("Torneiras", c.torneiras) + linha("Local", c.local) +

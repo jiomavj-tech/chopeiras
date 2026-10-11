@@ -114,3 +114,9 @@ ol.passos li{margin-bottom:7px}
    elas se arrumam em duas fileiras de três — e as três do cliente
    continuam numa fileira só. */
 @media(max-width:430px){nav button{flex:1 1 28%;min-width:0;font-size:12px;padding:9px 4px}}
+
+/* Galeria da ficha: várias fotos do mesmo equipamento, uma por linha no
+   telemóvel e lado a lado quando há largura. */
+.galeria{display:grid;gap:8px;margin:10px 0;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+.galeria .foto{margin:0;width:100%;object-fit:cover;max-height:300px}

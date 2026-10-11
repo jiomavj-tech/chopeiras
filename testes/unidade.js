@@ -232,6 +232,38 @@ eq('provisório só é verdade quando o texto diz',
     ler({equipamentos:[{codigo:'1', provisorio:true}]}).equipamentos[0].provisorio],
    [false, true]);
 
+/* ── fotos na lista de importação ─────────────────────────────
+   Uma chopeira passou a poder ter várias fotos, e a lista pode trazer só
+   as fotos para um equipamento já cadastrado — é o caso de quem já
+   cadastrou tudo à mão e só quer juntar as imagens do documento. */
+const FOTO = 'data:image/jpeg;base64,/9j/4AAQSkZJRg==';
+
+const soFotos = ler({equipamentos:[{codigo:'0069', fotos:[FOTO, FOTO]}]}, ['0069']);
+eq('lista só com fotos, de equipamento já cadastrado, vira acréscimo',
+   soFotos.equipamentos[0].acao, 'sofotos');
+eq('e traz as fotos todas', soFotos.equipamentos[0].fotos.length, 2);
+
+eq('equipamento novo com foto continua sendo entrada nova',
+   ler({equipamentos:[{codigo:'NOVA1', marca:'x', fotos:[FOTO]}]}).equipamentos[0].acao, 'novo');
+
+eq('já cadastrado e sem foto nenhuma não dá trabalho a ninguém',
+   ler({equipamentos:[{codigo:'0069', marca:'x'}]}, ['0069']).equipamentos[0].acao, 'jatem');
+
+/* Um endereço http aqui gravaria um link que um dia deixa de responder,
+   e a ficha ficaria com um quadrado vazio sem ninguém saber porquê. */
+/* O engano mais provável: o número da etiqueta na lista não é o mesmo
+   que foi cadastrado. Criar a máquina na mesma faria nascer uma chopeira
+   em branco, com fotos penduradas e mais nada. */
+eq('fotos para um número que não existe não criam equipamento nenhum',
+   ler({equipamentos:[{codigo:'NAO-EXISTE', fotos:[FOTO]}]}).equipamentos[0].acao, 'naoachei');
+
+certo('foto que não é imagem embutida é recusada',
+      /não é uma imagem/.test(
+        ler({equipamentos:[{codigo:'1', fotos:['http://sitio/foto.jpg']}]}).problemas.join(' ')));
+certo('miniatura inválida também é recusada',
+      /miniatura/.test(
+        ler({equipamentos:[{codigo:'1', thumb:'nada disto'}]}).problemas.join(' ')));
+
 /* ── o catálogo do Giba Compressores ──────────────────────────
    É um arquivo de dados, e arquivo de dados estraga calado: basta uma
    vírgula a mais, ou o gerador rodar com a tabela errada, para o botão

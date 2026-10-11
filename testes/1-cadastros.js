@@ -204,6 +204,55 @@ function falha(t){ passos.push('  FALHA ' + t); erros.push(t); }
   vazio.includes('Nada encontrado') ? ok('busca sem resultado avisa') : falha('vazio: ' + vazio);
   await pg.fill('.busca input', '');
 
+  // ── 7c. acrescentar fotos a quem já está cadastrado
+  /* O caso real: os equipamentos já foram cadastrados à mão, e as fotos
+     vêm depois, de um documento. Só as fotos podem entrar — o resto do
+     que já foi preenchido não se toca. */
+  const FOTO = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAg=';
+  await pg.click('button:has-text("Importar lista")');
+  await pg.waitForSelector('#imp_texto');
+  await pg.fill('#imp_texto', JSON.stringify({equipamentos: [
+    {codigo:'0069', fotos:[FOTO, FOTO, FOTO]},
+    {codigo:'CH-014', fotos:[FOTO]}
+  ]}));
+  await pg.click('button:has-text("Conferir")');
+  await pg.waitForTimeout(400);
+  tela = await pg.textContent('#tela');
+  (tela.includes('2 já cadastrados') && tela.includes('4 fotos'))
+    ? ok('conferência entende que são só fotos para equipamento já cadastrado')
+    : falha('conferência de fotos: ' + tela.slice(0, 260));
+
+  const antesFotos = await pg.evaluate(() => Object.keys(window.__LOJA.fotos || {}).length);
+  await pg.click('#btImportarEq');
+  await pg.waitForTimeout(900);
+  const depoisFotos = await pg.evaluate(() => ({
+    fotos: Object.keys(window.__LOJA.fotos || {}).length,
+    maquinas: Object.values(window.__LOJA.chopeiras)
+  }));
+  (depoisFotos.fotos === antesFotos + 4)
+    ? ok('as 4 fotos foram guardadas, cada uma no seu documento')
+    : falha('fotos guardadas: ' + antesFotos + ' → ' + depoisFotos.fotos);
+
+  const comFoto = depoisFotos.maquinas.find(c => c.codigo === '0069');
+  (comFoto && comFoto.fotos && comFoto.fotos.length === 3 && comFoto.fotoId === comFoto.fotos[0]
+    && comFoto.marca === 'Trink Bier' && comFoto.compressorModelo === 'NE6211E')
+    ? ok('ficou com as 3 fotos e nada do que já estava preenchido mudou')
+    : falha('depois das fotos: ' + JSON.stringify(comFoto).slice(0, 200));
+
+  // importar as mesmas fotos de novo ACRESCENTA, não substitui
+  await pg.click('button:has-text("Importar lista")');
+  await pg.waitForSelector('#imp_texto');
+  await pg.fill('#imp_texto', JSON.stringify({equipamentos: [{codigo:'0069', fotos:[FOTO]}]}));
+  await pg.click('button:has-text("Conferir")');
+  await pg.waitForTimeout(350);
+  await pg.click('#btImportarEq');
+  await pg.waitForTimeout(800);
+  const acumulou = await pg.evaluate(() =>
+    Object.values(window.__LOJA.chopeiras).find(c => c.codigo === '0069').fotos.length);
+  acumulou === 4
+    ? ok('foto nova acrescenta à galeria, não apaga as que já lá estavam')
+    : falha('depois de acrescentar: ' + acumulou + ' fotos');
+
   // ── 9. abrir a ficha da chopeira
   /* Pelo número, e não pelo primeiro da lista: a importação acima pôs
      mais equipamentos na frente deste. */
