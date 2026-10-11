@@ -171,6 +171,55 @@ eq('nada é guardado sem existir no disco',
    guardados.filter(f => f && !fs.existsSync(caminho.join(raiz, f))), []);
 certo('há ficheiros guardados', guardados.length > 5);
 
+/* ── ler a lista de equipamentos a importar ───────────────────
+   Esta é a peneira: o que ela deixar passar vai direto para o cadastro
+   de equipamentos, e um número de etiqueta errado só aparece meses
+   depois, quando a máquina volta e não casa com registro nenhum. */
+global.componenteVazio = N.componenteVazio;
+global.componentePreenchido = N.componentePreenchido;
+const IMP = require('../importar.js');
+const ler = (obj, existentes) =>
+  IMP.lerListaEquipamentos(typeof obj === 'string' ? obj : JSON.stringify(obj), existentes || []);
+
+eq('texto que não é JSON é recusado, sem gravar nada',
+   ler('isto não é json').equipamentos.length, 0);
+certo('e diz que não é JSON', /JSON/.test(ler('nada disso').problemas[0]));
+certo('lista sem o campo certo é recusada', ler({bla: []}).problemas.length > 0);
+certo('lista vazia é recusada', ler({equipamentos: []}).problemas.length > 0);
+
+const umBom = {equipamentos: [{codigo:'0069', marca:'Trink Bier', compressorModelo:'NE6211E',
+  compressorGas:'R22', observacoes:'do orçamento', componentes:[
+    {tipo:'Compressor', marca:'Embraco', modelo:'NE6211E'}]}]};
+eq('equipamento bom passa', ler(umBom).problemas, []);
+eq('e chega com o número lido', ler(umBom).equipamentos[0].codigo, '0069');
+eq('a ficha técnica vem junto', ler(umBom).equipamentos[0].componentes.length, 1);
+
+certo('sem número de etiqueta é recusado',
+      /etiqueta/.test(ler({equipamentos:[{marca:'x'}]}).problemas.join(' ')));
+
+/* Um campo escrito errado é pior do que um campo faltando: grava calado
+   e o app nunca mais o lê. */
+certo('campo desconhecido é recusado pelo nome',
+      /compressorModelo2/.test(ler({equipamentos:[{codigo:'1', compressorModelo2:'x'}]}).problemas.join(' ')));
+
+certo('número repetido dentro da própria lista é apanhado',
+      /duas vezes/.test(ler({equipamentos:[{codigo:'A1'},{codigo:'a1'}]}).problemas.join(' ')));
+
+/* Importar duas vezes não pode duplicar a máquina — e o número da
+   etiqueta não distingue maiúscula de minúscula. */
+const jaTem = ler({equipamentos:[{codigo:'A1'},{codigo:'B2'}]}, ['a1']);
+eq('o que já está cadastrado vem marcado',
+   jaTem.equipamentos.map(e => e.jaExiste), [true, false]);
+
+eq('componente vazio não entra na ficha',
+   ler({equipamentos:[{codigo:'1', componentes:[{tipo:'', marca:'', modelo:''}]}]})
+     .equipamentos[0].componentes.length, 0);
+
+eq('provisório só é verdade quando o texto diz',
+   [ler({equipamentos:[{codigo:'1'}]}).equipamentos[0].provisorio,
+    ler({equipamentos:[{codigo:'1', provisorio:true}]}).equipamentos[0].provisorio],
+   [false, true]);
+
 /* ── o catálogo do Giba Compressores ──────────────────────────
    É um arquivo de dados, e arquivo de dados estraga calado: basta uma
    vírgula a mais, ou o gerador rodar com a tabela errada, para o botão

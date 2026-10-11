@@ -22,15 +22,24 @@ function falha(t){ passos.push('  FALHA ' + t); erros.push(t); }
   /* ERR_CERT_AUTHORITY_INVALID: em máquina atrás de proxy com certificado
      próprio, o Chromium recusa os scripts de fora. A página em teste vem
      por http do 127.0.0.1, então este erro nunca é do aplicativo. */
-  const ruido = /gstatic|ERR_TUNNEL|ERR_CERT_AUTHORITY_INVALID|sw\.js|service worker|A bad HTTP response code/i;
+  const ruido = /gstatic|ERR_TUNNEL|ERR_CERT_AUTHORITY_INVALID|ERR_FAILED|sw\.js|service worker|A bad HTTP response code/i;
   pg.on('console', m => {
     if (m.type() === 'error' && !ruido.test(m.text())) erros.push('console: ' + m.text());
   });
   pg.on('pageerror', e => erros.push('pageerror: ' + e.message));
 
   await pg.addInitScript(fake);
-  await pg.route('**/gstatic.com/**', r => r.abort());   // o SDK real não entra
-  await pg.route('**/sw.js', r => r.abort());
+  /* Barrar TUDO o que é de fora: o que se testa aqui é o aplicativo, não
+     o Google. Em expressão regular, e não no glob que estava aqui antes:
+     aquele padrão pedia uma barra logo antes de "gstatic.com", e no
+     endereço verdadeiro o que vem antes é "www.", com ponto. Nunca casou.
+     As suítes passaram meses a depender de a rede estar quebrada — quando
+     o ambiente ganhou saída para a internet, o SDK verdadeiro carregou
+     por cima do de mentira e as quatro caíram de uma vez, sem nada ter
+     mudado no aplicativo. */
+  await pg.route(/gstatic\.com|googleapis\.com|accounts\.google\.com/,
+                 r => r.abort());
+  await pg.route(/\/sw\.js(\?|$)/, r => r.abort());
 
   await pg.goto(process.env.URL_TESTE || 'http://127.0.0.1:8199/index.html');
   await pg.waitForSelector('#nav button', { timeout: 8000 });
@@ -130,6 +139,60 @@ function falha(t){ passos.push('  FALHA ' + t); erros.push(t); }
   t3.includes('Escolha de qual empresa') ? ok('chopeira sem empresa recusada') : falha('passou: ' + t3);
   await pg.click('button:has-text("Cancelar")');
 
+  // ── 7b. importar uma lista inteira de equipamentos
+  /* Cadastrar vinte máquinas uma a uma é onde se erra a etiqueta. Esta
+     tela recebe a lista pronta — e o que ela deixar passar vai direto
+     para o cadastro, por isso o teste conferir também o que ela RECUSA. */
+  await pg.click('button:has-text("Importar lista")');
+  await pg.waitForSelector('#imp_texto');
+
+  await pg.fill('#imp_texto', 'isto não é json');
+  await pg.click('button:has-text("Conferir")');
+  await pg.waitForTimeout(300);
+  let tela = await pg.textContent('#tela');
+  (tela.includes('JSON') && tela.includes('Nada foi gravado'))
+    ? ok('lista inválida é recusada antes de gravar qualquer coisa')
+    : falha('recusa da lista inválida: ' + tela.slice(0, 160));
+
+  const lista = JSON.stringify({equipamentos: [
+    {codigo:'0069', marca:'Trink Bier', modelo:'Gel Chopp / Aquagel 3L',
+     compressorMarca:'Embraco', compressorModelo:'NE6211E', compressorGas:'R22',
+     observacoes:'Importado do orçamento REV32, item C02.',
+     componentes:[{tipo:'Compressor', marca:'Embraco', modelo:'NE6211E'},
+                  {tipo:'Gás refrigerante', modelo:'R22', spec:'3,700 kg'}]},
+    {codigo:'ORC-C09', marca:'Chopeira preta Elgin', provisorio:true,
+     observacoes:'SEM ETIQUETA. Número provisório.'},
+    {codigo:'CH-014', marca:'Beertec'}       /* já existe: não pode duplicar */
+  ]});
+  await pg.fill('#imp_texto', lista);
+  await pg.click('button:has-text("Conferir")');
+  await pg.waitForTimeout(400);
+  tela = await pg.textContent('#tela');
+  (tela.includes('2 equipamentos') && tela.includes('CH-014') && tela.includes('provisório'))
+    ? ok('conferência mostra os 2 novos, o repetido de fora, e o provisório marcado')
+    : falha('conferência: ' + tela.slice(0, 300));
+
+  const antes = await pg.evaluate(() => Object.keys(window.__LOJA.chopeiras).length);
+  await pg.selectOption('#imp_cliente', { index: 1 });
+  await pg.click('#btImportarEq');
+  await pg.waitForTimeout(900);
+  const depoisImp = await pg.evaluate(() => Object.values(window.__LOJA.chopeiras));
+  (depoisImp.length === antes + 2)
+    ? ok('importou exatamente os 2 novos, sem duplicar o que já existia')
+    : falha('tinha ' + antes + ', ficou com ' + depoisImp.length);
+
+  const trink = depoisImp.find(c => c.codigo === '0069');
+  (trink && trink.clienteId && trink.compressorModelo === 'NE6211E'
+    && trink.componentes && trink.componentes.length === 2
+    && trink.observacoes.includes('REV32'))
+    ? ok('o equipamento chega com empresa, compressor, ficha técnica e a origem')
+    : falha('importado: ' + JSON.stringify(trink).slice(0, 220));
+
+  const prov = depoisImp.find(c => c.codigo === 'ORC-C09');
+  (prov && prov.provisorio === true && !prov.compressorModelo)
+    ? ok('o que o documento não sabia fica em branco, e o registro fica provisório')
+    : falha('provisório: ' + JSON.stringify(prov).slice(0, 180));
+
   // ── 8. busca pelo número
   await pg.fill('.busca input', 'CH-014');
   await pg.waitForTimeout(200);
@@ -142,8 +205,11 @@ function falha(t){ passos.push('  FALHA ' + t); erros.push(t); }
   await pg.fill('.busca input', '');
 
   // ── 9. abrir a ficha da chopeira
-  await pg.waitForTimeout(200);
-  await pg.click('button:has-text("Abrir")');
+  /* Pelo número, e não pelo primeiro da lista: a importação acima pôs
+     mais equipamentos na frente deste. */
+  await pg.fill('.busca input', 'CH-014');
+  await pg.waitForTimeout(250);
+  await pg.locator('.reg').first().locator('button:has-text("Abrir")').click();
   await pg.waitForSelector('h2.mono');
   const ficha = await pg.textContent('.card');
   (ficha.includes('CH-014') && ficha.includes('Embraco') && ficha.includes('Bar do Zé'))

@@ -60,7 +60,7 @@ fs.writeFileSync(path.join(temporaria, 'cru.html'),
    todas com o mesmo erro, que não era defeito nenhum do aplicativo. */
 ['icone-192.png','icone-512.png','icone-mascara.png','manifest.webmanifest',
  'style.css','pecas-compressores.json',
- 'nucleo.js', 'base.js', 'clientes.js', 'chopeiras.js', 'acessos.js', 'chamados.js', 'integracoes.js', 'servicos.js', 'orcamento.js', 'documentos.js', 'demo.js']
+ 'nucleo.js', 'base.js', 'clientes.js', 'chopeiras.js', 'acessos.js', 'chamados.js', 'integracoes.js', 'servicos.js', 'orcamento.js', 'documentos.js', 'demo.js', 'importar.js']
   .forEach(f => fs.copyFileSync(path.join(RAIZ, f), path.join(temporaria, f)));
 
 const TIPOS = {'.html':'text/html; charset=utf-8', '.png':'image/png',
@@ -94,7 +94,7 @@ function correr(suite, ambiente){
    cruel: a que derruba o aplicativo inteiro em silêncio. Já aconteceu —
    um "else" sem fechar, e nenhuma tela funcionava. */
 function conferirSintaxe(){
-  const alvos = ['nucleo.js', 'arranque.js', 'base.js', 'clientes.js', 'chopeiras.js', 'acessos.js', 'chamados.js', 'integracoes.js', 'servicos.js', 'orcamento.js', 'documentos.js', 'demo.js', 'sw.js',
+  const alvos = ['nucleo.js', 'arranque.js', 'base.js', 'clientes.js', 'chopeiras.js', 'acessos.js', 'chamados.js', 'integracoes.js', 'servicos.js', 'orcamento.js', 'documentos.js', 'demo.js', 'importar.js', 'sw.js',
     'ferramentas/gerar-catalogo.mjs'];
   for(const f of alvos){
     const r = spawnSync(process.execPath, ['--check', path.join(RAIZ, f)], {encoding:'utf8'});

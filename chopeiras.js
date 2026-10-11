@@ -17,6 +17,7 @@ function telaChopeiras(){
   if(editando && editando.tipo === "chopeira") return formChopeira();
   if(editando && editando.tipo === "verChopeira") return verChopeira();
   if(editando && editando.tipo === "componentes") return formComponentes();
+  if(editando && editando.tipo === "importarChopeiras") return formImportarEquipamentos();
 
   if(!EU.admin && !EU.clienteId){
     $("tela").innerHTML = '<div class="alert yel"><b>Seu acesso ainda não está ligado a uma empresa.</b> ' +
@@ -27,6 +28,7 @@ function telaChopeiras(){
   $("tela").innerHTML =
     (EU.admin ? '<div class="btns" style="margin:0 0 12px">' +
       '<button class="btn pri" onclick="novaChopeira()">+ Nova chopeira</button>' +
+      '<button class="btn" onclick="importarEquipamentos()">Importar lista</button>' +
       '<button class="btn" onclick="atualizar()">Atualizar</button></div>' : '') +
     '<div class="busca"><input placeholder="Buscar pelo número, marca ou local" value="'+esc(window.__buscaCho||"")+
       '" oninput="filtrarChopeiras(this.value)"></div>' +

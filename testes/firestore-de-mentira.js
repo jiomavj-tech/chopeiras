@@ -101,8 +101,20 @@
   };
 
   let aoMudar = null;
+
+  /* O aviso de "já entrou" só pode sair depois de a página inteira ter
+     sido lida. O arranque.js é o segundo de treze scripts, e quem entra
+     chama função que mora no décimo — com setTimeout(0) o aviso saía no
+     meio do carregamento e dava "desenharSino is not defined", conforme
+     a máquina estivesse mais ou menos rápida. O SDK verdadeiro demorava
+     o bastante para esconder a corrida; o de mentira não demora nada. */
+  const quandoPronto = fn => {
+    if(document.readyState === "complete") return setTimeout(fn, 0);
+    window.addEventListener("load", () => setTimeout(fn, 0), {once: true});
+  };
+
   const auth = () => ({
-    onAuthStateChanged: fn => { aoMudar = fn; setTimeout(()=>fn(window.__USUARIO), 0); },
+    onAuthStateChanged: fn => { aoMudar = fn; quandoPronto(() => fn(window.__USUARIO)); },
     signInWithPopup: () => { if(aoMudar) aoMudar(window.__USUARIO); return Promise.resolve(); },
     signOut: () => Promise.resolve()
   });

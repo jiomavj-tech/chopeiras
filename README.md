@@ -119,6 +119,24 @@ igual. No telemóvel o teclado fechava e entrava só a primeira letra. Agora tro
 lista: a caixa fica de pé, com o cursor onde estava. Vale para peças, chopeiras e clientes —
 as três tinham o mesmo defeito.
 
+**Importar uma lista de equipamentos.** Em Chopeiras, botão **Importar lista** (só o
+administrador). Serve para quando chega um cliente com vinte máquinas de uma vez: em vez de vinte
+telas de cadastro, entra a lista pronta, em JSON, colada ou escolhida como arquivo do aparelho.
+
+Nada é gravado antes de você conferir. O **Conferir** mostra quantos entram, quais já estão
+cadastrados (pelo número da etiqueta, sem ligar a maiúscula) e quais vêm marcados como
+provisórios. Se a lista tiver qualquer problema — número de etiqueta repetido, equipamento sem
+número, um campo escrito errado — ele recusa a lista inteira e nomeia o problema, em vez de gravar
+metade.
+
+Campo escrito errado é recusado de propósito: `compressorModelo2` gravaria calado e o aplicativo
+nunca mais leria aquele valor. É melhor parar na conferência.
+
+A lista **não mora neste repositório**, e não deve morar. A página é pública: a relação de
+equipamentos de um cliente, com patrimônio e número de série, não pode ficar numa URL que qualquer
+pessoa abre. Por isso a tela recebe o arquivo do seu aparelho, e não um arquivo publicado ao lado
+do aplicativo.
+
 **Agenda do Google.** Marcar recolha ou entrega cria o compromisso sozinho, e **remarcar muda a
 data no mesmo compromisso** em vez de duplicar — o id do evento fica guardado na ordem. Apagar a
 data apaga o compromisso. Precisa de um Client ID, explicado em
@@ -272,6 +290,7 @@ Publicando assim, as regras do Firestore continuam a ter de ser enviadas à part
 | `servicos.js` | Serviços executados na máquina, e o ditado por voz |
 | `orcamento.js` | Catálogo de peças, montar e responder orçamento |
 | `documentos.js` | Motor de PDF, laudo, relatório e avulsos |
+| `importar.js` | Cadastrar uma lista inteira de equipamentos de uma vez |
 | `demo.js` | Firestore de mentira, para experimentar sem configurar |
 | `firestore.rules` | Quem vê o quê — conferido no servidor |
 | `firebase.json`, `.firebaserc` | Hospedagem e projeto |
@@ -311,7 +330,7 @@ node testes/unidade.js
 
 Confere as regras do `nucleo.js`, a lista do service worker, o catálogo de peças e o que as
 regras do Firestore dizem — documento válido, prazo que vira o mês, orçamento que vence, soma de
-orçamento, o texto que o cliente lê, fluxo de status. **85 verificações em ~90 ms.**
+orçamento, o texto que o cliente lê, fluxo de status. **98 verificações em ~90 ms.**
 
 **Antes de publicar** (uns dois minutos):
 
@@ -321,7 +340,8 @@ node testes/rodar.js
 
 Confere a sintaxe de tudo, corre os testes de unidade, e só depois abre o aplicativo num Chromium
 de verdade, com um Firestore de mentira no lugar do Google, percorrendo os fluxos inteiros —
-**88 verificações**, incluindo trazer o catálogo do Compressores inteiro e achar um relé pelo
+**93 verificações**, incluindo importar uma lista de equipamentos, trazer o catálogo do
+Compressores inteiro e achar um relé pelo
 modelo do compressor, e gerar o PDF e conferir que o arquivo é mesmo um PDF, com a foto embutida. Detalhe do que cobre e do que **não** cobre
 em [`testes/LEIAME.md`](testes/LEIAME.md).
 

@@ -26,13 +26,22 @@ const falha = t => { passos.push('  FALHA ' + t); erros.push(t); };
   /* ERR_CERT_AUTHORITY_INVALID: em máquina atrás de proxy com certificado
      próprio, o Chromium recusa os scripts de fora. A página em teste vem
      por http do 127.0.0.1, então este erro nunca é do aplicativo. */
-  const ruido = /gstatic|ERR_TUNNEL|ERR_CERT_AUTHORITY_INVALID|sw\.js|service worker|A bad HTTP response code/i;
+  const ruido = /gstatic|ERR_TUNNEL|ERR_CERT_AUTHORITY_INVALID|ERR_FAILED|sw\.js|service worker|A bad HTTP response code/i;
   pg.on('console', m => { if (m.type() === 'error' && !ruido.test(m.text())) erros.push('console: ' + m.text()); });
   pg.on('pageerror', e => erros.push('pageerror: ' + e.message));
 
   await pg.addInitScript(fake);
-  await pg.route('**/gstatic.com/**', r => r.abort());
-  await pg.route('**/sw.js', r => r.abort());
+  /* Barrar TUDO o que é de fora: o que se testa aqui é o aplicativo, não
+     o Google. Em expressão regular, e não no glob que estava aqui antes:
+     aquele padrão pedia uma barra logo antes de "gstatic.com", e no
+     endereço verdadeiro o que vem antes é "www.", com ponto. Nunca casou.
+     As suítes passaram meses a depender de a rede estar quebrada — quando
+     o ambiente ganhou saída para a internet, o SDK verdadeiro carregou
+     por cima do de mentira e as quatro caíram de uma vez, sem nada ter
+     mudado no aplicativo. */
+  await pg.route(/gstatic\.com|googleapis\.com|accounts\.google\.com/,
+                 r => r.abort());
+  await pg.route(/\/sw\.js(\?|$)/, r => r.abort());
   await pg.goto(process.env.URL_TESTE || 'http://127.0.0.1:8199/index.html');
   await pg.waitForSelector('#nav button');
 
