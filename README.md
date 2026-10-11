@@ -330,7 +330,7 @@ node testes/unidade.js
 
 Confere as regras do `nucleo.js`, a lista do service worker, o catálogo de peças e o que as
 regras do Firestore dizem — documento válido, prazo que vira o mês, orçamento que vence, soma de
-orçamento, o texto que o cliente lê, fluxo de status. **98 verificações em ~90 ms.**
+orçamento, o texto que o cliente lê, fluxo de status. **100 verificações em ~90 ms.**
 
 **Antes de publicar** (uns dois minutos):
 

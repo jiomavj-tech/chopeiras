@@ -171,6 +171,18 @@ eq('nada é guardado sem existir no disco',
    guardados.filter(f => f && !fs.existsSync(caminho.join(raiz, f))), []);
 certo('há ficheiros guardados', guardados.length > 5);
 
+/* ── o número da versão bate nos dois lugares? ────────────────
+   O rodapé mostra o número lido da cache do service worker, mas antes
+   de o service worker responder mostra o que está escrito à mão no
+   index.html. Quando os dois discordam, o rodapé muda de número sozinho
+   ao carregar — e quem foi conferir se a atualização chegou vê um número
+   que não é o de nenhuma das duas versões. Já aconteceu: sw em v11,
+   index a dizer 7. */
+const versaoSw = (sw.match(/const VERSAO = 'chopeiras-v(\d+)'/) || [])[1];
+const versaoHtml = (html.match(/id="versaoApp">versão (\d+)</) || [])[1];
+certo('o service worker declara uma versão', !!versaoSw);
+eq('o número escrito no rodapé é o mesmo da cache', versaoHtml, versaoSw);
+
 /* ── ler a lista de equipamentos a importar ───────────────────
    Esta é a peneira: o que ela deixar passar vai direto para o cadastro
    de equipamentos, e um número de etiqueta errado só aparece meses
